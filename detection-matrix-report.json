@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-10-08T20:56:29.339959+00:00",
+  "created_at": "2026-10-08T21:04:35.032301+00:00",
   "scope": "Authored synthetic adapter/rule regression matrix; no agent-level prevention measurement",
   "attack_cases": 42,
   "benign_cases": 6,

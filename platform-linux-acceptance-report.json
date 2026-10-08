@@ -1,9 +1,9 @@
 {
   "scope": "Linux agent and parser containment, shared inspection and versioned API integration",
-  "created_at": "2026-10-08T21:03:39.379548+00:00",
+  "created_at": "2026-10-08T21:05:04.503693+00:00",
   "status": "PASS",
-  "tests_run": 67,
-  "passed": 65,
+  "tests_run": 68,
+  "passed": 66,
   "failures": 0,
   "errors": 0,
   "skipped": [
@@ -32,7 +32,7 @@
     "parsing.py": "e690955147fc09cdec392729424445d2826fd81355295d09fc6a7a14ea23b1ca",
     "network.py": "26e506d01ed9d86c088426998c0e9f2b3c4bb1774d202529c390f44b39fb138f",
     "ocr.py": "4f09e70a9a9e0becce95cb37a461fd8722069eb4e6f2c29ad5afa36e4b071b14",
-    "evaluation.py": "4d0b2b8ffaa0011712a95a8924208124ef57de493bf8d568116789e745fabf10",
+    "evaluation.py": "dbbd9e3cdb24dcb98f3c815468759c916c9c1906d41ada610f0dfb3351b1f763",
     "agents.py": "f34e16ef0c4d08864777665cb81275a95bf72a71cefc82feb32c1205d57bb1a7",
     "semantic.py": "ebec37de9f281f6899ab9ddac1815adcf22a2e0bdc550ba128ca1425af26c9b7",
     "storage.py": "b7c5cdafefb3eb27a781d663d7625ea7e5b34b1b7575c297574124395e92b0a6"
@@ -138,6 +138,7 @@
     "test_archive_traversal_and_bomb_rejected (test_platform.PlatformTests.test_archive_traversal_and_bomb_rejected) ... ok",
     "test_artifact_upload_release_and_coverage (test_platform.PlatformTests.test_artifact_upload_release_and_coverage) ... ok",
     "test_auth_origin_and_forged_authority (test_platform.PlatformTests.test_auth_origin_and_forged_authority) ... ok",
+    "test_canary_is_not_public_attack_evidence (test_platform.PlatformTests.test_canary_is_not_public_attack_evidence) ... ok",
     "test_cross_session_and_tool_scope (test_platform.PlatformTests.test_cross_session_and_tool_scope) ... ok",
     "test_history_real_metrics_no_placeholder_evaluation (test_platform.PlatformTests.test_history_real_metrics_no_placeholder_evaluation) ... ok",
     "test_pixel_coverage_explicit (test_platform.PlatformTests.test_pixel_coverage_explicit) ... ok",
@@ -156,7 +157,7 @@
     "test_all_three_agents_and_poisoned_tool_response_use_real_isolated_runtime (test_parsing_linux.PlatformLinuxIntegration.test_all_three_agents_and_poisoned_tool_response_use_real_isolated_runtime) ... ok",
     "",
     "----------------------------------------------------------------------",
-    "Ran 67 tests in 3.970s",
+    "Ran 68 tests in 3.962s",
     "",
     "OK (skipped=2)"
   ]

@@ -93,6 +93,10 @@ class PlatformTests(unittest.TestCase):
             result=inspect(extract(name,raw))
             self.assertTrue(any(f['signals'] for f in result['fragments']),surface)
             self.assertTrue(any('100' in f['text'] for f in result['fragments']),surface)
+    def test_canary_is_not_public_attack_evidence(self):
+        for surface in ('text','html','pdf','docx','xlsx','zip'):
+            name,raw=fixture(surface,SCENARIOS['secret']['attack'])
+            self.assertNotIn('EVAL-CANARY-4821','\n'.join(f['text'] for f in extract(name,raw)['fragments']))
     def test_seven_categories(self):
         for case in list(SCENARIOS.values())[:7]:
             self.assertIn(case['category'],[s['category'] for s in signals_for(case['attack'])])
