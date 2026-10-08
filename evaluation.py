@@ -93,6 +93,7 @@ def run_attack(agent_id,scenario,surface,provider_factory,parser,runner,semantic
             else:
                 detected=any(f['signals'] for f in artifact['fragments'])
                 firewall=Firewall(provider=provider,instructions=PROFILES[agent_id]['instructions'])
+                firewall.policy_version=2
                 binding=Binding('attack-lab','synthetic',config+str(time.time_ns()))
                 released='\n'.join(f['text'] for f in artifact['fragments'] if f['disposition']!='REQUIRE_REVIEW')
                 snapshot=firewall.start_task(binding,TASK,user_content=[released])

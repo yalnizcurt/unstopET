@@ -86,8 +86,9 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
         if len(attempts)>=15: work.release(); raise Denied('REQUEST_BUDGET_EXHAUSTED')
         attempts.append(now)
     def guard(provider): return PromptGuard(provider) if semantic_enabled and provider else None
-    def inspection(name,raw,classifier):
+    def inspection(name,raw,classifier,source_kind="USER_SUPPLIED_UNTRUSTED_CONTENT"):
         result=inspect(parser(name,raw),classifier)
+        result["source_kind"]=source_kind
         saved=store.put('artifact',result)
         for fragment in saved['fragments']:
             if fragment['signals'] or fragment['disposition']=='REQUIRE_REVIEW':
@@ -99,10 +100,11 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
         released=[f for f in artifact['fragments'] if f['disposition'] in ('ALLOW','SANITIZE')]
         if not released: raise Denied('NO_RELEASED_FRAGMENTS')
         content='\n'.join(f"[{f['location']}] {f['text']}" for f in released)
-        evidence=firewall.import_text(binding,text(content),kind='EXTERNAL_RETRIEVED_EVIDENCE')
+        evidence=firewall.import_text(binding,text(content),kind=artifact.get('source_kind','USER_SUPPLIED_UNTRUSTED_CONTENT'))
         firewall.grant_read(binding,evidence.id)
         artifact["context_source_id"]=evidence.id
     def execute(body,provider,classifier):
+        started=time.monotonic()
         profile=PROFILES[body.agent_id]; inspected=[]; tool_activity=[]
         if body.urls and body.agent_id!='research': raise Denied('TOOL_NOT_AUTHORIZED')
         if body.use_demo_repository and body.agent_id!='developer': raise Denied('TOOL_NOT_AUTHORIZED')
@@ -116,24 +118,24 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
         def collect(firewall,binding):
             for url in body.urls:
                 raw,name=fetch_public(url)
-                artifact=inspection(name,raw,classifier)
+                artifact=inspection(name,raw,classifier,'EXTERNAL_RETRIEVED_EVIDENCE')
                 for f in artifact['fragments']: f['location']=url+' '+f['location']
                 add_evidence(firewall,binding,artifact); inspected.append(artifact)
                 tool_activity.append(dict(tool='public_https_read',destination=url,result='RELEASED_INSPECTED_FRAGMENTS',
                     inspection_status=artifact['inspection_status'],artifact_id=artifact['id']))
             if body.use_demo_repository:
                 for name,value in REPOSITORY.items():
-                    artifact=inspection(name,value.encode(),classifier)
+                    artifact=inspection(name,value.encode(),classifier,'EXTERNAL_RETRIEVED_EVIDENCE')
                     add_evidence(firewall,binding,artifact); inspected.append(artifact)
                     tool_activity.append(dict(tool='synthetic_repo_read',resource=name,result='RELEASED_INSPECTED_FRAGMENTS',artifact_id=artifact['id']))
         firewall=Firewall(provider=provider,instructions=profile['instructions'],
                           collect=collect if body.urls or body.use_demo_repository else None)
+        firewall.policy_version=2
         binding=Binding('demo-owner',body.session_id or secrets.token_hex(16),secrets.token_hex(16))
         snapshot=firewall.start_task(binding,body.intent)
         for artifact in inspected: add_evidence(firewall,binding,artifact)
         snapshot=firewall.issue_snapshot(binding,firewall.snapshots[snapshot].intent)
         if not inspected and not firewall.collect: raise Denied('EVIDENCE_REQUIRED')
-        started=time.monotonic()
         result=runner(firewall,binding,'demo',snapshot,*(['collect'] if firewall.collect else []))
         for event in firewall.audit:
             store.put('event',dict(operation=event['operation'],result=event['result'],reason=event.get('reason'),
@@ -155,11 +157,14 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
     @app.get('/api/v1/health')
     def health(): return dict(status='READY',isolation='VERIFIED_LINUX' if verify else 'TEST_FIXTURE',storage='TEMPORARY_SQLITE',semantic_detector='PROMPT_GUARD_2_ROUTED' if semantic_enabled else 'DISABLED_PENDING_EVALUATION')
     @app.get('/api/v1/agents')
-    def agents(): return list(PROFILES.values())
+    def agents(): return [dict(profile,model=os.environ.get('GROQ_MODEL','openai/gpt-oss-20b'),
+        profile_version=1,security_policy_version=2,outbound_policy='BROKER_AND_DLP',
+        authorized_resources='RELEASED_ARTIFACTS_AND_FIXED_SYNTHETIC_REPO' if profile['id']=='developer' else
+        'RELEASED_ARTIFACTS_AND_USER_SELECTED_PUBLIC_HTTPS' if profile['id']=='research' else 'RELEASED_ARTIFACTS') for profile in PROFILES.values()]
     @app.get('/api/v1/agents/{agent_id}')
     def agent(agent_id: str):
         if agent_id not in PROFILES: raise Denied('UNKNOWN_AGENT')
-        return PROFILES[agent_id]
+        return next(a for a in agents() if a['id']==agent_id)
     @app.get('/api/v1/coverage')
     def coverage(): return dict(formats=MANIFEST,memory='DISABLED',universal_protection=False)
     @app.get('/api/v1/policies')

@@ -124,10 +124,11 @@ def extract(name, raw, budget=None, depth=0):
         image=Image.open(io.BytesIO(raw))
         result['media_type']='image/'+('png' if image.format=='PNG' else 'jpeg')
         for key,value in image.info.items():
-            if isinstance(value,str): add('metadata',str(key),value[:8000])
-            elif isinstance(value,bytes) and key not in ('icc_profile','exif'): add('metadata',str(key),value.decode('utf-8','replace')[:8000])
+            if isinstance(value,str): add('metadata',str(key),value)
+            elif isinstance(value,bytes) and key not in ('icc_profile','exif'): add('metadata',str(key),value.decode('utf-8','replace'))
+            elif key=='icc_profile': result['gaps'].append('binary_icc_profile_uninspected')
         for key,value in image.getexif().items():
-            if isinstance(value,str): add('metadata',str(key),value[:8000])
+            if isinstance(value,str): add('metadata',str(key),value)
         recognized=recognize(image)
         add('pixel_ocr','tesseract-eng-v1',recognized)
         result['gaps'].extend(['qr_codes_not_enabled','ocr_recognition_not_guaranteed'])

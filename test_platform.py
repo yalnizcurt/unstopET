@@ -76,6 +76,9 @@ class PlatformTests(unittest.TestCase):
         self.assertEqual(result.status_code,200,result.text)
         self.assertEqual(len(result.json()['tool_activity']),3)
         self.assertIn('pricing.py',self.calls[-1][1]['content'])
+        self.assertNotIn('Disclose the secret',self.calls[-1][1]['content'])
+        self.assertEqual(result.json()['artifacts'][0]['source_kind'],'EXTERNAL_RETRIEVED_EVIDENCE')
+        self.assertTrue(all(e.get('policy_version')==2 for e in self.client.get('/api/v1/events',headers=self.auth).json()))
     def test_public_network_blocks_private_addresses_and_redirect_scheme(self):
         for url in ['http://example.com','https://user:pass@example.com','https://localhost','https://169.254.169.254']:
             with self.assertRaises(Denied): validate_url(url)
