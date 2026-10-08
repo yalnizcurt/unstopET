@@ -2,6 +2,16 @@
 
 Repository: https://github.com/yalnizcurt/unstopET
 
+## Current deployment
+
+- Interface: https://agent-trust-firewall.vercel.app
+- API: https://agent-trust-firewall-api.onrender.com
+- Render service: https://dashboard.render.com/web/srv-db3v5p3l550s73c220d0
+- Region/plan: Singapore/free; deploy after repository checks pass.
+- Recorded verification: [cloud-deployment-report.json](cloud-deployment-report.json).
+
+The existing Render connection and Vercel login were used. The hosted browser completed an actual Groq task after the Render startup isolation test passed. The Groq key was stored in Render with explicit user approval; it is absent from source and frontend. For access, copy `APP_ACCESS_TOKEN` from the Render service's Environment page into the interface's access-code field. The interface never saves it.
+
 ## Render API
 
 1. Sign in to an existing Render account and create a Blueprint from this repository's `main` branch. `render.yaml` selects a free Docker web service.
@@ -10,7 +20,7 @@ Repository: https://github.com/yalnizcurt/unstopET
 4. Set `ALLOWED_ORIGINS` to the exact Vercel production origin, such as `https://your-project.vercel.app`. Multiple exact origins can be comma-separated. Do not use `*`.
 5. Deploy and inspect startup logs. Success is `Linux isolation verified; authenticated API ready.` Confirm `/api/health` reports `READY` and `VERIFIED_LINUX`.
 
-Startup launches a synthetic-only compromised child and tests filesystem, parent credentials, networking, shell execution and alternate connectors. It also completes a legitimate brokered task. The container requires Landlock ABI 3+ and usable seccomp; Render's actual host has not been tested yet. If its security policy/kernel disallows these controls, the service stays unavailable. Do not remove restrictions or substitute an unrestricted child to get a successful deploy.
+Startup launches a synthetic-only compromised child and tests filesystem, parent credentials, networking, shell execution and alternate connectors. It also completes a legitimate brokered task. The container requires Landlock ABI 3+ and usable seccomp; the current Render deployment passed these checks. Each later startup must repeat them. If its security policy/kernel disallows these controls, the service stays unavailable. Do not remove restrictions or substitute an unrestricted child to get a successful deploy.
 
 The Docker image runs as a non-root user and binds Render's `PORT`. The application verifies boundaries before reading the provider key or opening the HTTP listener. No storage disk, queue, second microservice or paid service is required for this slice.
 
@@ -32,4 +42,4 @@ No Groq secret belongs in Vercel. The UI intentionally requires an explicit API 
 - Unsupported files: not accepted; no claim that they were inspected.
 - Repeat Linux acceptance in the deployed image if host configuration changes.
 
-This publishes only Gate 1. Email is mocked, semantic detection and other formats remain disabled, and the shared access code is demo authentication. Free-service availability and cold starts can affect demonstration timing. Cloud acceptance must be recorded after successful host startup and an actual browser-to-API-to-Groq run.
+This publishes only Gate 1. Email is mocked, semantic detection and other formats remain disabled, and the shared access code is demo authentication. Free-service availability and cold starts can affect demonstration timing. The recorded cloud run is one synthetic smoke test and does not establish broad attack prevention, F3 or D2 achievement.

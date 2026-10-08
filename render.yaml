@@ -3,6 +3,8 @@ services:
     name: agent-trust-firewall-api
     runtime: docker
     plan: free
+    region: singapore
+    autoDeployTrigger: checksPass
     dockerfilePath: ./Dockerfile
     healthCheckPath: /api/health
     envVars:

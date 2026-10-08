@@ -2,11 +2,11 @@
 
 Working **Gate 1 text prototype**: a browser interface, authenticated API, real Groq generation, server-owned context, mandatory execution broker, and an isolated Linux agent. This is the first vertical slice of the [approved five-gate plan](agent-trust-firewall-implementation-plan.md), not the completed multiformat product.
 
-The Linux deployment image passed **44 tests, with 2 macOS-only tests skipped**. Actual file, credential, network, shell and alternate-connector probes were denied, while the authorized comparison task completed. See [Linux acceptance evidence](gate1-linux-acceptance-report.json). Each API startup repeats the real isolation checks before accepting jobs. Render has not yet been verified; unsupported host kernels cause startup to fail closed.
+The Linux deployment image passed **44 tests, with 2 macOS-only tests skipped**. Actual file, credential, network, shell and alternate-connector probes were denied, while the authorized comparison task completed. See [Linux acceptance evidence](gate1-linux-acceptance-report.json). Each API startup repeats the real isolation checks before accepting jobs. Render's deployed service passed its startup checks and the hosted browser completed an actual Groq task; see [cloud evidence](cloud-deployment-report.json). Unsupported host kernels cause startup to fail closed.
 
 ## Deployment
 
-Use [deployment instructions](DEPLOYMENT.md): **Vercel hosts `frontend/`; Render runs the Docker API**. The Groq key belongs only in Render's server environment. The application access code is separate from that key. Both platforms need account access before a live deployment can be created.
+The deployed interface is at **https://agent-trust-firewall.vercel.app**; its API is **https://agent-trust-firewall-api.onrender.com**. Vercel hosts `frontend/`; Render runs the Docker API. The Groq key is configured only in Render's server environment. Enter the separate `APP_ACCESS_TOKEN` from this service's Render Environment page to run the agent. No access code or provider key is embedded in the static frontend. See [deployment instructions](DEPLOYMENT.md).
 
 The frontend is one static HTML page. The backend uses Python's standard library plus the operating system's `libseccomp2`. No frontend build or package installation is required.
 
