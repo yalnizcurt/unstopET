@@ -11,6 +11,7 @@ from html.parser import HTMLParser
 from defusedxml import ElementTree as XML
 from pypdf import PdfReader
 from PIL import Image
+from ocr import recognize
 
 MAX_FILE = 1_048_576
 MAX_EXPANDED = 2_097_152
@@ -127,7 +128,10 @@ def extract(name, raw, budget=None, depth=0):
             elif isinstance(value,bytes) and key not in ('icc_profile','exif'): add('metadata',str(key),value.decode('utf-8','replace')[:8000])
         for key,value in image.getexif().items():
             if isinstance(value,str): add('metadata',str(key),value[:8000])
-        result['gaps'].extend(['pixel_text_ocr_not_enabled','qr_codes_not_enabled'])
+        recognized=recognize(image)
+        add('pixel_ocr','tesseract-eng-v1',recognized)
+        result['gaps'].extend(['qr_codes_not_enabled','ocr_recognition_not_guaranteed'])
+        if not recognized.strip(): result['gaps'].append('no_recognized_pixel_text')
     elif ext in ('.txt','.md','.py','.js','.ts','.json','.csv','.html','.htm'):
         value=raw.decode('utf-8-sig',errors='strict')
         if '\x00' in value: raise ValueError('BINARY_TEXT_DENIED')

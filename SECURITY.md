@@ -5,7 +5,7 @@
 - Authentication precedes privileged API work; one shared demo principal is bound server-side. Browser roles, trust labels, tenant flags and snapshot identifiers cannot establish authority. Strict versioned request schemas reject unknown fields.
 - System policy and agent instructions are assembled on the server. Quoted/pasted/attached content remains untrusted. Mixed quoted instructions are demoted conservatively.
 - The child agent has an empty credential environment, no permitted general network syscalls, no shell/exec/fork and no protected-file access. Startup runs actual positive-control containment probes before listening or using credentials. Missing Linux isolation fails closed.
-- Parsers import trusted libraries before receiving upload bytes, then enter the same irreversible Linux restrictions. Parent/worker protocols have size/time limits. Macros, scripts, formulas and embedded objects are never executed.
+- Parsers import trusted libraries before receiving upload bytes, then enter the same irreversible Linux restrictions. English OCR uses a preloaded native Tesseract library and read-only language data; it adds no shell, exec, fork or network syscall permission. Parent/worker protocols have size/time limits. Macros, scripts, formulas and embedded objects are never executed.
 - All registered tools go through the broker. Research uses only explicit user-selected HTTPS URLs, resolves and rejects non-global addresses, pins the chosen address for verified TLS, disables redirects/proxies and bounds media and bytes. Synthetic repository reads cannot escape the fixed registry.
 - Tool responses are parsed and inspected before import into a new server snapshot. They cannot overwrite system instructions or grant permissions.
 - Mock email preparation checks server destination authority separately from DLP. Dispatch rechecks current permissions, snapshot, policy, destination and immutable payload; single-use permits prevent replay. The demo never sends live email.
@@ -18,9 +18,9 @@ This is a defense-in-depth prototype. Signature rules and Prompt Guard miss atta
 
 Shared demo authentication is not multi-tenant identity. Anyone with the demo access code can access retained demo records. Use synthetic/public inputs only. Raw upload bytes are discarded; inspected redacted fragments, task intent/output, events and evaluations can remain for 24 hours (maximum 300 records total, 100 per list). Free Render storage resets on redeploy; it is not a durable production audit store.
 
-Raster pixel OCR/QR, PDF raster/complex-object content, Office embedded objects and dynamic HTML are not comprehensively inspected. Unsupported portions are withheld. Memory and unrestricted connectors remain disabled. No production live email, shell or repository modification capability exists.
+QR decoding, imperfect English pixel OCR, PDF raster/complex-object content, Office embedded objects and dynamic HTML are not comprehensively inspected. Unsupported portions are withheld. Memory and unrestricted connectors remain disabled. No production live email, shell or repository modification capability exists.
 
-Provider retries are disabled in the initial release: outages/rate limits fail explicitly and require a new request. Model requests and classifier calls have fixed budgets. No cost amount is invented; Groq billing remains authoritative.
+The gateway retries HTTP 429/503 once with bounded 250ms backoff. Other outages fail explicitly; no side-effect dispatch is automatically retried. Model requests and classifier calls have fixed budgets. No cost amount is invented; Groq billing remains authoritative.
 
 ## Evidence
 

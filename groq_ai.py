@@ -31,6 +31,8 @@ class GroqProvider:
         self._api_key = api_key
         self.model = model
         self.attempts = 0
+        self.retries = 0
+        self.failure_codes = []
         self.usage = dict(prompt_tokens=0, completion_tokens=0, total_tokens=0)
         context = ssl.create_default_context()
         # Framework Python on macOS may have no CA bundle. Use an installed verified bundle;
@@ -44,11 +46,22 @@ class GroqProvider:
         self.opener = build_opener(ProxyHandler({}), NoRedirect(), HTTPSHandler(context=context))
 
     def __call__(self, messages):
+        for retry in range(2):
+            try: return self._complete(messages)
+            except Denied as error:
+                self.failure_codes.append(error.code)
+                if retry == 0 and error.code in ('PROVIDER_HTTP_429', 'PROVIDER_HTTP_503') and self.attempts < 12:
+                    self.retries += 1
+                    time.sleep(.25)
+                    continue
+                raise
+
+    def _complete(self, messages):
         if (not isinstance(messages, list) or len(messages) != 2 or
                 [m.get("role") for m in messages if isinstance(m, dict)] != ["system", "user"] or
                 any(set(m) != {"role", "content"} or not isinstance(m["content"], str) for m in messages)):
             raise Denied("INVALID_PROVIDER_MESSAGES")
-        payload = dict(model=self.model, messages=messages, temperature=0, max_completion_tokens=1024)
+        payload = dict(model=self.model, messages=messages, temperature=0, max_completion_tokens=3072)
         if self.model.startswith("openai/gpt-oss-"):
             payload["reasoning_effort"] = "low"
         data = encode(payload)
@@ -70,16 +83,16 @@ class GroqProvider:
                 raise Denied("PROVIDER_RESPONSE_TOO_LARGE")
             result = json.loads(raw)
             choice = result["choices"][0]
-            if choice["finish_reason"] != "stop" or choice["message"].get("tool_calls"):
-                raise Denied("PROVIDER_COMPLETION_INCOMPLETE")
-            body = text(choice["message"]["content"])
-            if SECRET.search(body):
-                raise Denied("SECRET_DISCLOSURE_DENIED")
             usage = {name: result["usage"][name] for name in self.usage}
             if any(type(value) is not int or value < 0 for value in usage.values()):
                 raise Denied("INVALID_PROVIDER_RESPONSE")
             for name, value in usage.items():
                 self.usage[name] += value
+            if choice["finish_reason"] != "stop" or choice["message"].get("tool_calls"):
+                raise Denied("PROVIDER_COMPLETION_INCOMPLETE")
+            body = text(choice["message"]["content"])
+            if SECRET.search(body):
+                raise Denied("SECRET_DISCLOSURE_DENIED")
             return dict(provider="GROQ", model=self.model, text=body, usage=usage)
         except HTTPError as error:
             # Do not log provider error bodies, headers, request objects, or credentials.

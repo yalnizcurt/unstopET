@@ -7,7 +7,7 @@
 | PDF | Extractable page text, standard metadata, annotation strings | Encrypted/malformed rejected; image/XObject/active/embedded/complex-object gaps withheld; no OCR |
 | DOCX | XML body, comments, metadata, headers/footers, relationship targets, selected attributes | OLE/media/drawings and non-XML parts reported withheld; layout rendering not implemented |
 | XLSX | Cells incl. hidden/veryHidden worksheets, inert formula strings, workbook/sheet names/state, comments, metadata/relationships | No formula execution/calculation; objects/drawings/media withheld |
-| PNG/JPEG | String metadata and textual EXIF | Pixel text/OCR and QR always incomplete; metadata only cannot support whole-image safe claims |
+| PNG/JPEG | String metadata, textual EXIF and English pixel OCR | English Tesseract pixel text plus metadata; recognition is imperfect and QR is not enabled; no whole-image safe claim |
 | ZIP | Supported child files, filenames, hashes, recursive locations | Max 2 nested archive levels, 32 members, 2 MB expansion, 100:1 compression ratio; unsupported children withheld |
 | PPTX/audio/video/legacy binary | None | Unsupported; no release |
 

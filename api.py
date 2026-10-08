@@ -101,6 +101,7 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
         content='\n'.join(f"[{f['location']}] {f['text']}" for f in released)
         evidence=firewall.import_text(binding,text(content),kind='EXTERNAL_RETRIEVED_EVIDENCE')
         firewall.grant_read(binding,evidence.id)
+        artifact["context_source_id"]=evidence.id
     def execute(body,provider,classifier):
         profile=PROFILES[body.agent_id]; inspected=[]; tool_activity=[]
         if body.urls and body.agent_id!='research': raise Denied('TOOL_NOT_AUTHORIZED')
@@ -143,6 +144,7 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
         record=store.put('session',dict(agent_id=body.agent_id,intent=body.intent,
             output=firewall.final_outputs[-1],status='COMPLETED',provider='GROQ' if provider else 'TEST_FIXTURE',
             model=getattr(provider,'model',None),usage=getattr(provider,'usage',{}),
+            provider_metrics=dict(attempts=getattr(provider,'attempts',0),retries=getattr(provider,'retries',0),failure_codes=getattr(provider,'failure_codes',[])),
             classifier=dict(calls=classifier.calls,seconds=round(classifier.seconds,3),tokens=classifier.tokens) if classifier else None,
             seconds=round(time.monotonic()-started,3),artifacts=inspected,tool_activity=tool_activity,
             decisions=[dict(operation=e['operation'],result=e['result'],reason=e.get('reason')) for e in firewall.audit],
@@ -169,6 +171,7 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
     @app.get('/api/v1/settings')
     def settings(): return dict(provider='Groq',model=os.environ.get('GROQ_MODEL','openai/gpt-oss-20b'),
         semantic_enabled=semantic_enabled,storage='Temporary SQLite; cleared by redeploy / 24-hour retention',
+        provider_retry='One retry with 250ms backoff for HTTP 429/503 only; other failures stay explicit',
         authentication='Shared demo access code, single principal',cost='Not calculated; provider billing is authoritative',
         raw_upload_retention='Discarded after extraction',isolated_runtime='Linux Landlock + seccomp')
     @app.get('/api/v1/overview')
@@ -208,10 +211,16 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
     @app.post('/api/v1/tasks')
     def task(body: Task):
         enter()
+        started=time.monotonic();provider=None
         try:
             provider=provider_factory(); return execute(body,provider,guard(provider))
         except Denied as error:
-            store.put('event',dict(operation='task.execute',result='DENY',reason=error.code,agent_id=body.agent_id)); raise
+            store.put('event',dict(operation='task.execute',result='DENY',reason=error.code,agent_id=body.agent_id))
+            store.put('session',dict(agent_id=body.agent_id,intent=SECRET.sub('[REDACTED]',body.intent),status='FAILED',
+                output='',error=error.code,provider='GROQ' if provider else 'UNAVAILABLE',model=getattr(provider,'model',None),
+                usage=getattr(provider,'usage',{}),seconds=round(time.monotonic()-started,3),artifacts=[],tool_activity=[],
+                decisions=[],emails_executed=0,runtime='VERIFIED_LINUX',memory='DISABLED'))
+            raise
         finally: work.release()
     @app.post('/api/analyze')
     def legacy(body: LegacyTask):

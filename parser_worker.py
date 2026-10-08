@@ -6,7 +6,9 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from extractors import extract
 from linux_guard import restrict
-restrict(read_files=[str(Path(__file__))])
+from ocr import initialize, TESSDATA
+initialize()
+restrict(read_files=[str(Path(__file__)),TESSDATA])
 if len(sys.argv)>1 and sys.argv[1]=='--probe':
     import os, socket
     def denied(action):
@@ -16,6 +18,7 @@ if len(sys.argv)>1 and sys.argv[1]=='--probe':
         return False
     print(json.dumps(dict(protected_read=denied(lambda:Path(sys.argv[2]).read_bytes()),
         network=denied(lambda:socket.create_connection(('127.0.0.1',int(sys.argv[3])),timeout=1)),
+        direct_shell_exec=denied(lambda:os.execve('/bin/sh',['/bin/sh','-c','exit 73'],{})),
         credentials_absent='PARSER_PROBE_CREDENTIAL' not in os.environ)),flush=True)
     raise SystemExit(0)
 try:

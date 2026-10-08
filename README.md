@@ -10,7 +10,7 @@ The console includes agents/workspaces, file scanning, fragment investigations, 
 
 Agents: procurement comparison; public HTTPS research through a controlled reader; synthetic repository review with inert patch suggestions. All generation uses the existing verified Linux runtime, trusted Model Gateway and mandatory broker. Mock email requests cannot independently authorize side effects; live email is disabled.
 
-Supported declared adapters: UTF-8 text, static HTML, PDF text/metadata/annotation strings, DOCX XML channels, XLSX cells/hidden sheets/comments, bounded ZIPs. Raster metadata is partial; pixel OCR/QR is not enabled. Unsupported regions remain withheld. Persistent memory and unrestricted shell/connectors are disabled.
+Supported declared adapters: UTF-8 text, static HTML, PDF text/metadata/annotation strings, DOCX XML channels, XLSX cells/hidden sheets/comments, bounded ZIPs. English raster OCR and metadata remain partial; QR decoding and guaranteed recognition are not enabled. Unsupported regions remain withheld. Persistent memory and unrestricted shell/connectors are disabled.
 
 ## Local development
 
@@ -30,7 +30,7 @@ The production start command is `python3 api.py`. Versioned APIs live under `/ap
 
 ## Verification and limits
 
-The expanded Linux acceptance report records 63 passing checks and two Mac-only skips. Classifier calibration and reserved-variant reports use actual Groq Prompt Guard scores. Hosted workflow/evaluation evidence is recorded separately when verified; authored small sets are not universal protection or official F3/D2 achievement.
+The expanded Linux acceptance report records 65 passing checks and two Mac-only skips. Classifier calibration and reserved-variant reports use actual Groq Prompt Guard scores. Hosted workflow/evaluation evidence is recorded separately when verified; authored small sets are not universal protection or official F3/D2 achievement.
 
 Free Render history is temporary SQLite, bounded to 24 hours / 300 total records. Raw binaries are discarded after extraction. Synthetic/public demo inputs only; this is not enterprise tenant authentication or durable production audit storage. Free services can sleep and restart.
 

@@ -65,7 +65,7 @@ class GroqTests(unittest.TestCase):
         request, timeout = captured[0]
         self.assertEqual((request.full_url, timeout), (ENDPOINT, 15))
         self.assertNotIn("gsk_", request.data.decode())
-        self.assertEqual(json.loads(request.data)["max_completion_tokens"], 1024)
+        self.assertEqual(json.loads(request.data)["max_completion_tokens"], 3072)
         provider.attempts = 12
         with self.assertRaisesRegex(Denied, "PROVIDER_BUDGET_EXHAUSTED"):
             provider(messages)
@@ -94,3 +94,17 @@ class GroqTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+class RetryTests(unittest.TestCase):
+    def test_retry_is_bounded_and_does_not_expose_error_body(self):
+        from unittest.mock import patch
+        provider=GroqProvider('gsk_'+'A'*48)
+        def unavailable(request,timeout):
+            raise HTTPError(ENDPOINT,503,'private error',{},io.BytesIO(b'private body'))
+        provider.opener=SimpleNamespace(open=unavailable)
+        with patch('groq_ai.time.sleep'), self.assertRaisesRegex(Denied,'^PROVIDER_HTTP_503$'):
+            provider([dict(role='system',content='policy'),dict(role='user',content='task')])
+        self.assertEqual(provider.attempts,2);self.assertEqual(provider.retries,1)
+        self.assertEqual(provider.failure_codes,['PROVIDER_HTTP_503','PROVIDER_HTTP_503'])
+
+if __name__ == "__main__": unittest.main()

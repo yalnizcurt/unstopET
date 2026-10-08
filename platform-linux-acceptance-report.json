@@ -1,9 +1,9 @@
 {
   "scope": "Linux agent and parser containment, shared inspection and versioned API integration",
-  "created_at": "2026-10-08T20:40:48.580792+00:00",
+  "created_at": "2026-10-08T20:55:15.161148+00:00",
   "status": "PASS",
-  "tests_run": 65,
-  "passed": 63,
+  "tests_run": 67,
+  "passed": 65,
   "failures": 0,
   "errors": 0,
   "skipped": [
@@ -23,14 +23,19 @@
     "gate1.py": "6f1264091db751a68870177b26410915034d39331c70ffcab50115b7dc0fc488",
     "agent_runtime.py": "09818a88868b9f44d5aa8a7d684eeeb97ed4d69023186fe52fbd69d0b9a48e82",
     "linux_guard.py": "5a4e93a6f6a601a2be0ecdaf91329722df97c91f1271d3840199dd5fb1fb40a5",
-    "groq_ai.py": "38fe7a72b66b008480ebf7c978ec09927888fce6c5cc76d2e4d4336d03e3dc24",
+    "groq_ai.py": "8deb42761b568bb2bc33803b2af7eb9ec227dfdc6fc748b58e32dc9647d16995",
     "server.py": "5983e46e5eaf03df58dbe8760f82fd9d2886db9668f56a3e7fcd927bf56a94cd",
-    "api.py": "c68f29b6464da36f0f3453b51b1ba8a96a0b05a2eb954f7cbe59ab2e1a722d05",
-    "inspection.py": "5dd33fbab66939cf30b24b3d2772bcb7aaa5ff6f49553dcf1b9d15ca4646ab24",
-    "extractors.py": "5324e2f4267438fe596b12dc2da8f6e0561c8588d3249dc1fac8902678474f31",
-    "parser_worker.py": "bb5e07d1702d277b223dd5c1fdc3401c0b784907cb2e9e6a71c46aaaba737c87",
-    "parsing.py": "243581e1eecde7ef573f3024401bbbba2f8566326371b0e44c1442b724b7e23b",
-    "network.py": "26e506d01ed9d86c088426998c0e9f2b3c4bb1774d202529c390f44b39fb138f"
+    "api.py": "9b3f19082cfdd55c40644bc57f25a24c9af3a47c891d7bf16d48392eed374772",
+    "inspection.py": "6c7321da0ff6bb71efb347a62f53487758298994f687e30a063587c675d342ea",
+    "extractors.py": "1a21fc80eb0eaea4f28daccb6135da133b5ebee60b198b4b5a7cd0558d0242a7",
+    "parser_worker.py": "1747e471aea7b6592af2e905191b3c148057c4523933b3cff19e383ec896e177",
+    "parsing.py": "e690955147fc09cdec392729424445d2826fd81355295d09fc6a7a14ea23b1ca",
+    "network.py": "26e506d01ed9d86c088426998c0e9f2b3c4bb1774d202529c390f44b39fb138f",
+    "ocr.py": "4f09e70a9a9e0becce95cb37a461fd8722069eb4e6f2c29ad5afa36e4b071b14",
+    "evaluation.py": "dab543548e52abef050c9a4405751aa5d2662230d993e5aa0fbd83b93af4e555",
+    "agents.py": "73412e803971bb24b4949fa173d8959c7f914ddda0e851259e5adc888282393f",
+    "semantic.py": "ebec37de9f281f6899ab9ddac1815adcf22a2e0bdc550ba128ca1425af26c9b7",
+    "storage.py": "b7c5cdafefb3eb27a781d663d7625ea7e5b34b1b7575c297574124395e92b0a6"
   },
   "isolation": {
     "probes": {
@@ -74,7 +79,7 @@
     "DOCX XML",
     "XLSX XML",
     "bounded ZIP",
-    "raster metadata only"
+    "raster metadata and English OCR"
   ],
   "semantic_detector": "PROMPT_GUARD_EVALUATED_SEPARATELY",
   "persistent_memory": "DISABLED",
@@ -123,6 +128,7 @@
     "test_invalid_json_is_unknown_rather_than_prevented (test_groq.GroqTests.test_invalid_json_is_unknown_rather_than_prevented) ... ok",
     "test_redirect_and_http_error_do_not_disclose_credentials (test_groq.GroqTests.test_redirect_and_http_error_do_not_disclose_credentials) ... ok",
     "test_transport_is_pinned_bounded_and_does_not_send_key_as_content (test_groq.GroqTests.test_transport_is_pinned_bounded_and_does_not_send_key_as_content) ... ok",
+    "test_retry_is_bounded_and_does_not_expose_error_body (test_groq.RetryTests.test_retry_is_bounded_and_does_not_expose_error_body) ... ok",
     "test_isolation_and_credential_free_task (test_linux.LinuxTests.test_isolation_and_credential_free_task) ... ok",
     "test_agent_authority_fields_and_invalid_content_rejected (test_server.APITests.test_agent_authority_fields_and_invalid_content_rejected) ... ok",
     "test_authentication_and_origin_before_execution (test_server.APITests.test_authentication_and_origin_before_execution) ... ok",
@@ -145,11 +151,12 @@
     "test_unsupported_never_safe_and_not_sent (test_platform.PlatformTests.test_unsupported_never_safe_and_not_sent) ... ok",
     "test_parser_errors_never_allow (test_parsing_linux.ParserLinuxTests.test_parser_errors_never_allow) ... ok",
     "test_parser_read_and_network_isolation_with_positive_controls (test_parsing_linux.ParserLinuxTests.test_parser_read_and_network_isolation_with_positive_controls) ... ok",
+    "test_raster_ocr_isolated_and_inspected (test_parsing_linux.ParserLinuxTests.test_raster_ocr_isolated_and_inspected) ... ok",
     "test_real_sandboxed_workers_process_all_enabled_document_formats (test_parsing_linux.ParserLinuxTests.test_real_sandboxed_workers_process_all_enabled_document_formats) ... ok",
     "test_all_three_agents_and_poisoned_tool_response_use_real_isolated_runtime (test_parsing_linux.PlatformLinuxIntegration.test_all_three_agents_and_poisoned_tool_response_use_real_isolated_runtime) ... ok",
     "",
     "----------------------------------------------------------------------",
-    "Ran 65 tests in 3.683s",
+    "Ran 67 tests in 3.986s",
     "",
     "OK (skipped=2)"
   ]

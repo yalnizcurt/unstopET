@@ -84,7 +84,7 @@ MANIFEST = [
  dict(format='PDF', status='ENABLED', channels=['page text','metadata','annotation text'], gaps=['raster text / OCR','embedded objects','complex layout']),
  dict(format='DOCX', status='ENABLED', channels=['body','comments','metadata','headers / footers','relationships'], gaps=['embedded OLE / media','unrendered layouts']),
  dict(format='XLSX', status='ENABLED', channels=['cells','hidden sheets','comments','metadata','relationships','formulas as inert text'], gaps=['embedded objects / drawings','calculated formula values']),
- dict(format='PNG / JPEG', status='PARTIAL', channels=['metadata'], gaps=['pixel text / OCR','QR codes']),
+ dict(format='PNG / JPEG', status='PARTIAL', channels=['metadata','English pixel OCR'], gaps=['OCR recognition not guaranteed','QR codes']),
  dict(format='ZIP', status='ENABLED', channels=['bounded recursive supported children','filenames'], gaps=['unsupported children withheld']),
  dict(format='PPTX / audio / video / legacy binaries', status='UNSUPPORTED', channels=[], gaps=['no adapter']),
 ]

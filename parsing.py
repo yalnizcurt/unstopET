@@ -14,7 +14,7 @@ def parse_file(name, raw):
     request=json.dumps(dict(name=name,data=base64.b64encode(raw).decode())).encode()+b'\n'
     try:
         process=subprocess.run([sys.executable,'-I',str(Path(__file__).with_name('parser_worker.py'))],
-            input=request,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,env={},timeout=12)
+            input=request,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,env={"OMP_THREAD_LIMIT":"1"},timeout=12)
         if process.returncode or len(process.stdout)>256_000: raise ValueError
         result=json.loads(process.stdout)
         if not result.get('ok'): raise ValueError

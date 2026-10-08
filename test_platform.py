@@ -106,8 +106,9 @@ class PlatformTests(unittest.TestCase):
     def test_pixel_coverage_explicit(self):
         from PIL import Image
         b=io.BytesIO();Image.new('RGB',(10,10)).save(b,format='PNG')
-        r=inspect(extract('image.png',b.getvalue()))
-        self.assertEqual(r['inspection_status'],'PARTIAL');self.assertIn('pixel_text_ocr_not_enabled',r['uninspected_channels'])
+        with patch('extractors.recognize',return_value=''):
+            r=inspect(extract('image.png',b.getvalue()))
+        self.assertEqual(r['inspection_status'],'PARTIAL');self.assertIn('no_recognized_pixel_text',r['uninspected_channels'])
     def test_history_real_metrics_no_placeholder_evaluation(self):
         before=self.client.get('/api/v1/overview',headers=self.auth).json()
         self.assertEqual(before['inputs'],0);self.assertIsNone(before['avg_seconds'])
