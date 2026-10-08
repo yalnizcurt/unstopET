@@ -7,7 +7,7 @@
       "deterministic": false,
       "routed": true,
       "classifier_calls": 1,
-      "seconds": 0.172,
+      "seconds": 0.202,
       "coverage": "COMPLETE"
     },
     {
@@ -16,7 +16,7 @@
       "deterministic": false,
       "routed": false,
       "classifier_calls": 1,
-      "seconds": 0.168,
+      "seconds": 0.179,
       "coverage": "COMPLETE"
     },
     {
@@ -25,7 +25,7 @@
       "deterministic": false,
       "routed": true,
       "classifier_calls": 1,
-      "seconds": 0.203,
+      "seconds": 0.218,
       "coverage": "COMPLETE"
     },
     {
@@ -34,7 +34,7 @@
       "deterministic": false,
       "routed": true,
       "classifier_calls": 1,
-      "seconds": 0.164,
+      "seconds": 0.171,
       "coverage": "COMPLETE"
     },
     {
@@ -43,7 +43,7 @@
       "deterministic": false,
       "routed": false,
       "classifier_calls": 1,
-      "seconds": 0.168,
+      "seconds": 0.207,
       "coverage": "COMPLETE"
     },
     {
@@ -61,7 +61,7 @@
       "deterministic": false,
       "routed": false,
       "classifier_calls": 1,
-      "seconds": 0.165,
+      "seconds": 0.375,
       "coverage": "COMPLETE"
     },
     {
@@ -70,7 +70,7 @@
       "deterministic": false,
       "routed": false,
       "classifier_calls": 1,
-      "seconds": 0.166,
+      "seconds": 0.181,
       "coverage": "COMPLETE"
     }
   ],

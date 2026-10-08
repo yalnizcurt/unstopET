@@ -45,7 +45,15 @@ class Attack(Strict):
 
 def create_app(access_token, provider_factory, origins, store=None, parser=parse_file, runner=run_runtime,
                verify=True, semantic_enabled=False):
-    store=store or Store(os.environ.get('ATF_DB_PATH','/tmp/atf-history.sqlite3'))
+    if store is None:
+        store=Store(os.environ.get('ATF_DB_PATH','/tmp/atf-history.sqlite3'))
+        archive=Path(__file__).with_name('cloud-evaluation-report.json')
+        if archive.is_file():
+            measured=json.loads(archive.read_text())
+            for record in measured.get('results',[]):
+                if record.get('results') and record.get('id') and not store.get(record['id'],'evaluation'):
+                    store.put('evaluation',dict(record,origin='ARCHIVED_MEASURED_RUN',
+                        scope=record['scope']+' Archived measurement from '+str(measured.get('backend_commit'))+'.'),record_id=record['id'])
     work=threading.Lock(); attempts=[]
     @asynccontextmanager
     async def lifespan(app):

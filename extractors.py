@@ -76,7 +76,7 @@ def extract(name, raw, budget=None, depth=0):
         archive=zipfile.ZipFile(io.BytesIO(raw)); infos=archive.infolist()
         if len(infos)>32 or sum(i.file_size for i in infos)>MAX_EXPANDED: raise ValueError('ARCHIVE_BUDGET_EXHAUSTED')
         for i in infos:
-            if i.flag_bits&1 or i.file_size>MAX_FILE or i.file_size>max(1,i.compress_size)*100 or i.filename.startswith('/') or '..' in PurePosixPath(i.filename).parts:
+            if len(i.filename)>180 or i.flag_bits&1 or i.file_size>MAX_FILE or i.file_size>max(1,i.compress_size)*100 or i.filename.startswith('/') or '..' in PurePosixPath(i.filename).parts:
                 raise ValueError('UNSAFE_ARCHIVE_MEMBER')
         members=set(archive.namelist())
         if ext in ('.docx','.xlsx'):

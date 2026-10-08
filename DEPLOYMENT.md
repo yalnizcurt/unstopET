@@ -8,7 +8,7 @@ Repository: https://github.com/yalnizcurt/unstopET
 - API: https://agent-trust-firewall-api.onrender.com
 - Render service: https://dashboard.render.com/web/srv-db3v5p3l550s73c220d0
 - Region/plan: Singapore/free; deploy after repository checks pass.
-- Recorded verification: [cloud-deployment-report.json](cloud-deployment-report.json).
+- Historical Gate 1 verification: [cloud-deployment-report.json](cloud-deployment-report.json); platform verification is recorded separately in [cloud-platform-smoke-report.json](cloud-platform-smoke-report.json).
 
 The existing Render connection and Vercel login were used. The hosted browser completed an actual Groq task after the Render startup isolation test passed. The Groq key was stored in Render with explicit user approval; it is absent from source and frontend. For access, copy `APP_ACCESS_TOKEN` from the Render service's Environment page into the interface's access-code field. The interface never saves it.
 
@@ -27,7 +27,7 @@ The Docker image runs as a non-root user and binds Render's `PORT`. The applicat
 ## Vercel interface
 
 1. Import this repository into Vercel.
-2. Set **Root Directory: `frontend`**, **Framework: Other**, and leave the build command unset. Deploy the static site.
+2. Set **Root Directory: `frontend`**, **Framework: Vite**, build command `npm run build`, and output directory `dist`. Deploy the built site.
 3. Add its exact production origin to Render's `ALLOWED_ORIGINS` and redeploy the API.
 4. Open the site, enter the Render HTTPS API URL and application access code. Run the supplier example.
 
@@ -42,7 +42,7 @@ No Groq secret belongs in Vercel. The UI intentionally requires an explicit API 
 - Unsupported files: not accepted; no claim that they were inspected.
 - Repeat Linux acceptance in the deployed image if host configuration changes.
 
-This publishes only Gate 1. Email is mocked, semantic detection and other formats remain disabled, and the shared access code is demo authentication. Free-service availability and cold starts can affect demonstration timing. The recorded cloud run is one synthetic smoke test and does not establish broad attack prevention, F3 or D2 achievement.
+The original Gate 1 report is historical evidence. The expanded release below adds the console, three protected agents, declared file adapters and measured semantic detection. Email remains mocked and the shared access code is demo authentication. Free-service availability and cold starts can affect demonstration timing. Neither smoke tests nor the small authored evaluation establish universal protection or official F3/D2 achievement.
 
 ## Expanded console release
 
@@ -51,3 +51,5 @@ The backend now starts `python3 api.py` (FastAPI). `/api/v1` exposes profiles, t
 The React/Vite frontend is built with `npm ci && npm run build` in `frontend/`; Vercel serves `dist` with SPA refresh routing. `VITE_API_BASE` defaults to the existing Render origin. `SEMANTIC_ENABLED=1` enables the classifier after measured calibration/reserved checks. Credentials remain only in Render environment settings.
 
 SQLite is intentionally temporary at `/tmp/atf-history.sqlite3`, with a 24-hour/300-record cap. No paid database or disk was provisioned, and the unrelated existing database was not reused. Binary upload bytes are discarded. This configuration is a synthetic demo, not durable enterprise deployment.
+
+Public synthetic evaluation exports are copied into the image and restored as explicitly labelled archived measurements. This preserves reviewable test evidence after redeploy; it does not make live user history durable. Documentation/evidence-only commits can use Render’s documented `[skip render]` commit phrase to avoid restarting the demo unnecessarily.

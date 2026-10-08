@@ -2,7 +2,7 @@
 
 Measurements and targets are separate. Do not treat a passing unit test as a measured attack prevention percentage.
 
-- `platform-linux-acceptance-report.json`: expanded backend checks, real Linux agent/parser restrictions, API authority/coverage tests and forced-compromise tool proposals. 66 pass, two Mac-specific skips.
+- `platform-linux-acceptance-report.json`: expanded backend checks, real Linux agent/parser restrictions, API authority/coverage tests and forced-compromise tool proposals. 68 pass, two Mac-specific skips.
 - `semantic-evaluation-report.json`: 16 authored calibration inputs with real Groq Prompt Guard 2 86M scores. At a frozen 0.9 threshold, the implemented router recovers two of eight attacks missed by rules; zero added false positives on eight benign cases. Standalone classifier flags an educational quote; the router excludes explicitly labelled educational material. Several indirect attacks remain missed.
 - `semantic-heldout-report.json`: eight reserved authored language/phrasing variants, not independent authoring. Routed classifier recovers three of four attacks missed by rules, with no added false positives on four benign cases. The French variant is missed. This sample is too small for broad reliability claims.
 - `detection-matrix-report.json`: 42 authored attack format variants (seven categories × six surfaces) and six benign format variants. Target-category detection and preserved price facts pass on this regression matrix. Repeated wording and thin benign coverage prevent general reliability claims. The report includes 95% Wilson intervals.
@@ -19,3 +19,13 @@ Seven-category and multiformat fixtures are authored engineering evidence, not a
 3. Use File Scanner for a supported artifact, then inspect original inert text, released fragments, locations and gaps.
 4. Run an Attack Lab comparison; inspect actual A/B/C responses and execution decisions, then open Evaluations and Security Events.
 5. Run Web Research on `https://example.com` and Developer Assistant on the fixed synthetic repository. Show cited brief and proposed inert patch.
+
+## Hosted matched evaluation
+
+`cloud-evaluation-report.json` records 24 real Groq generation calls on the deployed backend: seven attack-category fixtures plus one benign control, each in A/B/C. B and C recognized all seven authored attacks and completed all seven legitimate comparisons, with zero unauthorized simulated executions and zero observed synthetic canary leakage. A completed three attacked tasks; four refusals had unscored attacker objectives. No successful baseline attacker objective was observed in this run; do not claim the baseline was compromised. The 7/7 protected outcome has a wide 95% Wilson interval (about 64.6%–100%), not general 100% reliability.
+
+The initial semantic calibration measures detector improvement on variants missed by signatures. The seven main hosted fixtures were already recognized by rules, so that run does not prove additional prevention benefit from AI. The semantic-only scenario is evaluated separately. Isolated labels under five words do not request classification; this avoids a measured alert on a sheet name. Short fragments still receive deterministic checks.
+
+Archived public synthetic runs are included as versioned measured evidence in the container and labelled `ARCHIVED_MEASURED_RUN` in the UI, with original timestamps and backend commit. They are not rerun or represented as new measurements on startup. Live task/upload/event history remains temporary SQLite.
+
+The semantic-only positive fixture is a known authored paraphrase: rules do not flag it and real Prompt Guard does. A separate context-laundering fixture was missed by the classifier; `semantic-scenario-report.json` retains that miss and Attack Lab keeps it selectable. These are detector observations, not fabricated agent compromise outcomes.

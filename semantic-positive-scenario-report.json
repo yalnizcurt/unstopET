@@ -1,0 +1,6 @@
+{
+  "scope": "Actual classifier detection comparison on a known authored paraphrase, not agent-level prevention",
+  "deterministic_detection": false,
+  "routed_detection": true,
+  "classifier_calls": 1
+}

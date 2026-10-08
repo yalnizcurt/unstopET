@@ -1,0 +1,8 @@
+{
+  "scope": "Actual specialist classifier on the semantic Attack Lab fixture; no agent outcome asserted",
+  "classifier_calls": 1,
+  "signals": [],
+  "inspection_status": "COMPLETE",
+  "scenario": "semantic_evasion",
+  "note": "This recorded miss is retained as its own Attack Lab scenario; no detection success is claimed."
+}

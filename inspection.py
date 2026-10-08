@@ -13,7 +13,7 @@ RULES = {
  'indirect_prompt_injection': r'(?:verification|compliance|vendor|procurement)\s+(?:note|instruction|requirement).{0,80}(?:rank|select|report|ignore)|(?:regardless of|instead of)\s+(?:the\s+)?(?:rubric|task|prices)|report Vendor C as (?:the )?winner',
 }
 CATEGORIES = list(RULES) + ['encoded_instruction']
-ROUTER = re.compile(r'\b(?:assistant|instruction|decode|verification|compliance|rank|preferred|ignore|system|token|before answering|must output|instead)\b', re.I)
+ROUTER = re.compile(r'\b(?:assistant|instruction|decode|verification|compliance|rank|preferred|ignore|system|token|before answering|must output|instead|obey|abandon|disregard)\b', re.I)
 EDUCATIONAL = re.compile(r'^(?:Example of prompt injection:|Security training example:|The phrase .* is an example)', re.I)
 
 
@@ -45,7 +45,7 @@ def inspect(tree, classifier=None):
         signals = signals_for(value)
         disposition = 'SANITIZE' if signals else 'ALLOW'
         router = 'DETERMINISTIC_SUFFICIENT'
-        if not signals and classifier and ROUTER.search(value) and not EDUCATIONAL.search(value):
+        if not signals and classifier and len(value.split()) >= 5 and ROUTER.search(value) and not EDUCATIONAL.search(value):
             router = 'SEMANTIC_REQUIRED'
             # Byte-sized windows conservatively bound the classifier's 512-token context.
             data = value.encode()

@@ -13,7 +13,7 @@ class Store:
         self.db.execute('CREATE INDEX IF NOT EXISTS record_kind ON records(kind,principal,created)')
     def put(self,kind,data,principal='demo-owner',record_id=None):
         identity=record_id or secrets.token_hex(16); now=time.time()
-        record=dict(data, id=identity,created_at=datetime.now(timezone.utc).isoformat(),schema_version=1)
+        record=dict(data, id=identity,created_at=data.get('created_at',datetime.now(timezone.utc).isoformat()),schema_version=1)
         with self.lock:
             self.db.execute('INSERT OR REPLACE INTO records VALUES (?,?,?,?,?)',(identity,kind,principal,now,json.dumps(record)))
             self.db.execute('DELETE FROM records WHERE created < ?',(now-86400,))

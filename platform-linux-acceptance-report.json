@@ -1,9 +1,9 @@
 {
   "scope": "Linux agent and parser containment, shared inspection and versioned API integration",
-  "created_at": "2026-10-08T21:05:04.503693+00:00",
+  "created_at": "2026-10-08T21:37:54.575776+00:00",
   "status": "PASS",
-  "tests_run": 68,
-  "passed": 66,
+  "tests_run": 70,
+  "passed": 68,
   "failures": 0,
   "errors": 0,
   "skipped": [
@@ -25,17 +25,17 @@
     "linux_guard.py": "5a4e93a6f6a601a2be0ecdaf91329722df97c91f1271d3840199dd5fb1fb40a5",
     "groq_ai.py": "8deb42761b568bb2bc33803b2af7eb9ec227dfdc6fc748b58e32dc9647d16995",
     "server.py": "5983e46e5eaf03df58dbe8760f82fd9d2886db9668f56a3e7fcd927bf56a94cd",
-    "api.py": "f2b4189b6b38f6a3a2179fb12a1646aafbc9df0d81ea2f0a7f08324a728f7d09",
-    "inspection.py": "6c7321da0ff6bb71efb347a62f53487758298994f687e30a063587c675d342ea",
-    "extractors.py": "69d66859fadb383abb091b8631bb844075b925ae933952511a7799d3ac1bc3e3",
+    "api.py": "7b17ee2d226a4fe31ce10a92bed98c7e45f3737d28cc08261fbdf6619ba442c6",
+    "inspection.py": "49fec498b7b420d8827eef1db24518045ef5a46dd7f9217684e3a97702736859",
+    "extractors.py": "b128fdd9494abbade7276f7d9e0d450f8605949f9d81debf6e98447a53fac518",
     "parser_worker.py": "1747e471aea7b6592af2e905191b3c148057c4523933b3cff19e383ec896e177",
     "parsing.py": "e690955147fc09cdec392729424445d2826fd81355295d09fc6a7a14ea23b1ca",
     "network.py": "26e506d01ed9d86c088426998c0e9f2b3c4bb1774d202529c390f44b39fb138f",
     "ocr.py": "4f09e70a9a9e0becce95cb37a461fd8722069eb4e6f2c29ad5afa36e4b071b14",
-    "evaluation.py": "dbbd9e3cdb24dcb98f3c815468759c916c9c1906d41ada610f0dfb3351b1f763",
+    "evaluation.py": "0a7c56fa3a1a309c33aaf0fb8fd464eb6e706006491616780df85bffbb246f45",
     "agents.py": "f34e16ef0c4d08864777665cb81275a95bf72a71cefc82feb32c1205d57bb1a7",
     "semantic.py": "ebec37de9f281f6899ab9ddac1815adcf22a2e0bdc550ba128ca1425af26c9b7",
-    "storage.py": "b7c5cdafefb3eb27a781d663d7625ea7e5b34b1b7575c297574124395e92b0a6"
+    "storage.py": "fa759b1027259d7d8560c5e2cbd9f929daf74a5387bbf1f43997c4f695338e1d"
   },
   "isolation": {
     "probes": {
@@ -136,6 +136,7 @@
     "test_legitimate_task_preserves_prices_and_quarantines_known_attack (test_server.APITests.test_legitimate_task_preserves_prices_and_quarantines_known_attack) ... ok",
     "test_all_attack_surfaces_have_real_extraction (test_platform.PlatformTests.test_all_attack_surfaces_have_real_extraction) ... ok",
     "test_archive_traversal_and_bomb_rejected (test_platform.PlatformTests.test_archive_traversal_and_bomb_rejected) ... ok",
+    "test_archived_evaluations_preserve_measurement_time_without_model_calls (test_platform.PlatformTests.test_archived_evaluations_preserve_measurement_time_without_model_calls) ... ok",
     "test_artifact_upload_release_and_coverage (test_platform.PlatformTests.test_artifact_upload_release_and_coverage) ... ok",
     "test_auth_origin_and_forged_authority (test_platform.PlatformTests.test_auth_origin_and_forged_authority) ... ok",
     "test_canary_is_not_public_attack_evidence (test_platform.PlatformTests.test_canary_is_not_public_attack_evidence) ... ok",
@@ -146,6 +147,7 @@
     "test_quote_cannot_inherit_intent_authority (test_platform.PlatformTests.test_quote_cannot_inherit_intent_authority) ... ok",
     "test_secret_egress_blocked_and_not_stored (test_platform.PlatformTests.test_secret_egress_blocked_and_not_stored) ... ok",
     "test_semantic_error_withholds_and_never_claims_safe (test_platform.PlatformTests.test_semantic_error_withholds_and_never_claims_safe) ... ok",
+    "test_semantic_router_skips_isolated_metadata_labels (test_platform.PlatformTests.test_semantic_router_skips_isolated_metadata_labels) ... ok",
     "test_seven_categories (test_platform.PlatformTests.test_seven_categories) ... ok",
     "test_synthetic_repository_uses_reinspected_tool_output (test_platform.PlatformTests.test_synthetic_repository_uses_reinspected_tool_output) ... ok",
     "test_three_agents_share_boundary_and_audit (test_platform.PlatformTests.test_three_agents_share_boundary_and_audit) ... ok",
@@ -157,7 +159,7 @@
     "test_all_three_agents_and_poisoned_tool_response_use_real_isolated_runtime (test_parsing_linux.PlatformLinuxIntegration.test_all_three_agents_and_poisoned_tool_response_use_real_isolated_runtime) ... ok",
     "",
     "----------------------------------------------------------------------",
-    "Ran 68 tests in 3.962s",
+    "Ran 70 tests in 3.929s",
     "",
     "OK (skipped=2)"
   ]
