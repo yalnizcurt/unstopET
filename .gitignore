@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.models/
+.gate1-*/
+.runtime/
+.env
+.env.*

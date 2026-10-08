@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: agent-trust-firewall-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: APP_ACCESS_TOKEN
+        generateValue: true
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: GROQ_MODEL
+        value: openai/gpt-oss-20b

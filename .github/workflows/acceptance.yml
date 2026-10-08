@@ -1,0 +1,12 @@
+name: Linux boundary acceptance
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t agent-trust-firewall .
+      - run: docker run --rm agent-trust-firewall python3 acceptance.py
