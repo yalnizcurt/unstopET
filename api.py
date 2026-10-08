@@ -59,7 +59,7 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
     async def lifespan(app):
         if verify: verify_linux_boundary()
         yield
-    app=FastAPI(title='Agent Trust Firewall',version='1.0.0',lifespan=lifespan,docs_url=None,redoc_url=None,openapi_url=None)
+    app=FastAPI(title='Agent Trust Firewall',version='1.0.0',lifespan=lifespan,docs_url='/api/docs',redoc_url=None,openapi_url='/api/openapi.json')
     app.state.store=store
     @app.middleware('http')
     async def boundary(request: Request, call_next):
@@ -71,7 +71,7 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
         if request.method=='OPTIONS':
             headers.update({'Access-Control-Allow-Methods':'GET, POST, OPTIONS','Access-Control-Allow-Headers':'Authorization, Content-Type'})
             return JSONResponse({},200,headers=headers)
-        if request.url.path not in ('/api/health','/api/v1/health'):
+        if request.url.path not in ('/api/health','/api/v1/health','/api/docs','/api/openapi.json'):
             if not hmac.compare_digest(request.headers.get('authorization','').encode(),('Bearer '+access_token).encode()):
                 return JSONResponse({'error':'AUTHENTICATION_REQUIRED'},401,headers=headers)
             if request.method=='POST':
@@ -271,6 +271,16 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
                     attacker_objective=row.get('attacker_objective_observed'),prevented=row.get('prevented')))
             return saved
         finally: work.release()
+    original_openapi=app.openapi
+    def documented_schema():
+        schema=original_openapi()
+        schema.setdefault('components',{}).setdefault('securitySchemes',{})['DemoAccessCode']={
+            'type':'http','scheme':'bearer','description':'Render APP_ACCESS_TOKEN; never the Groq credential'}
+        for path,operations in schema['paths'].items():
+            if path not in ('/api/health','/api/v1/health'):
+                for operation in operations.values(): operation['security']=[{'DemoAccessCode':[]}]
+        return schema
+    app.openapi=documented_schema
     return app
 
 if __name__=='__main__':

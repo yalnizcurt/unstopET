@@ -6,6 +6,7 @@ Repository: https://github.com/yalnizcurt/unstopET
 
 - Interface: https://agent-trust-firewall.vercel.app
 - API: https://agent-trust-firewall-api.onrender.com
+- Interactive API documentation: https://agent-trust-firewall-api.onrender.com/api/docs
 - Render service: https://dashboard.render.com/web/srv-db3v5p3l550s73c220d0
 - Region/plan: Singapore/free; deploy after repository checks pass.
 - Historical Gate 1 verification: [cloud-deployment-report.json](cloud-deployment-report.json); platform verification is recorded separately in [cloud-platform-smoke-report.json](cloud-platform-smoke-report.json).

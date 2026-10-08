@@ -134,6 +134,12 @@ class PlatformTests(unittest.TestCase):
         for record in rows:
             self.assertEqual(record['origin'],'ARCHIVED_MEASURED_RUN')
             self.assertEqual(record['created_at'],originals[record['id']])
+    def test_public_api_documentation_requires_bearer_for_protected_operations(self):
+        self.assertEqual(self.client.get('/api/docs').status_code,200)
+        schema=self.client.get('/api/openapi.json').json()
+        self.assertEqual(schema['paths']['/api/v1/tasks']['post']['security'],[{'DemoAccessCode':[]}])
+        self.assertNotIn('security',schema['paths']['/api/health']['get'])
+        self.assertEqual(self.client.get('/api/v1/events').status_code,401)
     def test_history_real_metrics_no_placeholder_evaluation(self):
         before=self.client.get('/api/v1/overview',headers=self.auth).json()
         self.assertEqual(before['inputs'],0);self.assertIsNone(before['avg_seconds'])
