@@ -43,3 +43,11 @@ No Groq secret belongs in Vercel. The UI intentionally requires an explicit API 
 - Repeat Linux acceptance in the deployed image if host configuration changes.
 
 This publishes only Gate 1. Email is mocked, semantic detection and other formats remain disabled, and the shared access code is demo authentication. Free-service availability and cold starts can affect demonstration timing. The recorded cloud run is one synthetic smoke test and does not establish broad attack prevention, F3 or D2 achievement.
+
+## Expanded console release
+
+The backend now starts `python3 api.py` (FastAPI). `/api/v1` exposes profiles, tasks, artifact inspection/coverage, events, policies, evaluations and contained Attack Lab runs. The old `/api/analyze` route is preserved for the original demo client.
+
+The React/Vite frontend is built with `npm ci && npm run build` in `frontend/`; Vercel serves `dist` with SPA refresh routing. `VITE_API_BASE` defaults to the existing Render origin. `SEMANTIC_ENABLED=1` enables the classifier after measured calibration/reserved checks. Credentials remain only in Render environment settings.
+
+SQLite is intentionally temporary at `/tmp/atf-history.sqlite3`, with a 24-hour/300-record cap. No paid database or disk was provisioned, and the unrelated existing database was not reused. Binary upload bytes are discarded. This configuration is a synthetic demo, not durable enterprise deployment.

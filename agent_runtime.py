@@ -82,6 +82,12 @@ if sys.argv[1] == "probe":
     print(json.dumps(dict(probes=probes, error_codes=DENIAL_ERRORS)), flush=True)
 elif sys.argv[1] == "demo":
     snapshot_id = sys.argv[2]
+    if len(sys.argv) > 3 and sys.argv[3] == "collect":
+        collected = request("tools.collect", snapshot_id=snapshot_id)
+        if not collected["ok"]:
+            print(json.dumps(dict(completed=False)), flush=True)
+            raise SystemExit(0)
+        snapshot_id = collected["result"]["snapshot_id"]
     response = request("model.generate", snapshot_id=snapshot_id)
     if response["ok"]:
         try:

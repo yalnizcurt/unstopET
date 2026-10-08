@@ -16,7 +16,7 @@ class PathRule(ctypes.Structure):
     _fields_ = [("allowed_access", ctypes.c_uint64), ("parent_fd", ctypes.c_int32)]
 
 
-def restrict():
+def restrict(read_files=()):
     if sys.platform != "linux":
         raise RuntimeError("Linux isolation unavailable")
     libc = ctypes.CDLL(None, use_errno=True)
@@ -52,7 +52,7 @@ def restrict():
     attributes = Ruleset((1 << 15) - 1)  # All filesystem operations through ABI 3, including truncate.
     ruleset = call("landlock_create_ruleset", ctypes.byref(attributes), ctypes.sizeof(attributes), 0)
     try:
-        for path in (sysconfig.get_path("stdlib"), str(Path(__file__).with_name("agent_runtime.py")), "/dev/urandom"):
+        for path in (sysconfig.get_path("stdlib"), str(Path(__file__).with_name("agent_runtime.py")), "/dev/urandom", *read_files):
             descriptor = os.open(path, os.O_PATH | os.O_CLOEXEC)
             try:
                 rights = (1 << 2) | ((1 << 3) if os.path.isdir(path) else 0)

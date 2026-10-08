@@ -105,10 +105,12 @@ class Permit:
 class Firewall:
     """Trusted application API. The runtime can reach only handle(binding, request)."""
 
-    def __init__(self, now=time.monotonic, provider=None):
+    def __init__(self, now=time.monotonic, provider=None, instructions="", collect=None):
         self.now = now
         # Configured by the trusted application; runtime request fields cannot select a provider.
         self.provider = provider
+        self.instructions = text(instructions)
+        self.collect = collect
         self.policy_version = 1
         self.artifacts: dict[str, Artifact] = {}
         self.snapshots: dict[str, ContextSnapshot] = {}
@@ -239,7 +241,7 @@ class Firewall:
             ))
         # Only server code creates roles. A snapshot reference is not an authorization credential.
         return [
-            dict(role="system", content=SYSTEM_POLICY),
+            dict(role="system", content=SYSTEM_POLICY + ("\n" + self.instructions if self.instructions else "")),
             dict(role="user", content=encode(dict(
                 task_intent_kind="AUTHORIZED_TASK_INTENT", authorized_task_intent=snapshot.intent, evidence=evidence,
             )).decode()),
@@ -377,6 +379,13 @@ class Firewall:
                 op, args = request["op"], request["args"]
                 if op == "model.generate":
                     result = self.generate(binding, args)
+                elif op == "tools.collect":
+                    fields(args, ("snapshot_id",))
+                    snapshot = self._snapshot(binding, args["snapshot_id"])
+                    if self.collect is None:
+                        raise Denied("TOOL_NOT_AUTHORIZED")
+                    self.collect(self, binding)
+                    result = dict(snapshot_id=self.issue_snapshot(binding, snapshot.intent))
                 elif op == "read_evidence":
                     fields(args, ("snapshot_id", "artifact_id"))
                     snapshot = self._snapshot(binding, args["snapshot_id"])
@@ -403,7 +412,7 @@ class Firewall:
                 return dict(ok=True, result=result)
             except (Denied, TypeError, ValueError, KeyError) as exc:
                 code = exc.code if isinstance(exc, Denied) else "INVALID_REQUEST"
-                audit_op = op if op in ("model.generate", "read_evidence", "email.prepare", "email.dispatch",
+                audit_op = op if op in ("model.generate", "tools.collect", "read_evidence", "email.prepare", "email.dispatch",
                                         "finalize", "memory.write") else "request"
                 self._record(binding, audit_op, "DENY", reason=code)
                 return dict(ok=False, error=code)

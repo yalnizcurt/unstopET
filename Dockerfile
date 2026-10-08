@@ -3,7 +3,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends libseccomp2 ca-
     && rm -rf /var/lib/apt/lists/* \
     && useradd --uid 1000 --create-home firewall
 WORKDIR /app
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
 COPY *.py /app/
 USER firewall
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
-CMD ["python3", "server.py"]
+CMD ["python3", "api.py"]
