@@ -127,7 +127,9 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
             for url in body.urls:
                 raw,name=fetch_public(url)
                 artifact=inspection(name,raw,classifier,'EXTERNAL_RETRIEVED_EVIDENCE')
-                for f in artifact['fragments']: f['location']=url+' '+f['location']
+                for f in artifact['fragments']:
+                    f['released_location']=url+' '+f.get('released_location',f['location'])
+                    f['location']=url+' '+f['location']
                 add_evidence(firewall,binding,artifact); inspected.append(artifact)
                 tool_activity.append(dict(tool='public_https_read',destination=url,result='RELEASED_INSPECTED_FRAGMENTS',
                     inspection_status=artifact['inspection_status'],artifact_id=artifact['id']))

@@ -1,9 +1,9 @@
 {
   "scope": "Linux agent and parser containment, shared inspection and versioned API integration",
-  "created_at": "2026-10-10T11:31:34.019224+00:00",
+  "created_at": "2026-10-10T11:55:03.397773+00:00",
   "status": "PASS",
-  "tests_run": 83,
-  "passed": 81,
+  "tests_run": 84,
+  "passed": 82,
   "failures": 0,
   "errors": 0,
   "skipped": [
@@ -25,7 +25,7 @@
     "linux_guard.py": "5a4e93a6f6a601a2be0ecdaf91329722df97c91f1271d3840199dd5fb1fb40a5",
     "groq_ai.py": "5229303f0fa5361e5b6c0f06746699907ca737f7da798e377c5ff3f61f4d0f95",
     "server.py": "5983e46e5eaf03df58dbe8760f82fd9d2886db9668f56a3e7fcd927bf56a94cd",
-    "api.py": "1a996fd9186a0e9a89e3ea63a74c355eb8c65725cdd81d18ecb5eca84c22751f",
+    "api.py": "154042158513927e8fd10c3b400dcb7b43b305c8d07b4833c132046285d6e5e4",
     "inspection.py": "afdc9a9f74e1b92a272a4dcc232c79b978e80515072706d7069216f0c3ad27c6",
     "extractors.py": "14b25106f81cdf3bc7a5ba01c35108f28de9eedd2a61fccc7b3f015cbaeb9193",
     "parser_worker.py": "1747e471aea7b6592af2e905191b3c148057c4523933b3cff19e383ec896e177",
@@ -141,6 +141,7 @@
     "test_artifact_upload_release_and_coverage (test_platform.PlatformTests.test_artifact_upload_release_and_coverage) ... ok",
     "test_attack_lab_forces_and_labels_independent_action_containment (test_platform.PlatformTests.test_attack_lab_forces_and_labels_independent_action_containment) ... ok",
     "test_auth_origin_and_forged_authority (test_platform.PlatformTests.test_auth_origin_and_forged_authority) ... ok",
+    "test_brokered_source_url_is_preserved_in_released_model_evidence (test_platform.PlatformTests.test_brokered_source_url_is_preserved_in_released_model_evidence) ... ok",
     "test_canary_is_not_public_attack_evidence (test_platform.PlatformTests.test_canary_is_not_public_attack_evidence) ... ok",
     "test_cross_session_and_tool_scope (test_platform.PlatformTests.test_cross_session_and_tool_scope) ... ok",
     "test_encoded_known_secrets_are_redacted_and_never_sent_to_models (test_platform.PlatformTests.test_encoded_known_secrets_are_redacted_and_never_sent_to_models) ... ok",
@@ -172,7 +173,7 @@
     "test_all_three_agents_and_poisoned_tool_response_use_real_isolated_runtime (test_parsing_linux.PlatformLinuxIntegration.test_all_three_agents_and_poisoned_tool_response_use_real_isolated_runtime) ... ok",
     "",
     "----------------------------------------------------------------------",
-    "Ran 83 tests in 4.087s",
+    "Ran 84 tests in 4.105s",
     "",
     "OK (skipped=2)"
   ]

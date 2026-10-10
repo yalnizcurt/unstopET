@@ -179,6 +179,13 @@ class PlatformTests(unittest.TestCase):
         record=inspect(extract('nested.zip',buffer.getvalue()))
         self.assertNotIn(secret,json.dumps(record));self.assertNotIn(encoded,json.dumps(record))
         self.assertEqual(record['inspection_status'],'PARTIAL')
+    def test_brokered_source_url_is_preserved_in_released_model_evidence(self):
+        url='https://public.example/research'
+        with patch('api.fetch_public',return_value=(b'<p>Useful public fact</p>','web.html')):
+            r=self.post('tasks',dict(agent_id='research',intent='Explain the source facts.',urls=[url]))
+        self.assertEqual(r.status_code,200,r.text)
+        self.assertIn(url,self.calls[-1][1]['content'])
+        self.assertTrue(all(url in f['released_location'] for f in r.json()['artifacts'][0]['fragments']))
     def test_seven_categories(self):
         for case in list(SCENARIOS.values())[:7]:
             self.assertIn(case['category'],[s['category'] for s in signals_for(case['attack'])])
