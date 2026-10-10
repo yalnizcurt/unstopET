@@ -37,6 +37,8 @@ Actual calibration recovered two rule-missed attacks out of eight authored attac
 
 Detector scores are raw uncalibrated signals. Actual generation/classifier calls, tokens and latency are exposed; currency cost is not invented. Contextual LLM escalation remains disabled.
 
+Release decision: **READY WITH DISCLOSED LIMITATIONS**. All required A–G workflows have recorded hosted evidence. Seven main authored categories pass the protected comparisons; the broader nine-attack routed recall is 8/9, below the proposed 90% target. One provider-429 configuration and the semantic evasion remain in the published evidence.
+
 ## Evidence and release decision
 
 Use [Release checklist](docs/RELEASE_CHECKLIST.md) for the final decision and A–G hosted evidence, [Evaluation](EVALUATION.md) for measured corpus/results/uncertainty, [Implementation audit](docs/IMPLEMENTATION_AUDIT.md) for resolved defects, and [Known limitations](docs/KNOWN_LIMITATIONS.md) for excluded capabilities. All metrics are measurements on their stated samples, not claims of universal protection.
@@ -57,4 +59,4 @@ Prepare the free Render service before presenting; open the console and authenti
 | 3:45–4:30 | Attack Lab `semantic`: compare A/B/C detection, task completion, tokens and decisions. C detects the known paraphrase that B misses. Show the retained `semantic_evasion` miss/unknowns as a limit |
 | 4:30–5:00 | Show measured evaluations, six architecture views and release limitations. Explain that authorization is independent of detector or model success |
 
-Screenshots and final executed scenario evidence are linked from the release checklist. Recording is unavailable in the enabled browser tools; no recording or portal submission is falsely claimed.
+Screenshots and final executed scenario evidence are linked from the release checklist and `submission-readiness-report.json`. Recording is unavailable in the enabled browser tools; no recording or portal submission is falsely claimed.

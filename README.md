@@ -13,6 +13,8 @@ Agents: procurement comparison; public HTTPS research through a controlled reade
 
 Supported declared adapters: UTF-8 text, static HTML, PDF text/metadata/annotation strings, DOCX XML channels, XLSX cells/hidden sheets/comments, bounded ZIPs. English raster OCR and metadata remain partial; QR decoding and guaranteed recognition are not enabled. Unsupported regions remain withheld. Persistent memory and unrestricted shell/connectors are disabled.
 
+Release decision: **READY WITH DISCLOSED LIMITATIONS** for the tested synthetic/public hackathon workflow. All three agents and the hosted walkthrough work. The broader nine-attack set has 8/9 routed detection; general reliability targets, durable multi-user storage and universal protection are not established. See the [release checklist](docs/RELEASE_CHECKLIST.md).
+
 ## Local development
 
 The backend requires Linux Landlock ABI 3+ and libseccomp; it deliberately fails closed on unsupported hosts. Use the Docker image on a supported Linux kernel. Set `APP_ACCESS_TOKEN`, `GROQ_API_KEY`, `GROQ_MODEL`, `ALLOWED_ORIGINS` and optionally `SEMANTIC_ENABLED=1` in the trusted server environment. Never place secrets in frontend variables or Git.
@@ -31,8 +33,8 @@ The production start command is `python3 api.py`. Versioned APIs live under `/ap
 
 ## Verification and limits
 
-The expanded Linux acceptance report records 82 passing checks and two Mac-only skips. Classifier calibration and reserved-variant reports use actual Groq Prompt Guard scores. The authored 42-attack / six-benign detection matrix exercises seven categories across six document surfaces; it is not an unseen-attack reliability estimate. Hosted workflow/evaluation evidence is recorded separately when verified; authored small sets are not universal protection or official F3/D2 achievement.
+The expanded Linux acceptance report records 82 passing checks and two Mac-only skips. Classifier calibration and reserved-variant reports use actual Groq Prompt Guard scores. The authored 42-attack / six-benign detection matrix exercises seven categories across six document surfaces; it is not an unseen-attack reliability estimate. Final hosted A–G API and browser acceptance is recorded in [submission-readiness-report.json](submission-readiness-report.json); authored small sets are not universal protection or official F3/D2 achievement.
 
 Free Render history is temporary SQLite, bounded to 24 hours / 300 total records. Raw binaries are discarded after extraction. Synthetic/public demo inputs only; this is not enterprise tenant authentication or durable production audit storage. Free services can sleep and restart.
 
-See [Implementation sequence](IMPLEMENTATION.md), [Architecture](ARCHITECTURE.md), [Security](SECURITY.md), [Agent capabilities](AGENTS.md), [Coverage](COVERAGE.md), [Evaluation](EVALUATION.md) [Deployment](DEPLOYMENT.md), [Submission package](SUBMISSION.md), [Release checklist](docs/RELEASE_CHECKLIST.md) and [Implementation audit](docs/IMPLEMENTATION_AUDIT.md).
+See [Implementation sequence](IMPLEMENTATION.md), [Architecture](ARCHITECTURE.md), [Security](SECURITY.md), [Agent capabilities](AGENTS.md), [Coverage](COVERAGE.md), [Evaluation](EVALUATION.md), [Deployment](DEPLOYMENT.md), [Submission package](SUBMISSION.md), [Release checklist](docs/RELEASE_CHECKLIST.md) and [Implementation audit](docs/IMPLEMENTATION_AUDIT.md).

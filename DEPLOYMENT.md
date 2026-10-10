@@ -30,9 +30,9 @@ The Docker image runs as a non-root user and binds Render's `PORT`. The applicat
 1. Import this repository into Vercel.
 2. Set **Root Directory: `frontend`**, **Framework: Vite**, build command `npm run build`, and output directory `dist`. Deploy the built site.
 3. Add its exact production origin to Render's `ALLOWED_ORIGINS` and redeploy the API.
-4. Open the site, enter the Render HTTPS API URL and application access code. Run the supplier example.
+4. Open the site and enter the Render application access code. The configured Render HTTPS API is shown in Settings. Run the supplier example.
 
-No Groq secret belongs in Vercel. The UI intentionally requires an explicit API URL and never saves the access code. Preview origins must be added individually if needed. The frontend enforces HTTPS except for local development.
+No Groq secret belongs in Vercel. `VITE_API_BASE` selects the API at build time and defaults to the verified Render service. The UI never saves the access code. Preview origins must be added individually if needed.
 
 ## Verify the deployed slice
 
@@ -54,3 +54,10 @@ The React/Vite frontend is built with `npm ci && npm run build` in `frontend/`; 
 SQLite is intentionally temporary at `/tmp/atf-history.sqlite3`, with a 24-hour/300-record cap. No paid database or disk was provisioned, and the unrelated existing database was not reused. Binary upload bytes are discarded. This configuration is a synthetic demo, not durable enterprise deployment.
 
 Public synthetic evaluation exports are copied into the image and restored as explicitly labelled archived measurements. This preserves reviewable test evidence after redeploy; it does not make live user history durable. Documentation/evidence-only commits can use Render’s documented `[skip render]` commit phrase to avoid restarting the demo unnecessarily.
+
+
+## Verified submission release
+
+[submission-readiness-report.json](submission-readiness-report.json) records the final A–G hosted checks, source-bound Render release, Vercel READY deployment, actual browser assets, model outputs, independent forced-action denials and secret-literal checks. [Release checklist](docs/RELEASE_CHECKLIST.md) records the conditional readiness decision. Backend source `1d953ac` remains live; frontend/document-only commits deliberately skip a backend restart.
+
+For the five-minute demonstration, warm the free service, authenticate, use the committed public supplier fixtures and malicious research URL, and open the existing measured semantic comparison. Keep tests synthetic. Provider 429s are bounded, explicit and retained; reduce request pace and retry after cooldown. No paid plan or unrestricted execution was enabled to hide availability limits.

@@ -72,4 +72,40 @@ Audit baseline: deployed backend `e606ecb`, Vercel production console, source an
 
 Verdict: preserve the working security architecture; fix the bounded input/retention/reporting defects and complete final hosted acceptance before release.
 
+## Final-run regression
+
+14. **Procurement invented complete currency/terms information** (`agents.py`).
+    A real three-document Groq run returned correct prices/delivery/warranty but claimed absent currency was supplied. Its narrow-space supplier name also exposed an overly strict ASCII assertion. The server profile now explicitly requires "Currency not specified" and "Not provided" for absent fields. The acceptance check normalizes Unicode spacing, preserves the original response and requires the missing-currency disclosure in a fresh real run. This is a model-quality correction; no hardcoded answer replaces inference.
+
 Not checked: third-party parser internals, independent unseen attack authoring, high-concurrency/multi-instance deployments, a submission portal or an external security certification. No dependency or infrastructure replacement is needed for the demonstrated scope.
+
+
+15. **Reopening a task did not restore its sources** (`frontend/src/main.tsx`).
+    History displayed the prior research result alongside the default example URL. The existing history action now restores actual broker URLs, repository selection and user-supplied artifacts. A production browser assertion verified the malicious research fixture URL was restored.
+
+16. **Mobile table reasons became narrow vertical text** (`frontend/src/style.css`).
+    The global table could squeeze long security reasons into a tiny column. A minimum-width rule and unbroken timestamp/decision labels keep evidence tables readable inside their existing horizontal scroll container; no page-wide overflow is permitted. Final mobile visual verification is recorded with the release evidence.
+
+17. **Saved evaluation selectors did not match the displayed result** (`frontend/src/main.tsx`).
+    Reopening a measured semantic comparison left the default override selected. The history action now restores the recorded agent, scenario and surface. Changing a selector clears the old comparison, and selectors are disabled during execution. A browser assertion verifies restored values and stale-result clearing.
+
+## Final resolution
+
+Findings 1–17 are corrected and verified for the disclosed synthetic/public demonstration scope. The initial state table above is the audit snapshot, not the final implementation state. Backend source hashes match the 82-pass Linux report. Hosted A–G evidence, the retained rate-limit failure, supplier-quality regression and browser evidence are in `submission-readiness-report.json`.
+
+| Final capability group | State | Verified scope / limit |
+|---|---|---|
+| Mandatory input/context/action/tool-output/DLP controls | COMPLETE | Shared core, immutable permissions/payloads, actual Linux bypass probes, exact source-bound tests |
+| Filename/magic/retention/provenance/router/reporting corrections | COMPLETE | Targeted regressions and hosted artifact/error checks |
+| Three distinct protected Groq workflows | COMPLETE | Three clean supplier documents plus hostile workbook; public malicious page brief; fixed repository review |
+| Enabled nine-screen console and Attack Lab | COMPLETE | Actual file upload/task/comparison, evidence drill-down, policy/history/theme/error controls; desktop/mobile checks |
+| Seven engineering attack categories | COMPLETE | Authored seven-category hosted runs and 42 format variants; official F3 achievement remains unverified |
+| Semantic generalization / D2 reliability | PARTIAL | Measured incremental detection; final broader C recall 8/9, retained evasion and unknown prevention; no independent reliability claim |
+| Tier 1/Tier 2 declared parser channels | COMPLETE | Profile `atf-extract-v2`; gaps/unsupported regions explicitly withheld |
+| Raster images | PARTIAL | Tested English OCR and metadata; QR/recognition guarantees absent |
+| Shared demo authentication / temporary retention | COMPLETE | One authenticated principal, explicit origins, bounded temporary SQLite; not enterprise tenant identity |
+| Durable live multi-user storage | MISSING | Not provisioned or claimed; public archived test evidence is versioned in Git |
+| Optional memory / correlation / contextual LLM / Tier 3 / live effects | MISSING | Disabled; no direct network/shell/MCP escape route enabled |
+| Deployment and submission preparation | COMPLETE | Verified Vercel/Render, actual reports, six diagrams, timed walkthrough and screenshots; portal submission/recording not performed |
+
+Final decision: **READY WITH DISCLOSED LIMITATIONS** for the tested hackathon demonstration. The extended detection target and general reliability targets are not established. See `docs/RELEASE_CHECKLIST.md` and `EVALUATION.md` for denominators and unresolved capability limits.
