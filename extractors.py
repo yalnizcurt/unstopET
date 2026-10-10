@@ -29,7 +29,7 @@ class HTML(HTMLParser):
         self.tags.append(tag)
         for key, value in attrs:
             if value: self.add('attributes', f'{tag}@{key}', value)
-        if tag in ('script','iframe','object','embed'): self.add.gaps.append('active_or_embedded_'+tag)
+        if tag in ('script','iframe','object','embed','img','svg','video','audio','link','style'): self.add.gaps.append('active_or_embedded_'+tag)
     def handle_endtag(self, tag):
         if self.tags and tag in self.tags: self.tags=self.tags[:len(self.tags)-1-self.tags[::-1].index(tag)]
     def handle_data(self, data): self.add('static_text', '/'.join(self.tags), data)
@@ -50,6 +50,10 @@ def extract(name, raw, budget=None, depth=0):
                 location=f'{name}:{location}:line{line+1}', text=part))
     add.gaps=result['gaps']
     ext=PurePosixPath(name.lower()).suffix
+    signature=('.pdf',) if raw.startswith(b'%PDF-') else ('.zip','.docx','.xlsx') if raw.startswith(b'PK\x03\x04') else ('.png',) if raw.startswith(b'\x89PNG\r\n\x1a\n') else ('.jpg','.jpeg') if raw.startswith(b'\xff\xd8\xff') else ()
+    if (signature and ext not in signature) or (ext in ('.pdf','.zip','.docx','.xlsx','.png','.jpg','.jpeg') and not signature):
+        raise ValueError('MIME_MISMATCH')
+    add('filename','name',name)
     if len(raw)>MAX_FILE: raise ValueError('FILE_TOO_LARGE')
     if raw.startswith(b'%PDF-') and ext=='.pdf':
         result['media_type']='application/pdf'
@@ -89,6 +93,7 @@ def extract(name, raw, budget=None, depth=0):
                 shared=[''.join(node.itertext()) for node in root]
             for i in infos:
                 if i.is_dir(): continue
+                add('filename',i.filename,i.filename)
                 data=archive.read(i)
                 if i.filename.endswith(('.xml','.rels')):
                     root=XML.fromstring(data)
@@ -113,9 +118,9 @@ def extract(name, raw, budget=None, depth=0):
             if depth>=2: raise ValueError('NESTING_BUDGET_EXHAUSTED')
             for i in infos:
                 if i.is_dir(): continue
-                add('filenames',i.filename,i.filename)
                 child=extract(i.filename,archive.read(i),budget,depth+1)
-                result['children'].append(dict(id=child['id'],filename=child['filename'],sha256=child['sha256'],status=child['status'],gaps=child['gaps']))
+                result['children'].append(dict(id=child['id'],filename=child['filename'],sha256=child['sha256'],status=child['status'],gaps=child['gaps'],children=child['children']))
+                for fragment in child['fragments']: fragment['location']=name+'!'+fragment['location']
                 result['fragments'].extend(child['fragments'])
                 result['gaps'].extend(child['gaps'])
                 if child['status']=='UNSUPPORTED': result['gaps'].append(i.filename+':unsupported_child')
@@ -140,6 +145,6 @@ def extract(name, raw, budget=None, depth=0):
         if result['media_type']=='text/html': parser=HTML(add); parser.feed(value); parser.close()
         else: add('text','body',value)
     else: result['status']='UNSUPPORTED'; result['gaps'].append('unsupported_media_or_magic_mismatch')
-    if not result['fragments'] and result['status']!='UNSUPPORTED': result['gaps'].append('no_extracted_content')
+    if not any(f['channel']!='filename' for f in result['fragments']) and result['status']!='UNSUPPORTED': result['gaps'].append('no_extracted_content')
     if result['gaps'] and result['status']!='UNSUPPORTED': result['status']='PARTIAL'
     return result

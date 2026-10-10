@@ -15,8 +15,9 @@ class PinnedHTTPS(http.client.HTTPSConnection):
 
 def validate_url(url):
     if not isinstance(url,str) or len(url)>2048: raise Denied('INVALID_PUBLIC_URL')
-    parsed=urlsplit(url)
-    if parsed.scheme!='https' or not parsed.hostname or parsed.username or parsed.password or parsed.fragment or parsed.port not in (None,443):
+    try: parsed=urlsplit(url); port=parsed.port
+    except ValueError: raise Denied('INVALID_PUBLIC_URL') from None
+    if parsed.scheme!='https' or not parsed.hostname or parsed.username or parsed.password or parsed.fragment or port not in (None,443):
         raise Denied('DESTINATION_DENIED')
     host=parsed.hostname.encode('idna').decode()
     if host=='localhost' or host.endswith(('.localhost','.local','.internal')): raise Denied('DESTINATION_DENIED')

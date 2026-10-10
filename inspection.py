@@ -2,7 +2,7 @@
 import base64
 import re
 import unicodedata
-from firewall import SECRET, digest
+from firewall import digest, redact_known_secrets
 
 RULES = {
  'instruction_override': r'ignore\s+(?:all\s+)?(?:previous|prior|above|earlier)\s+(?:instructions|rules)|override\s+(?:the\s+)?(?:system|security)\s+(?:policy|instructions)',
@@ -24,7 +24,7 @@ def signals_for(value):
                for k, pattern in RULES.items() if re.search(pattern, normalized, re.I)]
     if EDUCATIONAL.search(normalized):
         return []
-    if SECRET.search(normalized):
+    if normalized != redact_known_secrets(normalized):
         signals.append(dict(category='credential_theft', engine='dlp', confidence=1.0))
     for token in re.findall(r'[A-Za-z0-9+/]{24,}={0,2}', normalized):
         try:
@@ -36,17 +36,25 @@ def signals_for(value):
     return signals
 
 
+def retained_children(children):
+    return [dict(child,filename=redact_known_secrets(child['filename']),
+        gaps=[redact_known_secrets(gap) for gap in child['gaps']],
+        children=retained_children(child.get('children',[]))) for child in children]
+
 def inspect(tree, classifier=None):
     """Only released fragment strings reach the broker. Unsupported regions remain withheld."""
-    fragments = []
+    fragments = []; withheld_names=[]
     gaps = list(tree.get('gaps', []))
     for original in tree.get('fragments', []):
         value = original['text']
         signals = signals_for(value)
         disposition = 'SANITIZE' if signals else 'ALLOW'
         router = 'DETERMINISTIC_SUFFICIENT'
-        if not signals and classifier and len(value.split()) >= 5 and ROUTER.search(value) and not EDUCATIONAL.search(value):
+        selected=['normalization','rules','bounded_base64_decoder','dlp']
+        semantic_reason='CLASSIFIER_DISABLED' if not classifier else 'SIGNATURE_MATCH' if signals else 'SHORT_FRAGMENT' if len(value.split())<5 else 'EDUCATIONAL_QUOTATION' if EDUCATIONAL.search(value) else 'NO_SEMANTIC_CUE' if not ROUTER.search(value) else 'AMBIGUOUS_INSTRUCTION_CUE'
+        if semantic_reason=='AMBIGUOUS_INSTRUCTION_CUE':
             router = 'SEMANTIC_REQUIRED'
+            selected.append('prompt_guard_2')
             # Byte-sized windows conservatively bound the classifier's 512-token context.
             data = value.encode()
             try:
@@ -62,20 +70,24 @@ def inspect(tree, classifier=None):
                 gaps.append(original['location'] + ':semantic_inspection_unavailable')
         released = '[Instruction attempt quarantined]' if disposition == 'SANITIZE' else value
         if disposition == 'REQUIRE_REVIEW': released = '[Fragment withheld pending inspection]'
-        fragments.append(dict(original, original_hash=digest(value.encode()),
-            original_text=SECRET.sub('[REDACTED]', value), text=SECRET.sub('[REDACTED]', released),
+        if original['channel']=='filename' and disposition!='ALLOW': withheld_names.append(value)
+        fragments.append(dict(original, location=redact_known_secrets(original['location']), original_hash=digest(value.encode()),
+            original_text=redact_known_secrets(value), text=redact_known_secrets(released),
             disposition=disposition, signals=signals, router=router,
+            routing=dict(selected=selected,reason=semantic_reason,skipped=[] if 'prompt_guard_2' in selected else [dict(engine='prompt_guard_2',reason=semantic_reason)],analysis_complete=disposition!='REQUIRE_REVIEW'),
             risk=95 if signals else None if disposition == 'REQUIRE_REVIEW' else 0))
+    for fragment in fragments:
+        fragment['released_location']=fragment['id'] if any(name in fragment['location'] for name in withheld_names) else fragment['location']
     status = 'UNSUPPORTED' if tree.get('status') == 'UNSUPPORTED' else 'PARTIAL' if gaps else 'COMPLETE'
     if not fragments and status != 'UNSUPPORTED': status = 'PARTIAL'; gaps.append('no_extracted_content')
-    return dict(schema_version=1, id=tree['id'], filename=tree['filename'], sha256=tree['sha256'],
-        media_type=tree['media_type'], parser_version='atf-extract-v1', policy_version=2,
+    return dict(schema_version=1, id=tree['id'], filename=redact_known_secrets(tree['filename']), sha256=tree['sha256'],
+        media_type=tree['media_type'], parser_version='atf-extract-v2', policy_version=2,
         inspection_status=status, inspected_channels=sorted(set(f['channel'] for f in fragments)),
-        uninspected_channels=sorted(set(gaps)), release_scope='INSPECTED_FRAGMENTS_ONLY' if status=='PARTIAL' else
+        uninspected_channels=sorted(set(redact_known_secrets(gap) for gap in gaps)), release_scope='INSPECTED_FRAGMENTS_ONLY' if status=='PARTIAL' else
         'NONE' if status=='UNSUPPORTED' else 'DECLARED_PROFILE_FRAGMENTS',
         decision='BLOCK' if status=='UNSUPPORTED' or not fragments else 'REQUIRE_REVIEW' if any(f['disposition']=='REQUIRE_REVIEW' for f in fragments) else
         'SANITIZE' if any(f['signals'] for f in fragments) else 'ALLOW',
-        fragments=fragments, children=tree.get('children', []),
+        fragments=fragments, children=retained_children(tree.get('children', [])),
         safe_claim=False, note='Completeness describes declared parser channels, not immunity to prompt injection.')
 
 MANIFEST = [
@@ -88,3 +100,5 @@ MANIFEST = [
  dict(format='ZIP', status='ENABLED', channels=['bounded recursive supported children','filenames'], gaps=['unsupported children withheld']),
  dict(format='PPTX / audio / video / legacy binaries', status='UNSUPPORTED', channels=[], gaps=['no adapter']),
 ]
+
+for profile in MANIFEST: profile["profile_version"]="atf-extract-v2"

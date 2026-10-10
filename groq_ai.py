@@ -12,7 +12,7 @@ import time
 from urllib.error import HTTPError, URLError
 from urllib.request import HTTPRedirectHandler, HTTPSHandler, ProxyHandler, Request, build_opener
 
-from firewall import Binding, Denied, Firewall, SECRET, encode, text
+from firewall import Binding, Denied, Firewall, encode, text, redact_known_secrets
 
 ENDPOINT = "https://api.groq.com/openai/v1/chat/completions"
 
@@ -67,7 +67,7 @@ class GroqProvider:
         data = encode(payload)
         if len(data) > 32_768 or self.attempts >= 12:
             raise Denied("PROVIDER_BUDGET_EXHAUSTED")
-        if SECRET.search(encode(messages).decode()):
+        if (content:=encode(messages).decode()) != redact_known_secrets(content):
             raise Denied("SECRET_DISCLOSURE_DENIED")
         self.attempts += 1
         request = Request(ENDPOINT, data=data, headers={
@@ -91,7 +91,7 @@ class GroqProvider:
             if choice["finish_reason"] != "stop" or choice["message"].get("tool_calls"):
                 raise Denied("PROVIDER_COMPLETION_INCOMPLETE")
             body = text(choice["message"]["content"])
-            if SECRET.search(body):
+            if body != redact_known_secrets(body):
                 raise Denied("SECRET_DISCLOSURE_DENIED")
             return dict(provider="GROQ", model=self.model, text=body, usage=usage)
         except HTTPError as error:

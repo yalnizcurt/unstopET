@@ -4,7 +4,7 @@ import math
 import time
 from urllib.error import HTTPError, URLError
 from urllib.request import Request
-from firewall import Denied, SECRET, encode
+from firewall import Denied, encode, redact_known_secrets
 from groq_ai import ENDPOINT
 
 GUARD_MODEL = 'meta-llama/llama-prompt-guard-2-86m'
@@ -17,7 +17,7 @@ class PromptGuard:
         self.tokens = 0
 
     def __call__(self, content):
-        if len(content.encode()) > 400 or SECRET.search(content) or self.calls >= 16:
+        if len(content.encode()) > 400 or content!=redact_known_secrets(content) or self.calls >= 16:
             raise Denied('CLASSIFIER_BUDGET_OR_DISCLOSURE_DENIED')
         self.calls += 1
         started = time.monotonic()

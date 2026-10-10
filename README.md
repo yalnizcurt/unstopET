@@ -3,6 +3,7 @@
 A deployed defense-in-depth AI security prototype: a React/TypeScript security console, shared inspection engine and three Groq-powered protected agents. Server policy controls authority, evidence release and external effects even when the model follows an adversarial instruction.
 
 - Console: https://agent-trust-firewall.vercel.app
+- API documentation: https://agent-trust-firewall-api.onrender.com/api/docs
 - API health: https://agent-trust-firewall-api.onrender.com/api/v1/health
 - Repository: https://github.com/yalnizcurt/unstopET
 
@@ -30,8 +31,8 @@ The production start command is `python3 api.py`. Versioned APIs live under `/ap
 
 ## Verification and limits
 
-The expanded Linux acceptance report records 69 passing checks and two Mac-only skips. Classifier calibration and reserved-variant reports use actual Groq Prompt Guard scores. The authored 42-attack / six-benign detection matrix exercises seven categories across six document surfaces; it is not an unseen-attack reliability estimate. Hosted workflow/evaluation evidence is recorded separately when verified; authored small sets are not universal protection or official F3/D2 achievement.
+The expanded Linux acceptance report records 81 passing checks and two Mac-only skips. Classifier calibration and reserved-variant reports use actual Groq Prompt Guard scores. The authored 42-attack / six-benign detection matrix exercises seven categories across six document surfaces; it is not an unseen-attack reliability estimate. Hosted workflow/evaluation evidence is recorded separately when verified; authored small sets are not universal protection or official F3/D2 achievement.
 
 Free Render history is temporary SQLite, bounded to 24 hours / 300 total records. Raw binaries are discarded after extraction. Synthetic/public demo inputs only; this is not enterprise tenant authentication or durable production audit storage. Free services can sleep and restart.
 
-See [Implementation sequence](IMPLEMENTATION.md), [Architecture](ARCHITECTURE.md), [Security](SECURITY.md), [Agent capabilities](AGENTS.md), [Coverage](COVERAGE.md), [Evaluation](EVALUATION.md) and [Deployment](DEPLOYMENT.md).
+See [Implementation sequence](IMPLEMENTATION.md), [Architecture](ARCHITECTURE.md), [Security](SECURITY.md), [Agent capabilities](AGENTS.md), [Coverage](COVERAGE.md), [Evaluation](EVALUATION.md) [Deployment](DEPLOYMENT.md), [Submission package](SUBMISSION.md), [Release checklist](docs/RELEASE_CHECKLIST.md) and [Implementation audit](docs/IMPLEMENTATION_AUDIT.md).

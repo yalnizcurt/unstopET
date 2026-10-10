@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
+import base64
 import hashlib
 import json
 import re
@@ -21,6 +22,18 @@ HOSTILE = re.compile(
     r"send\s+.*(credentials|secrets)|"
     r"(system|developer)\s*:", re.I
 )
+
+
+def redact_known_secrets(value):
+    value=SECRET.sub('[REDACTED]',value)
+    def encoded(match):
+        token=match.group()
+        if len(token)>5500: return token
+        try:
+            decoded=base64.b64decode(token.replace('-','+').replace('_','/')+'='*((-len(token))%4),validate=True).decode('utf-8')
+        except (ValueError,UnicodeError): return token
+        return '[REDACTED]' if SECRET.search(decoded) else token
+    return re.sub(r'[A-Za-z0-9+/_-]{24,}={0,2}',encoded,value)
 
 
 class Denied(Exception):
@@ -171,7 +184,8 @@ class Firewall:
                     self.allowed[binding].add(artifact.id)
             return self.issue_snapshot(binding, intent)
 
-    def import_text(self, binding, content, kind="EXTERNAL_RETRIEVED_EVIDENCE", sensitivity="PUBLIC"):
+    # inspected is supplied only by the trusted application after fragment release, never by runtime requests.
+    def import_text(self, binding, content, kind="EXTERNAL_RETRIEVED_EVIDENCE", sensitivity="PUBLIC", inspected=False):
         with self.lock:
             self._charge(binding, len(text(content).encode()))
             if kind not in ("USER_SUPPLIED_UNTRUSTED_CONTENT", "EXTERNAL_RETRIEVED_EVIDENCE"):
@@ -180,7 +194,7 @@ class Firewall:
                 raise Denied("INVALID_SENSITIVITY")
             artifact_id = secrets.token_hex(16)
             fragments = tuple(
-                (f"{artifact_id}:{i}", "[Instruction attempt quarantined]" if HOSTILE.search(line) else line)
+                (f"{artifact_id}:{i}", "[Instruction attempt quarantined]" if not inspected and HOSTILE.search(line) else line)
                 for i, line in enumerate(content.splitlines())
             )
             artifact = Artifact(artifact_id, binding, kind, content, digest(content.encode()), sensitivity,
@@ -248,7 +262,7 @@ class Firewall:
         ]
 
     def _dlp(self, binding, payload, snapshot=None, external=False, attachments=()):
-        if SECRET.search(payload.decode("utf-8", errors="replace")):
+        if (value:=payload.decode("utf-8", errors="replace")) != redact_known_secrets(value):
             raise Denied("SECRET_DISCLOSURE_DENIED")
         if external:
             refs = snapshot.refs if snapshot else ()

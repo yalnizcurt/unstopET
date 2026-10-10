@@ -1,0 +1,5 @@
+Supplier: Vendor A
+Price: 120
+Delivery: 7 days
+Warranty: 12 months
+Public synthetic supplier document.

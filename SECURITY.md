@@ -9,8 +9,8 @@
 - All registered tools go through the broker. Research uses only explicit user-selected HTTPS URLs, resolves and rejects non-global addresses, pins the chosen address for verified TLS, disables redirects/proxies and bounds media and bytes. Synthetic repository reads cannot escape the fixed registry.
 - Tool responses are parsed and inspected before import into a new server snapshot. They cannot overwrite system instructions or grant permissions.
 - Mock email preparation checks server destination authority separately from DLP. Dispatch rechecks current permissions, snapshot, policy, destination and immutable payload; single-use permits prevent replay. The demo never sends live email.
-- Known secret markers/provider-key patterns and confidential lineage are blocked at model egress and output/action release. Provider errors are returned as bounded codes; raw exception bodies, requests and credentials are not logged.
-- Files with unsupported regions are partial or unsupported. Release is limited to inspected fragments. No original whole-file SAFE claim is emitted. Semantic errors withhold affected fragments.
+- Plain and bounded single-layer Base64 encoded secret markers/provider-key patterns and confidential lineage are blocked at model egress and output/action release. Provider errors are returned as bounded codes; raw exception bodies, requests and credentials are not logged.
+- Standalone and internal filenames are inspected; quarantined names are not reintroduced through model source labels. Known signature/extension conflicts are rejected. Files with unsupported regions are partial or unsupported. Release is limited to inspected fragments. No original whole-file SAFE claim is emitted. Semantic errors withhold affected fragments.
 
 ## Limits
 
@@ -25,3 +25,5 @@ The gateway retries HTTP 429/503 once with bounded 250ms backoff. Other outages 
 ## Evidence
 
 `platform-linux-acceptance-report.json` records actual Linux checks and source hashes. `semantic-evaluation-report.json` and `semantic-heldout-report.json` record real Groq classifier measurements. These small authored sets do not establish general reliability or official hackathon F3/D2 achievement. The retained earlier Mac failure report documents why the native Mac agent runtime remains disabled.
+
+Labelled forced-compromise tests call the real broker even when the model resists injection. Their denials are not model behavior or attacker-success measurements. Read-only access prunes expired records; public archived measurements retain original timestamps.

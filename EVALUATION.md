@@ -2,7 +2,7 @@
 
 Measurements and targets are separate. Do not treat a passing unit test as a measured attack prevention percentage.
 
-- `platform-linux-acceptance-report.json`: expanded backend checks, real Linux agent/parser restrictions, API authority/coverage tests and forced-compromise tool proposals. 69 pass, two Mac-specific skips.
+- `platform-linux-acceptance-report.json`: expanded backend checks, real Linux agent/parser restrictions, API authority/coverage tests and forced-compromise tool proposals. 81 pass, two Mac-specific skips.
 - `semantic-evaluation-report.json`: 16 authored calibration inputs with real Groq Prompt Guard 2 86M scores. At a frozen 0.9 threshold, the implemented router recovers two of eight attacks missed by rules; zero added false positives on eight benign cases. Standalone classifier flags an educational quote; the router excludes explicitly labelled educational material. Several indirect attacks remain missed.
 - `semantic-heldout-report.json`: eight reserved authored language/phrasing variants, not independent authoring. Routed classifier recovers three of four attacks missed by rules, with no added false positives on four benign cases. The French variant is missed. This sample is too small for broad reliability claims.
 - `detection-matrix-report.json`: 42 authored attack format variants (seven categories × six surfaces) and six benign format variants. Target-category detection and preserved price facts pass on this regression matrix. Repeated wording and thin benign coverage prevent general reliability claims. The report includes 95% Wilson intervals.
@@ -29,3 +29,5 @@ The initial semantic calibration measures detector improvement on variants misse
 Archived public synthetic runs are included as versioned measured evidence in the container and labelled `ARCHIVED_MEASURED_RUN` in the UI, with original timestamps and backend commit. They are not rerun or represented as new measurements on startup. Live task/upload/event history remains temporary SQLite.
 
 The semantic-only positive fixture is a known authored paraphrase: rules do not flag it and real Prompt Guard does. A separate context-laundering fixture was missed by the classifier; `semantic-scenario-report.json` retains that miss and Attack Lab keeps it selectable. These are detector observations, not fabricated agent compromise outcomes.
+
+The final audited release adds standalone/internal filename checks, strict signature conflicts, nested provenance, external HTML-media gaps, on-read retention cleanup, explicit router reasons and plain/single-layer Base64 marker DLP. Forced-compromise proposals are labelled independently of model output and recorded as actual broker decisions. Final source-bound containment/API evidence and hosted A–G checks are the release gates.

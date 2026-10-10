@@ -13,7 +13,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 from agents import PROFILES, REPOSITORY
-from firewall import Binding, Denied, Firewall, SECRET, text
+from firewall import Binding, Denied, Firewall, text, redact_known_secrets
 from gate1 import run_runtime, verify_linux_boundary
 from groq_ai import GroqProvider
 from inspection import MANIFEST, inspect
@@ -107,8 +107,8 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
         if artifact['inspection_status']=='UNSUPPORTED': raise Denied('UNSUPPORTED_ARTIFACT')
         released=[f for f in artifact['fragments'] if f['disposition'] in ('ALLOW','SANITIZE')]
         if not released: raise Denied('NO_RELEASED_FRAGMENTS')
-        content='\n'.join(f"[{f['location']}] {f['text']}" for f in released)
-        evidence=firewall.import_text(binding,text(content),kind=artifact.get('source_kind','USER_SUPPLIED_UNTRUSTED_CONTENT'))
+        content='\n'.join(f"[{f.get('released_location',f['location'])}] {f['text']}" for f in released)
+        evidence=firewall.import_text(binding,text(content),kind=artifact.get('source_kind','USER_SUPPLIED_UNTRUSTED_CONTENT'),inspected=True)
         firewall.grant_read(binding,evidence.id)
         artifact["context_source_id"]=evidence.id
     def execute(body,provider,classifier):
@@ -116,7 +116,7 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
         profile=PROFILES[body.agent_id]; inspected=[]; tool_activity=[]
         if body.urls and body.agent_id!='research': raise Denied('TOOL_NOT_AUTHORIZED')
         if body.use_demo_repository and body.agent_id!='developer': raise Denied('TOOL_NOT_AUTHORIZED')
-        if SECRET.search(body.intent) or any(SECRET.search(url) for url in body.urls): raise Denied('SECRET_DISCLOSURE_DENIED')
+        if body.intent!=redact_known_secrets(body.intent) or any(url!=redact_known_secrets(url) for url in body.urls): raise Denied('SECRET_DISCLOSURE_DENIED')
         if body.session_id and not store.get(body.session_id,'session'): raise Denied('SESSION_ACCESS_DENIED')
         for i,value in enumerate(body.evidence): inspected.append(inspection(f'pasted-{i+1}.txt',text(value).encode(),classifier))
         for identity in body.artifact_ids:
@@ -207,7 +207,7 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
         try:
             try: raw=base64.b64decode(body.data,validate=True)
             except ValueError: raise Denied('INVALID_BASE64_FILE') from None
-            if SECRET.search(body.filename): raise Denied('SENSITIVE_FILENAME_DENIED')
+            if body.filename!=redact_known_secrets(body.filename): raise Denied('SENSITIVE_FILENAME_DENIED')
             provider=provider_factory(); return inspection(body.filename,raw,guard(provider))
         finally: work.release()
     @app.get('/api/v1/artifacts')
@@ -229,7 +229,7 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
             provider=provider_factory(); return execute(body,provider,guard(provider))
         except Denied as error:
             store.put('event',dict(operation='task.execute',result='DENY',reason=error.code,agent_id=body.agent_id))
-            store.put('session',dict(agent_id=body.agent_id,intent=SECRET.sub('[REDACTED]',body.intent),status='FAILED',
+            store.put('session',dict(agent_id=body.agent_id,intent=redact_known_secrets(body.intent),status='FAILED',
                 output='',error=error.code,provider='GROQ' if provider else 'UNAVAILABLE',model=getattr(provider,'model',None),
                 usage=getattr(provider,'usage',{}),seconds=round(time.monotonic()-started,3),artifacts=[],tool_activity=[],
                 decisions=[],emails_executed=0,runtime='VERIFIED_LINUX',memory='DISABLED'))
@@ -269,6 +269,12 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
                 store.put('event',dict(operation='attack_lab.'+row['configuration'],result='OBSERVED',
                     reason='SYNTHETIC_CONTAINED_TEST',evaluation_id=saved['id'],agent_id=body.agent_id,
                     attacker_objective=row.get('attacker_objective_observed'),prevented=row.get('prevented')))
+                probe=row.get('containment_probe')
+                if probe:
+                    decision=probe['decision']
+                    store.put('event',dict(operation=probe['operation'],result='ALLOW' if decision['ok'] else 'DENY',
+                        reason=decision.get('error'),origin=probe['origin'],evaluation_id=saved['id'],
+                        agent_id=body.agent_id,policy_version=2))
             return saved
         finally: work.release()
     original_openapi=app.openapi

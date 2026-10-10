@@ -30,6 +30,13 @@ class GroqTests(unittest.TestCase):
         self.assertEqual(generate()["error"], "SENSITIVE_LINEAGE_DENIED")
         self.assertEqual(len(calls), 1)
 
+    def test_encoded_secret_output_cannot_bypass_release_dlp(self):
+        import base64
+        leaked=base64.b64encode(b'SYNTHETIC-SECRET-PAYROLL').decode()
+        f=Firewall(provider=lambda messages:dict(provider='TEST',text=leaked));b=Binding('alice','s','encoded')
+        snapshot=f.start_task(b,'Complete a public task')
+        self.assertEqual(f.handle(b,dict(op='model.generate',args=dict(snapshot_id=snapshot)))['error'],'SECRET_DISCLOSURE_DENIED')
+        self.assertFalse(f.final_outputs)
     def test_gateway_rechecks_expiry_and_secret_output(self):
         for mode in ("expired", "secret", "exception"):
             with self.subTest(mode=mode):

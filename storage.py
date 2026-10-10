@@ -20,9 +20,16 @@ class Store:
             self.db.execute('DELETE FROM records WHERE id IN (SELECT id FROM records ORDER BY created DESC LIMIT -1 OFFSET 300)')
             self.db.commit()
         return record
+    def prune(self):
+        self.db.execute('DELETE FROM records WHERE created < ?',(time.time()-86400,))
+        self.db.commit()
     def list(self,kind,principal='demo-owner'):
-        with self.lock: rows=self.db.execute('SELECT data FROM records WHERE kind=? AND principal=? ORDER BY created DESC LIMIT 100',(kind,principal)).fetchall()
+        with self.lock:
+            self.prune()
+            rows=self.db.execute('SELECT data FROM records WHERE kind=? AND principal=? ORDER BY created DESC LIMIT 100',(kind,principal)).fetchall()
         return [json.loads(row[0]) for row in rows]
     def get(self,identity,kind,principal='demo-owner'):
-        with self.lock: row=self.db.execute('SELECT data FROM records WHERE id=? AND kind=? AND principal=?',(identity,kind,principal)).fetchone()
+        with self.lock:
+            self.prune()
+            row=self.db.execute('SELECT data FROM records WHERE id=? AND kind=? AND principal=?',(identity,kind,principal)).fetchone()
         return json.loads(row[0]) if row else None

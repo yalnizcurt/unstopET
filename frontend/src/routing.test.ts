@@ -6,3 +6,5 @@ for(const page of ['Overview','Agents','Threat Intelligence','File Scanner','Att
 assert.equal(routeFromHash(''),'Overview');
 assert.equal(routeFromHash('#%'),'Overview');
 console.log('Navigation encoding checks passed');
+
+assert.equal(routeFromHash("#missing-page"),"Overview");
