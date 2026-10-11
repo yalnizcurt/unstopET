@@ -1,7 +1,9 @@
 import type { Row } from "../components/Common";
 export const API =
-  (import.meta as any).env.VITE_API_BASE ||
-  "https://agent-trust-firewall-api.onrender.com";
+  (import.meta as any).env.PROD
+    ? location.origin
+    : (import.meta as any).env.VITE_API_BASE ||
+      "https://agent-trust-firewall-api.onrender.com";
 export async function request(path: string, token: string, body?: Row) {
   const response = await fetch(API + "/api/v1/" + path, {
     method: body ? "POST" : "GET",
