@@ -53,6 +53,7 @@ export function ArtifactInspector({ record }: { record: Row }) {
         <Badge value={record.inspection_status} />
         <span className="subtle">{record.release_scope}</span>
       </div>
+      <p className="subtle">Coverage applies to declared parser channels. COMPLETE is not a claim that every possible document feature was inspected or is safe.</p>
       <p className="subtle">
         Detected type: {record.media_type} · profile: {record.parser_version}
       </p>

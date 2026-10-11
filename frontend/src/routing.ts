@@ -10,6 +10,7 @@ export function routeFromHash(hash: string): string {
         } as Record<string, string>
       )[raw] || raw;
     return [
+      "Walkthrough",
       "Protected Agents",
       "Runtime Activity",
       "Security Incidents",

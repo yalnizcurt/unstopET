@@ -70,7 +70,9 @@ const defaults: Record<string, { intent: string; evidence: string }> = {
   },
 };
 export default function App() {
-  const [showPublicExhibit, setShowPublicExhibit] = useState(false);
+  const [showPublicExhibit, setShowPublicExhibit] = useState(
+    routeFromHash(location.hash) === "Walkthrough",
+  );
   const [token, setToken] = useState(""),
     [draft, setDraft] = useState(""),
     [ready, setReady] = useState(false),
@@ -178,14 +180,19 @@ export default function App() {
     go("Workspace");
   }
   useEffect(() => {
-    const fn = () => setPage(routeFromHash(location.hash));
+    const fn = () => {
+      const route = routeFromHash(location.hash);
+      setPage(route);
+      setShowPublicExhibit(route === "Walkthrough");
+    };
     addEventListener("hashchange", fn);
     return () => removeEventListener("hashchange", fn);
   }, []);
-  async function upload(files: FileList | null) {
-    if (!files) return;
+  async function upload(input: HTMLInputElement) {
+    const selected = Array.from(input.files || []);
+    input.value = "";
+    if (!selected.length) return;
     await action(async () => {
-      const selected = Array.from(files);
       if (selected.length > 8) throw Error("Select at most 8 files per upload");
       if (page === "Workspace" && attachments.length + selected.length > 8)
         throw Error("A task accepts at most 8 attached artifacts");
@@ -200,8 +207,9 @@ export default function App() {
           filename: file.name,
           data: btoa(binary),
         });
+        setArtifacts((a) => [record, ...a.filter((item) => item.id !== record.id)]);
         setInvestigate(record);
-        if (record.inspection_status !== "UNSUPPORTED")
+        if (page === "Workspace" && record.inspection_status !== "UNSUPPORTED")
           setAttachments((a) => [...a, record.id]);
       }
       await refresh();
@@ -263,7 +271,10 @@ export default function App() {
   return (
     <div className={light ? "app light" : "app"}>
       {showPublicExhibit ? (
-        <PublicExhibit onBack={() => setShowPublicExhibit(false)} />
+        <PublicExhibit onBack={() => {
+          setShowPublicExhibit(false);
+          go("Overview");
+        }} />
       ) : !ready ? (
         <main className="login">
           <div className="login-art">
@@ -336,7 +347,10 @@ export default function App() {
               <LockKeyhole size={14} /> Code stays in this browser session. Groq
               credentials stay on the server.
             </p>
-            <button type="button" className="exhibit-open-link" onClick={() => setShowPublicExhibit(true)}>
+            <button type="button" className="exhibit-open-link" onClick={() => {
+              setShowPublicExhibit(true);
+              location.hash = "Walkthrough";
+            }}>
               Explore public product walkthrough <ArrowUpRight size={16} />
             </button>
             <p className="subtle">

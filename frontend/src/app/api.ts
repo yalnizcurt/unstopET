@@ -1,4 +1,5 @@
 import type { Row } from "../components/Common";
+import { requestErrorMessage } from "../errors";
 export const API =
   (import.meta as any).env.PROD
     ? location.origin
@@ -15,6 +16,6 @@ export async function request(path: string, token: string, body?: Row) {
     signal: AbortSignal.timeout(150000),
   });
   const data = await response.json();
-  if (!response.ok) throw Error(data.error || "Service unavailable");
+  if (!response.ok) throw Error(requestErrorMessage(data.error));
   return data;
 }

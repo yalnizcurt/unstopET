@@ -27,6 +27,7 @@ export function RuntimeActivity({
         </div>
         <span className="subtle">{sessions.length} retained runs</span>
       </div>
+      <p className="retention-note">Demo history is temporary: records can expire after 24 hours or be evicted when the shared storage limit is reached. A missing record is not a successful security outcome.</p>
       <div className="scan-grid">
         <section className="panel">
           <h3>Protected executions</h3>
@@ -63,6 +64,9 @@ export function RuntimeActivity({
               <Badge value={selected.status} />
             </div>
             <p className="subtle mono hash">Run {selected.id}</p>
+            {!sessions.some((run) => run.id === selected.id) && (
+              <div className="notice">This run is no longer in the server's retained history. The trace below was previously loaded in this browser; refresh does not restore an expired record.</div>
+            )}
             {selected.origin && <Badge value={selected.origin} />}
             <p className="subtle">{selected.runtime}</p>
             <p className="subtle">

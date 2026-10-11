@@ -12,7 +12,7 @@ from gate1 import verify_linux_boundary
 
 if __name__ == "__main__":
     suite = unittest.defaultTestLoader.loadTestsFromNames([
-        "test_gate1", "test_groq", "test_linux", "test_server", "test_platform", "test_parsing_linux", "test_integrations", "test_runtime_steps", "test_runtime_events", "test_sdk", "test_reliability_benchmark"])
+        "test_gate1", "test_groq", "test_linux", "test_server", "test_platform", "test_parsing_linux", "test_integrations", "test_runtime_steps", "test_runtime_events", "test_sdk", "test_reliability_benchmark", "test_heldout_evaluation"])
     output = io.StringIO()
     result = unittest.TextTestRunner(stream=output, verbosity=2).run(suite)
     probes = verify_linux_boundary() if result.wasSuccessful() else None

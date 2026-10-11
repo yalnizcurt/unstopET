@@ -1,0 +1,50 @@
+# Threat model and reliability gap analysis
+
+Reviewed 11 October 2026 against primary guidance, published benchmark papers and the current code. This is a bounded prototype threat model, not an independent certification.
+
+The principal threat is an attacker controlling evidence—an uploaded document, selected web page, repository text or tool receipt—and persuading the model to treat that evidence as permission. Output manipulation can occur even when the broker prevents a dangerous action. Keep detection, model behavior and actual execution as separate measurements.
+
+## Findings from primary sources
+
+[OWASP LLM01:2025](https://genai.owasp.org/llmrisk/llm01-prompt-injection/) treats direct and indirect input as prompt-injection pathways, including obfuscated and multimodal content. Least privilege and external validation reduce consequences; a text classifier is not a complete permission boundary. [OWASP's Agentic Top 10](https://genai.owasp.org/2025/12/09/owasp-top-10-for-agentic-applications-the-benchmark-for-agentic-security-in-the-age-of-autonomous-ai/) extends the discussion to tool misuse, identity, persistent context and agent behavior. **Requirement:** the model may propose actions, but authenticated server state must authorize every resource and side effect. Verify this with a compromised-model experiment, independent of detector recall.
+
+[MITRE ATLAS September 2026 data](https://github.com/mitre-atlas/atlas-data/releases/tag/v2026.09) includes indirect injection and prompt obfuscation; its preceding releases address agent tool poisoning, authority expansion controls and resource consumption. ATLAS is a threat knowledge base, not a score for this product. **Requirement:** track entry point, untrusted source, proposed operation, destination, authority and execution outcome. A registry status or model refusal cannot substitute for this evidence.
+
+[AgentDojo](https://arxiv.org/abs/2406.13352) evaluates agents performing legitimate tasks while consuming adversarial tool outputs and supports adaptive attack development. **Requirement:** use a matched underlying task, measure useful completion as well as attacker success, and preserve failed/unknown runs. This project has not run the full AgentDojo suite. Its three hosted workflows and contained procurement A/B/C fixture remain distinct experiments.
+
+[InjecAgent](https://arxiv.org/abs/2403.02691) studies harmful actions and data stealing through tool-integrated agents. Its [official dataset](https://github.com/uiuc-kang-lab/InjecAgent) supplies an independently authored source of tool-output text. **Requirement:** test ordinary-looking, task-incompatible requests inside authentic receipt structures, not only familiar “ignore instructions” signatures. We imported a pinned, MIT-attributed subset and measured the detector without executing any upstream tool.
+
+[BIPIA](https://arxiv.org/abs/2312.14197) studies indirect attacks across several legitimate task types and defense approaches. Its [data instructions](https://github.com/microsoft/BIPIA/blob/main/benchmark/README.md) identify separate source-data licensing requirements. **Requirement:** preserve legitimate facts and test different tasks; do not republish benchmark context merely because repository code has a permissive license. BIPIA is a research reference here, not an imported or executed suite.
+
+## What the new measurements found
+
+The familiar offline suite detected **66/84 authored attack instances** and flagged **0/84 benign instances**. Its 168 instances repeat 28 strings over six formats. The new fixed corpus contains **32 public InjecAgent attacks**, **16 new authored attacks** and **16 benign controls**. Both deterministic B and routed-classifier C detected **4/48 attacks**, with **6/16 benign false positives**. Both detected **0/32 public tool-output attacks**. Groq's Prompt Guard 2 86M performed 11 real requests with no provider errors and added zero detections on this corpus. All misses and false positives are retained in [the report](../evaluation/heldout/routed-classifier-report-v1.json).
+
+This is a material detection gap. Most public attacks were not routed to semantic analysis; some requests were written as polite operational instructions and did not contain a known signature. One routed public case also escaped. Quoted attacks, a literal `send_email` function name and a documented role string produced benign signals. Two-layer encoding, homoglyphs, static instruction chaining and an attack following an educational prefix expose additional gaps. These results do not imply that prohibited effects executed: no agent generation or executor was run in this detector study.
+
+The new authored scenarios are first-use but not blinded; their author read the detector before writing them. Public cases were selected by source-instruction hashes before scoring. Public benchmark overlap with classifier training is unknown. No thresholds, router terms or rules were adjusted from this corpus. Source hashes and corpus freeze are recorded. [Dataset attribution and reproduction instructions](../evaluation/heldout/README.md) explain these limits.
+
+## Testable engineering requirements
+
+| Priority | Requirement and acceptance evidence | Current status |
+|---|---|---|
+| P0 | All privileged paths use the broker; forced proposals cannot obtain direct network, filesystem, shell, credentials or MCP access. Positive controls show allowed broker work still completes. | Existing Linux tests: `test_linux.LinuxTests`, `test_gate1.Gate1Tests`, `test_runtime_steps.MultiStepLinuxTests`. Root release report supplies current execution evidence. |
+| P0 | Gateway refuses agent-defined roles, forged/cross-user/stale snapshots and changed policy or release hashes. | Existing Gate 1 gateway tests; shared server request assembly. |
+| P0 | Dispatch revalidates exact payload, recipient, attachment lineage, current policy and one-use permit. | Existing Gate 1 immutable-envelope, revoked/stale permit and concurrent replay tests; email is a synthetic sink. |
+| P0 | Evidence never grants authority. User task intent is separate from pasted/quoted evidence; tool receipts cannot modify roles, grants or policy. | Existing quote-authority and forged-profile tests. Static first-use attacks demonstrate detection gaps; authorization stays separate. |
+| P0 | Every receipt is inspected and released into a new server snapshot before the next model request. | `test_runtime_steps.MultiStepLinuxTests.test_tool_result_injection_is_inspected_before_next_model`; hosted source-specific workflow evidence. |
+| P0 | Unsupported regions remain withheld; partial/unknown content cannot become a whole-file safe claim. Parser failures and model unavailability require review or denial. | Existing parser/coverage tests and `safe_claim=false`; first-use study covers only declared text channels and does not independently validate all unsupported formats. |
+| P1 | Evaluate router recall on task-aware tool output. Compare deterministic/routed/diagnostic semantic configurations using a separate frozen final set after any change. | **Open:** public subset 0/32 detections; only one routed. Do not reuse v1 as unseen after tuning. |
+| P1 | Distinguish malicious commands from quoted educational, literal code and incident-document text. No broad prefix exemption may suppress an operational command later in a fragment. | **Open:** 6/16 benign signals; educational-prefix blending missed. Context-aware policy needs development data plus a fresh final evaluation. |
+| P1 | Report bounded decoding coverage honestly; test nested/hex/unicode and exact DLP lineage without treating text extraction completeness as attack coverage. | One-layer Base64 and normalization exist; other transformations are gaps. Nested/hex/homoglyph first-use probes missed. |
+| P1 | A temporal/cross-source correlator, if enabled, must link bounded source facts across turns and show additional prevention without poisoning trusted state. | **Not implemented:** current multi-source corpus checks static fragments only. Memory remains disabled and denies writes. |
+| P1 | Observe both correct answer and forbidden effect independently, with A/B/C model/version/fixture metadata and utility/fact-retention scoring. | Existing hosted reports; first-use detector report explicitly leaves behavior and task-success fields unmeasured. |
+| P1 | Bound parser bytes/nesting/time, model turns, classifier requests, tokens and retries; failures remain in the results. | Existing budgets; study adds 128 calls/180 cumulative seconds/16,000 reported prompt tokens. Provider cost remains unknown. |
+
+## Deployment guarantees and exclusions
+
+The child runtime has no independent execution authority. Its three model turns and two model-selected tool requests are constrained by the server profile. Procurement scoring uses released facts; research reads at most two selected public HTTPS pages through the pinned reader; developer output is inert patch text for a fixed synthetic repository. No purchasing, live email, arbitrary shell/repository writes, autonomous search, persistent memory or arbitrary MCP integration is enabled.
+
+The Python SDK calls this hosted runtime. An inspection-only client obtains inspection results, not enforcement of its own subsequent agent/tool/network behavior. `PROTECTION_VERIFIED` describes source-matching containment evidence for the registered hosted integration; it is not a prompt-injection accuracy certificate. File coverage, OCR uncertainty, semantic misses, external provider quotas and bounded temporary history must remain visible.
+
+The next reliability milestone is a fresh evaluation of task-aware tool-output inspection and benign quotation handling. Enterprise identity, durable tenant audit storage, arbitrary integrations, temporal correlation, broader language/format support and production hardening remain separate work. Do not claim universal protection, full public-benchmark performance or official F3/D2 attainment from the current evidence.

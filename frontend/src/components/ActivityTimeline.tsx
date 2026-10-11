@@ -16,6 +16,14 @@ export function ActivityTimeline({ events }: { events: Row[] }) {
               <small>
                 {e.operation} · {new Date(e.created_at).toLocaleTimeString()}
               </small>
+              {e.origin === "FORCED_COMPROMISE_PROBE_NOT_MODEL_OUTPUT" && (
+                <small className="probe-label">Forced containment test · not a model proposal</small>
+              )}
+              {e.stage === "TOOL_REQUEST" && (
+                <small>{e.origin === "AUTHENTICATED_SOURCE_PLAN"
+                  ? "User-selected source plan · brokered retrieval"
+                  : "Agent proposal · execution requires broker authorization"}</small>
+              )}
             </span>
             <Badge value={e.decision} />
           </summary>

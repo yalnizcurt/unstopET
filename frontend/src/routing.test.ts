@@ -9,3 +9,4 @@ assert.equal(routeFromHash('#%'),'Overview');
 console.log('Navigation encoding checks passed');
 
 assert.equal(routeFromHash("#missing-page"),"Overview");
+assert.equal(routeFromHash("#Walkthrough"),"Walkthrough");

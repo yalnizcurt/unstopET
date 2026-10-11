@@ -9,3 +9,5 @@ __pycache__
 
 !cloud-evaluation-report.json
 !platform-linux-acceptance-report.json
+!evaluation/heldout/corpus-v1.json
+!evaluation/heldout/FREEZE.json

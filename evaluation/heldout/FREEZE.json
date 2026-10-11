@@ -1,0 +1,7 @@
+{
+  "version": "first-use-challenge-v1",
+  "sha256": "96866dc1a535da98b037bc1e4cbe7692fe8948672e1f94d1d1dd136e9e2fafd5",
+  "case_count": 64,
+  "frozen_before_detector_run": true,
+  "detector_tuned_to_this_set": false
+}

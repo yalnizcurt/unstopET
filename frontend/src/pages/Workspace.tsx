@@ -139,7 +139,7 @@ export function Workspace(props: ViewProps) {
                   type="file"
                   multiple
                   disabled={busy}
-                  onChange={(e) => upload(e.target.files)}
+                  onChange={(e) => upload(e.currentTarget)}
                 />
               </label>
               <span className="subtle">

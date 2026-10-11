@@ -44,7 +44,8 @@ export function ProtectedAgents(props: ViewProps) {
           <h1>Protected agents</h1>
           <p className="subtle">
             Three registered reference integrations, one enforced security
-            engine.
+            engine. Verification covers declared runtime boundaries; detector
+            reliability is measured separately.
           </p>
         </div>
         <button className="primary" onClick={() => go("Integrations")}>

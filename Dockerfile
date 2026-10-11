@@ -8,6 +8,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY *.py /app/
 COPY cloud-evaluation-report.json /app/
 COPY platform-linux-acceptance-report.json /app/
+COPY evaluation/heldout/corpus-v1.json evaluation/heldout/FREEZE.json evaluation/heldout/InjecAgent-LICENSE.txt /app/evaluation/heldout/
 COPY sdk/python/agent_trust_firewall /app/sdk/python/agent_trust_firewall/
 USER firewall
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1

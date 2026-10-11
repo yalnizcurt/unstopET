@@ -35,6 +35,7 @@ class RuntimeEventTests(unittest.TestCase):
         self.assertNotIn('chain_of_thought',trace.events[0])
     def test_attack_configurations_have_actual_run_traces_without_duplicate_denials(self):
         def provider(messages): return dict(provider='TEST',text='{"winner":"Vendor B","price":100,"requested_email":null}')
+        provider.model='SYNTHETIC_TEST_MODEL'
         def runner(firewall,binding,mode,snapshot,*args):
             response=firewall.handle(binding,dict(op='model.generate',args=dict(snapshot_id=snapshot)))
             return dict(completed=firewall.handle(binding,dict(op='finalize',args=dict(snapshot_id=snapshot,body=response['result']['text'])))['ok'])
@@ -42,6 +43,8 @@ class RuntimeEventTests(unittest.TestCase):
         client=TestClient(app);auth={'Authorization':'Bearer timeline-synthetic-access-code'}
         report=client.post('/api/v1/attacks/run',headers=auth,json={'scenario':'override'}).json()
         for row in report['results'][:2]:
+            self.assertEqual(row['model'],'SYNTHETIC_TEST_MODEL')
+            self.assertIsNone(row['classifier_model'])
             result=client.get('/api/v1/runs/'+row['run_id']+'/timeline',headers=auth).json()
             self.assertEqual(result['events'],row['timeline'])
         overview=client.get('/api/v1/overview',headers=auth).json()

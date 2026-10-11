@@ -72,7 +72,9 @@ export function Overview(props: ViewProps) {
               {label === "Threat fragments"
                 ? "Observed detector signals"
                 : label === "Blocked actions"
-                  ? "Actual broker denials"
+                  ? "Broker denials, including forced tests"
+                  : label === "Completed runs"
+                    ? "Output released; utility scored separately"
                   : "Stored demo activity"}
             </small>
           </div>

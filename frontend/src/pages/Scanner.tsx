@@ -42,7 +42,7 @@ export function Scanner(props: ViewProps) {
             type="file"
             multiple
             disabled={busy}
-            onChange={(e) => upload(e.target.files)}
+            onChange={(e) => upload(e.currentTarget)}
           />
         </label>
       </div>
