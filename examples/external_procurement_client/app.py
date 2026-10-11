@@ -29,6 +29,7 @@ def main():
         return 0 if run['status']=='COMPLETED' else 1
     except ATFError as error:
         print('Protected service rejected or could not complete the request: '+error.code)
+        if error.run_id: print('Retained run: '+error.run_id)
         return 1
     except OSError: raise SystemExit('A synthetic input or output file is unavailable.') from None
 

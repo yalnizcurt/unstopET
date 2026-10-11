@@ -77,7 +77,8 @@ class GroqProvider:
             try: document=json.loads(messages[1]['content'])
             except ValueError: document={}
             if isinstance(document,dict) and (document.get('model_turn',1)>=3 or
-                    (self.runtime_profile=='procurement' and any(r.get('tool')=='score_suppliers' and r.get('decision')=='ALLOW' for r in document.get('completed_tool_requests',[])))):
+                    (self.runtime_profile=='procurement' and any(r.get('tool')=='score_suppliers' and r.get('decision')=='ALLOW' for r in document.get('completed_tool_requests',[]))) or
+                    (self.runtime_profile=='research' and any(r.get('decision')=='ALLOW' for r in document.get('completed_tool_requests',[])))):
                 payload['tool_choice']=dict(type='function',function=dict(name='finish_response'))
         if self.model.startswith("openai/gpt-oss-"):
             payload["reasoning_effort"] = "low"
