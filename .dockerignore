@@ -8,3 +8,4 @@ __pycache__
 *.md
 
 !cloud-evaluation-report.json
+!platform-linux-acceptance-report.json

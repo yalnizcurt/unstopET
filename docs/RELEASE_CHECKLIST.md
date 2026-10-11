@@ -1,12 +1,14 @@
-# Release checklist
+The integration-first release is tracked separately in [Platform transformation](PLATFORM_TRANSFORMATION.md) and its final production report. The records below describe the prior release and do not establish deployment of later changes.
 
-Decision: **READY WITH DISCLOSED LIMITATIONS** for the tested synthetic/public hackathon demonstration. All required A–G workflows passed after retaining and retrying a real provider-rate-limit failure. The broader recall target is missed; no general reliability, enterprise readiness, universal protection, official F3/D2 award or portal submission is claimed.
+# Historical submission release checklist
+
+Historical decision (10 October 2026): **READY WITH DISCLOSED LIMITATIONS** for the tested synthetic/public hackathon demonstration. All required A–G workflows passed after retaining and retrying a real provider-rate-limit failure. The broader recall target is missed; no general reliability, enterprise readiness, universal protection, official F3/D2 award or portal submission is claimed.
 
 Final backend: `1d953ac84e611c95de67325e24c49abdca01d86e`, Render `dep-db52mt3bc2fs738bcd00`. Frontend changes use documented `[skip render]` commits because they do not alter the backend. Final Vercel deployment and browser bundle are recorded in [submission-readiness-report.json](../submission-readiness-report.json).
 
 | Gate | Result | Evidence |
 |---|---|---|
-| 1. Backend/security | PASS | [Linux acceptance](../platform-linux-acceptance-report.json): 82 pass, 0 failures/errors, two unsupported Mac-only skips; exact source hashes, parser/runtime restrictions, gateway authority, immutable dispatch/replay/revocation and DLP |
+| 1. Backend/security | PASS | Linux acceptance archived inside [historical submission report](../submission-readiness-report.json): 82 pass, 0 failures/errors, two unsupported Mac-only skips; exact source hashes, parser/runtime restrictions, gateway authority, immutable dispatch/replay/revocation and DLP |
 | 2. Agent integration | PASS | Real hosted A/B/D/E: procurement with three separate supplier files and hostile workbook; malicious public-page research; fixed repository review and inert patch |
 | 3. Frontend | PASS | Nine screens at desktop widths and mobile 390; actual upload/task/Attack Lab, evidence drill-down, source restoration, theme, refresh/authentication, file-limit error, inert HTML viewer; no observed critical browser errors |
 | 4. Attack Lab | PASS | Twelve planned matched A/B/C runs plus one retained rate-limited attempt; seven main category fixtures pass B/C; semantic positive and retained evasion visible; actual forced authorization denials |

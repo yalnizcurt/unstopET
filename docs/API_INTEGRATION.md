@@ -50,3 +50,25 @@ A lab request example is `{ "agent_id": "procurement", "scenario": "semantic", "
 Do not supply roles, system prompts, trust labels, tenant IDs, authorization flags, model credentials or context snapshots. These cannot establish authority and strict request schemas reject extra fields. Tool execution approval is not exposed to the agent or public API. DLP can deny an otherwise permitted disclosure.
 
 All code holders share one synthetic demo principal. This is not a multi-tenant production API. Temporary live records expire after 24 hours and can disappear on Render restart/redeploy; public evaluation archives retain their original measurement time and scope. Use only public/synthetic inputs.
+
+## Registered integrations and multi-step runs
+
+The dependency-free Python SDK is in `sdk/python`; the separate executable client is `examples/external_procurement_client/app.py`. It uploads the public fixtures over HTTPS and calls the hosted protected runtime. No model credential or local inference is involved. See [SDK instructions](../sdk/python/README.md) and [platform demo](PLATFORM_DEMO.md).
+
+| Endpoint | Contract |
+|---|---|
+| `GET /api/v1/integrations` | Server-owned registrations; lifecycle, profiles, boundaries and limits |
+| `GET /api/v1/integrations/{id}` | Integration details; clients cannot edit grants or register arbitrary tools |
+| `GET /api/v1/integrations/{id}/capabilities` | Declared inputs and narrow tools |
+| `GET /api/v1/integrations/{id}/verification` | Exact-source Linux acceptance and actual startup containment; connectivity alone is insufficient |
+| `GET /api/v1/integrations/{id}/runs` | Retained execution history for that registration |
+| `GET /api/v1/runs`, `/runs/{id}` | Actual business runs and separately labelled A/B/C fixtures |
+| `GET /api/v1/runs/{id}/timeline` | Correlated chronological decisions without private model reasoning |
+| `GET /api/v1/runs/{id}/security-summary` | Actual releases, tool requests, denials, coverage and unknown utility |
+| `GET /api/v1/incidents`, `/incidents/{id}` | Actual threat/denial evidence tied to source and run |
+
+A task can specify a registered `integration_id`; it does not grant authority. The Python procurement client selects `python-sdk-procurement`. An inspection-only registration cannot invoke a protected profile. Profiles and allowlists stay server-owned.
+
+The child is bounded to three model turns and two model-selected tool requests. Local Groq function declarations produce proposals only; `Firewall.handle` independently validates current snapshots, profile arguments, released resources and DLP. Groq browsing, remote MCP and code-execution tools are never declared. The finishing function returns public response data, never an executable action. Default/legacy provider calls continue rejecting native tool proposals.
+
+Tool receipts traverse the shared parser/inspection/release path before the next server-issued snapshot. Failed tasks retain a run ID and timeline; a 422 with `run_id` can be investigated through the run endpoints. `containment_probe: true` requests one fixed synthetic unauthorized-email denial, labelled independently from model output; it never authorizes sending an email. Memory and all live side effects remain disabled.

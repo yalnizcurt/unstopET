@@ -1,13 +1,13 @@
 # Agent Trust Firewall
 
-A deployed defense-in-depth AI security prototype: a React/TypeScript security console, shared inspection engine and three Groq-powered protected agents. Server policy controls authority, evidence release and external effects even when the model follows an adversarial instruction.
+Runtime security for AI agents: a React/TypeScript security console, shared inspection engine, hosted protected runtime and reusable Python client. Server policy controls authority, evidence release and external effects even when the model follows an adversarial instruction.
 
 - Console: https://agent-trust-firewall.vercel.app
 - API documentation: https://agent-trust-firewall-api.onrender.com/api/docs
 - API health: https://agent-trust-firewall-api.onrender.com/api/v1/health
 - Repository: https://github.com/yalnizcurt/unstopET
 
-The console includes agents/workspaces, file scanning, fragment investigations, real security events, policies, an A/B/C contained Attack Lab, stored evaluation outcomes and deployment settings. Access requires the server-configured demo access code; no Groq key enters the frontend.
+The console centers on Protected Agents, Runtime Activity, Security Incidents, read-only Security Policies, Security Lab, Integrations and Settings. Existing file scanning, workspaces, fragment investigation and A/B/C evaluations remain accessible. Access requires the server-configured demo access code; no Groq key enters the frontend.
 
 Agents: procurement comparison; public HTTPS research through a controlled reader; synthetic repository review with inert patch suggestions. All generation uses the existing verified Linux runtime, trusted Model Gateway and mandatory broker. Mock email requests cannot independently authorize side effects; live email is disabled.
 
@@ -33,8 +33,14 @@ The production start command is `python3 api.py`. Versioned APIs live under `/ap
 
 ## Verification and limits
 
-The expanded Linux acceptance report records 82 passing checks and two Mac-only skips. Classifier calibration and reserved-variant reports use actual Groq Prompt Guard scores. The authored 42-attack / six-benign detection matrix exercises seven categories across six document surfaces; it is not an unseen-attack reliability estimate. Final hosted A–G API and browser acceptance is recorded in [submission-readiness-report.json](submission-readiness-report.json); authored small sets are not universal protection or official F3/D2 achievement.
+The current Linux acceptance report records 108 passing checks and two Mac-only skips; the historical baseline had 82 passing checks. Classifier calibration and reserved-variant reports use actual Groq Prompt Guard scores. The authored 42-attack / six-benign detection matrix exercises seven categories across six document surfaces; it is not an unseen-attack reliability estimate. Final hosted A–G API and browser acceptance is recorded in [submission-readiness-report.json](submission-readiness-report.json); authored small sets are not universal protection or official F3/D2 achievement.
 
 Free Render history is temporary SQLite, bounded to 24 hours / 300 total records. Raw binaries are discarded after extraction. Synthetic/public demo inputs only; this is not enterprise tenant authentication or durable production audit storage. Free services can sleep and restart.
 
 See [Implementation sequence](IMPLEMENTATION.md), [Architecture](ARCHITECTURE.md), [Security](SECURITY.md), [Agent capabilities](AGENTS.md), [Coverage](COVERAGE.md), [Evaluation](EVALUATION.md), [Deployment](DEPLOYMENT.md), [Submission package](SUBMISSION.md), [Release checklist](docs/RELEASE_CHECKLIST.md) and [Implementation audit](docs/IMPLEMENTATION_AUDIT.md).
+
+## Integration-first transformation
+
+The dedicated implementation branch extends the same broker into maximum three model turns / two model-selected tool requests. Tools include released reads, deterministic supplier scoring and inert patch receipts; no direct child network/model/filesystem/shell/MCP path is enabled. Server-issued snapshots and inspection precede every continuation. Failed runs retain chronological evidence.
+
+Use the [Python client](sdk/python/README.md) and [independent reference application](examples/external_procurement_client/README.md) for hosted protected execution. Inspection alone does not enforce your external agent. Source-bound registry verification is distinct from connectivity. See [transformation tracking](docs/PLATFORM_TRANSFORMATION.md), [category crosswalk](docs/OFFICIAL_CATEGORY_CROSSWALK.md) and [platform walkthrough](docs/PLATFORM_DEMO.md). Production verification for the new transformation is reported separately from historical submission evidence.

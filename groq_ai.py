@@ -12,7 +12,7 @@ import time
 from urllib.error import HTTPError, URLError
 from urllib.request import HTTPRedirectHandler, HTTPSHandler, ProxyHandler, Request, build_opener
 
-from firewall import Binding, Denied, Firewall, encode, text, redact_known_secrets
+from firewall import Binding, Denied, Firewall, encode, fields, text, redact_known_secrets
 
 ENDPOINT = "https://api.groq.com/openai/v1/chat/completions"
 
@@ -30,6 +30,7 @@ class GroqProvider:
             raise Denied("INVALID_PROVIDER_MODEL")
         self._api_key = api_key
         self.model = model
+        self.runtime_profile = None  # Only trusted application code can declare local function proposals.
         self.attempts = 0
         self.retries = 0
         self.failure_codes = []
@@ -62,6 +63,22 @@ class GroqProvider:
                 any(set(m) != {"role", "content"} or not isinstance(m["content"], str) for m in messages)):
             raise Denied("INVALID_PROVIDER_MESSAGES")
         payload = dict(model=self.model, messages=messages, temperature=0, max_completion_tokens=3072)
+        if self.runtime_profile:
+            from runtime_tools import PROFILE_TOOLS, TOOLS
+            payload['tools']=[dict(type='function',function=dict(name=name,
+                description='Propose this brokered operation; this declaration grants no execution authority.',
+                parameters=dict(type='object',properties={key:dict(type='string',description=description) for key,description in TOOLS[name].items()},
+                    required=list(TOOLS[name]),additionalProperties=False))) for name in PROFILE_TOOLS[self.runtime_profile]]
+            payload['tools'].append(dict(type='function',function=dict(name='finish_response',
+                description='Return the final public answer or explicit incomplete status. This produces no tool execution.',
+                parameters=dict(type='object',properties=dict(status=dict(type='string',enum=['FINAL_RESPONSE','CANNOT_COMPLETE','REQUIRES_REVIEW']),
+                    output=dict(type='string')),required=['status','output'],additionalProperties=False))))
+            payload['parallel_tool_calls']=False
+            try: document=json.loads(messages[1]['content'])
+            except ValueError: document={}
+            if isinstance(document,dict) and (document.get('model_turn',1)>=3 or
+                    (self.runtime_profile=='procurement' and any(r.get('tool')=='score_suppliers' and r.get('decision')=='ALLOW' for r in document.get('completed_tool_requests',[])))):
+                payload['tool_choice']=dict(type='function',function=dict(name='finish_response'))
         if self.model.startswith("openai/gpt-oss-"):
             payload["reasoning_effort"] = "low"
         data = encode(payload)
@@ -88,9 +105,34 @@ class GroqProvider:
                 raise Denied("INVALID_PROVIDER_RESPONSE")
             for name, value in usage.items():
                 self.usage[name] += value
-            if choice["finish_reason"] != "stop" or choice["message"].get("tool_calls"):
-                raise Denied("PROVIDER_COMPLETION_INCOMPLETE")
-            body = text(choice["message"]["content"])
+            calls=choice['message'].get('tool_calls')
+            if calls:
+                from runtime_tools import validate_arguments
+                if not self.runtime_profile or choice['finish_reason']!='tool_calls' or not isinstance(calls,list) or len(calls)!=1:
+                    raise Denied('PROVIDER_COMPLETION_INCOMPLETE')
+                call=calls[0]
+                if not isinstance(call,dict) or call.get('type')!='function': raise Denied('INVALID_PROVIDER_TOOL_PROPOSAL')
+                name=call['function']['name']; arguments=json.loads(call['function']['arguments'])
+                if not isinstance(name,str): raise Denied('INVALID_PROVIDER_TOOL_PROPOSAL')
+                name=name.removeprefix('functions.')
+                if payload.get('tool_choice') and name!=payload['tool_choice']['function']['name']:
+                    raise Denied('UNEXPECTED_PROVIDER_TOOL_PROPOSAL')
+                if name=='finish_response':
+                    fields(arguments,('status','output'))
+                    if arguments['status'] not in ('FINAL_RESPONSE','CANNOT_COMPLETE','REQUIRES_REVIEW'):
+                        raise Denied('INVALID_PROVIDER_TURN_STATUS')
+                    output=text(arguments['output'])
+                    # Groq may place the public answer in content and emit an empty finishing argument.
+                    if not output.strip() and isinstance(choice['message'].get('content'),str):
+                        output=text(choice['message']['content'])
+                    if not output.strip(): raise Denied('EMPTY_PROVIDER_OUTPUT')
+                    body=text(json.dumps(dict(kind=arguments['status'],output=output)))
+                else:
+                    validate_arguments(self.runtime_profile,name,arguments)
+                    body=text(json.dumps(dict(kind='TOOL_REQUEST',tool=name,arguments=arguments)))
+            else:
+                if choice['finish_reason']!='stop': raise Denied('PROVIDER_COMPLETION_INCOMPLETE')
+                body=text(choice['message']['content'])
             if body != redact_known_secrets(body):
                 raise Denied("SECRET_DISCLOSURE_DENIED")
             return dict(provider="GROQ", model=self.model, text=body, usage=usage)

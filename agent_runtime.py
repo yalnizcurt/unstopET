@@ -80,7 +80,7 @@ if sys.argv[1] == "probe":
         response = request(operation)
         probes["broker_" + operation] = not response["ok"]
     print(json.dumps(dict(probes=probes, error_codes=DENIAL_ERRORS)), flush=True)
-elif sys.argv[1] == "demo":
+elif sys.argv[1] in ("demo", "agent"):
     snapshot_id = sys.argv[2]
     if len(sys.argv) > 3 and sys.argv[3] == "collect":
         collected = request("tools.collect", snapshot_id=snapshot_id)
@@ -88,18 +88,40 @@ elif sys.argv[1] == "demo":
             print(json.dumps(dict(completed=False)), flush=True)
             raise SystemExit(0)
         snapshot_id = collected["result"]["snapshot_id"]
-    response = request("model.generate", snapshot_id=snapshot_id)
-    if response["ok"]:
+    for turn in range(3 if sys.argv[1]=='agent' else 1):
+        response = request("model.generate", snapshot_id=snapshot_id)
+        if not response['ok']:
+            print(json.dumps(dict(completed=False)),flush=True)
+            break
+        body=response['result']['text']
         try:
-            proposed = json.loads(response["result"]["text"]).get("requested_email")
+            parsed=json.loads(body)
         except (ValueError, AttributeError):
-            proposed = None
+            parsed=None
+        if sys.argv[1]=='agent' and isinstance(parsed,dict) and 'kind' in parsed:
+            kind=parsed.get('kind')
+            if kind=='TOOL_REQUEST' and set(parsed)=={'kind','tool','arguments'} and turn<2:
+                tool=request('tools.invoke',snapshot_id=snapshot_id,tool=parsed['tool'],arguments=parsed['arguments'])
+                if tool['ok']: snapshot_id=tool['result']['snapshot_id']
+                continue
+            if kind=='FINAL_RESPONSE' and set(parsed)=={'kind','output'} and isinstance(parsed['output'],str):
+                body=parsed['output']
+            else:
+                status=kind if kind in ('CANNOT_COMPLETE','REQUIRES_REVIEW') and set(parsed)=={'kind','output'} else 'INVALID_TURN_PROTOCOL'
+                request('runtime.stop',snapshot_id=snapshot_id,status=status)
+                print(json.dumps(dict(completed=False)),flush=True)
+                break
+        elif sys.argv[1]=='agent' and ('"kind"' in body or body.lstrip().startswith('```json')):
+            request('runtime.stop',snapshot_id=snapshot_id,status='INVALID_TURN_PROTOCOL')
+            print(json.dumps(dict(completed=False)),flush=True)
+            break
+        # Preserve old single-response clients and contained A/B/C scoring fixtures.
+        proposed=parsed.get('requested_email') if isinstance(parsed,dict) else None
         if isinstance(proposed, dict):
             request("email.prepare", snapshot_id=snapshot_id,
                     recipient=proposed.get("recipient"), body=proposed.get("body"))
-        output = request("finalize", snapshot_id=snapshot_id, body=response["result"]["text"])
+        output = request("finalize", snapshot_id=snapshot_id, body=body)
         print(json.dumps(dict(completed=output["ok"])), flush=True)
-    else:
-        print(json.dumps(dict(completed=False)), flush=True)
+        break
 else:
     raise SystemExit("Unsupported runtime mode")

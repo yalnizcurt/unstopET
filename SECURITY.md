@@ -27,3 +27,13 @@ The gateway retries HTTP 429/503 once with bounded 250ms backoff. Other outages 
 `platform-linux-acceptance-report.json` records actual Linux checks and source hashes. `semantic-evaluation-report.json` and `semantic-heldout-report.json` record real Groq classifier measurements. These small authored sets do not establish general reliability or official hackathon F3/D2 achievement. The retained earlier Mac failure report documents why the native Mac agent runtime remains disabled.
 
 Labelled forced-compromise tests call the real broker even when the model resists injection. Their denials are not model behavior or attacker-success measurements. Read-only access prunes expired records; public archived measurements retain original timestamps.
+
+## Bounded runtime amendment
+
+A server-owned tool registry permits only exact schemas and profile-approved released artifacts, fixed repository paths or previously approved page IDs. Supplier scoring uses released facts, not model-submitted numbers. Tool receipts are independently inspected and imported before a new snapshot. Reads cannot broaden grants; collection is single-use. Model/child proposals cannot mutate roles, policies, registry, evidence hashes or destination rules. The existing mandatory broker owns every operation.
+
+The multi-step launcher is bounded by the existing 60-second task deadline, maximum three model turns and two tool requests. Legacy contained evaluation fixtures retain their one-response path. Review/invalid structured outputs and provider outages remain explicit failures with persisted trace. A fixed independent containment probe is labelled separately from model proposals. SDK redirects/proxies are disabled and its client errors do not echo raw service/provider bodies.
+
+The console exposes decisions and references, not model chain-of-thought. Integration protection verification requires matching deployed module hashes in Linux acceptance evidence and startup isolation. External inspection-only clients are responsible for obeying verdicts and cannot claim mandatory hosted context/tool control.
+
+The Groq gateway declares only server-selected local function schemas for the registered runtime. Provider function calls are inert proposals, revalidated by the existing mandatory broker; they do not execute on Groq. Built-in browser/code tools and remote MCP are absent. A server-controlled finishing choice after procurement scoring or at the third turn constrains completion and cannot grant privileges. Its output must be nonempty and passes release DLP. Provider reasoning fields are ignored. Legacy/A/B/C calls use the original text-only adapter and reject native tool calls.

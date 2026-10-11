@@ -7,6 +7,8 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 COPY *.py /app/
 COPY cloud-evaluation-report.json /app/
+COPY platform-linux-acceptance-report.json /app/
+COPY sdk/python/agent_trust_firewall /app/sdk/python/agent_trust_firewall/
 USER firewall
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 CMD ["python3", "api.py"]

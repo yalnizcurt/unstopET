@@ -75,7 +75,8 @@ def run_runtime(firewall, binding, mode, *args, verification_only=False):
                             stderr=subprocess.DEVNULL, env={},
                             preexec_fn=limits if sys.platform == "darwin" else None)
     result = None
-    deadline = time.monotonic() + (30 if sys.platform == "linux" else 10)
+    remaining=firewall.budgets[binding]['deadline']-firewall.now()
+    deadline = time.monotonic() + (min(60,max(0,remaining)) if mode=='agent' else 30 if sys.platform == "linux" else 10)
     buffer = b""
     selector = selectors.DefaultSelector()
     selector.register(proc.stdout, selectors.EVENT_READ)
@@ -107,6 +108,8 @@ def run_runtime(firewall, binding, mode, *args, verification_only=False):
         if proc.returncode != 0 or result is None:
             raise RuntimeError("Isolated runtime failed; Gate 1 has not passed.")
         return result
+    except subprocess.TimeoutExpired:
+        raise RuntimeError('Isolated runtime deadline exceeded') from None
     finally:
         selector.close()
         if proc.poll() is None:

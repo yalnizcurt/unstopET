@@ -12,7 +12,7 @@ from gate1 import verify_linux_boundary
 
 if __name__ == "__main__":
     suite = unittest.defaultTestLoader.loadTestsFromNames([
-        "test_gate1", "test_groq", "test_linux", "test_server", "test_platform", "test_parsing_linux"])
+        "test_gate1", "test_groq", "test_linux", "test_server", "test_platform", "test_parsing_linux", "test_integrations", "test_runtime_steps", "test_runtime_events", "test_sdk"])
     output = io.StringIO()
     result = unittest.TextTestRunner(stream=output, verbosity=2).run(suite)
     probes = verify_linux_boundary() if result.wasSuccessful() else None
@@ -25,7 +25,7 @@ if __name__ == "__main__":
         skipped=[dict(test=str(test), reason=reason) for test, reason in result.skipped],
         platform=platform.platform(), python_version=platform.python_version(),
         source_sha256={name: hashlib.sha256(Path(name).read_bytes()).hexdigest() for name in (
-            "firewall.py", "gate1.py", "agent_runtime.py", "linux_guard.py", "groq_ai.py", "server.py", "api.py", "inspection.py", "extractors.py", "parser_worker.py", "parsing.py", "network.py", "ocr.py", "evaluation.py", "agents.py", "semantic.py", "storage.py")},
+            "firewall.py", "gate1.py", "agent_runtime.py", "linux_guard.py", "groq_ai.py", "server.py", "api.py", "inspection.py", "extractors.py", "parser_worker.py", "parsing.py", "network.py", "ocr.py", "evaluation.py", "agents.py", "semantic.py", "storage.py", "integrations.py", "runtime_tools.py", "runtime_events.py")},
         isolation=probes, runtime_enabled=bool(probes), email_executor="MOCK",
         supported_formats=["UTF-8 text", "static HTML", "PDF declared channels", "DOCX XML", "XLSX XML", "bounded ZIP", "raster metadata and English OCR"], semantic_detector="PROMPT_GUARD_EVALUATED_SEPARATELY",
         persistent_memory="DISABLED", cloud_runtime_verified=False,

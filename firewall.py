@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
+from datetime import datetime, timezone
 import base64
 import hashlib
 import json
@@ -118,12 +119,18 @@ class Permit:
 class Firewall:
     """Trusted application API. The runtime can reach only handle(binding, request)."""
 
-    def __init__(self, now=time.monotonic, provider=None, instructions="", collect=None):
+    def __init__(self, now=time.monotonic, provider=None, instructions="", collect=None, tools=None, tool_catalog=None, event_sink=None):
         self.now = now
         # Configured by the trusted application; runtime request fields cannot select a provider.
         self.provider = provider
         self.instructions = text(instructions)
         self.collect = collect
+        self.tools = tools
+        self.tool_catalog = tool_catalog
+        self.tool_receipts = []
+        self.collected = set()
+        self.event_sink = event_sink
+        self.audit_origin = None
         self.policy_version = 1
         self.artifacts: dict[str, Artifact] = {}
         self.snapshots: dict[str, ContextSnapshot] = {}
@@ -146,19 +153,22 @@ class Firewall:
             raise Denied("TASK_EXPIRED")
         if budget["requests"] >= 32 or budget["bytes"] + size > 131_072:
             raise Denied("REQUEST_BUDGET_EXHAUSTED")
-        if model and budget["model_calls"] >= 4:
+        if model and budget["model_calls"] >= (3 if self.tools else 4):
             raise Denied("MODEL_BUDGET_EXHAUSTED")
         budget["requests"] += 1
         budget["bytes"] += size
         budget["model_calls"] += int(model)
 
-    def _record(self, binding, operation, result, *, stage="broker", reason=None):
+    def _record(self, binding, operation, result, *, stage="broker", reason=None, **details):
         event = dict(principal=binding.principal, task=binding.task, policy_version=self.policy_version,
-                     time=self.now(), operation=operation, stage=stage, result=result)
+                     event_id=secrets.token_hex(16),created_at=datetime.now(timezone.utc).isoformat(),
+                     time=self.now(), operation=operation, stage=stage, result=result, **details)
         if reason:
             event["reason"] = reason
         event["budget"] = dict(self.budgets.get(binding, {}))
+        if self.audit_origin: event['origin']=self.audit_origin
         self.audit.append(event)
+        if self.event_sink: self.event_sink(event)
 
     def start_task(self, binding, intent, user_content=(), external_content=()):
         """Called by the authenticated application, never by model-supplied fields."""
@@ -222,6 +232,8 @@ class Firewall:
         snapshot = ContextSnapshot(secrets.token_hex(16), binding, text(intent), refs,
                                    self.policy_version, self.now() + 30)
         self.snapshots[snapshot.id] = snapshot
+        self._record(binding,'context.snapshot','ALLOW',stage='CONTEXT_ASSEMBLY',snapshot_id=snapshot.id,
+                     context_source_ids=[ref[0] for ref in refs])
         return snapshot.id
 
     def _snapshot(self, binding, snapshot_id):
@@ -254,11 +266,14 @@ class Firewall:
                 content="\n".join(value for _, value in artifact.fragments),
             ))
         # Only server code creates roles. A snapshot reference is not an authorization credential.
+        document=dict(task_intent_kind="AUTHORIZED_TASK_INTENT", authorized_task_intent=snapshot.intent, evidence=evidence)
+        if self.tool_catalog:
+            document['runtime_catalog']=self.tool_catalog(self,binding,snapshot)
+            document['completed_tool_requests']=self.tool_receipts
+            document['model_turn']=self.budgets[binding]['model_calls']+1
         return [
             dict(role="system", content=SYSTEM_POLICY + ("\n" + self.instructions if self.instructions else "")),
-            dict(role="user", content=encode(dict(
-                task_intent_kind="AUTHORIZED_TASK_INTENT", authorized_task_intent=snapshot.intent, evidence=evidence,
-            )).decode()),
+            dict(role="user", content=encode(document).decode()),
         ]
 
     def _dlp(self, binding, payload, snapshot=None, external=False, attachments=()):
@@ -278,6 +293,8 @@ class Firewall:
         self._charge(binding, len(payload), model=True)
         snapshot = self._snapshot(binding, args["snapshot_id"])
         self._dlp(binding, payload, snapshot, external=self.provider is not None)
+        self._record(binding,'model.request','ALLOW',stage='MODEL_REQUEST',snapshot_id=snapshot.id,
+                     model_turn=self.budgets[binding]['model_calls'],payload_hash=digest(payload))
         if self.provider is not None:
             try:
                 result = self.provider(messages)
@@ -393,11 +410,34 @@ class Firewall:
                 op, args = request["op"], request["args"]
                 if op == "model.generate":
                     result = self.generate(binding, args)
+                elif op == "tools.invoke":
+                    fields(args,("snapshot_id","tool","arguments"))
+                    snapshot=self._snapshot(binding,args['snapshot_id'])
+                    if self.tools is None: raise Denied('TOOL_NOT_AUTHORIZED')
+                    if len(self.tool_receipts)>=2: raise Denied('TOOL_CYCLE_LIMIT')
+                    from runtime_tools import validate_arguments
+                    validate_arguments(self.tool_catalog(self,binding,snapshot)['agent_profile_id'],args['tool'],args['arguments'])
+                    tool_request_id=secrets.token_hex(16)
+                    self._record(binding,'tool.request','PROPOSED',stage='TOOL_REQUEST',tool=args['tool'],
+                        tool_request_id=tool_request_id,snapshot_id=snapshot.id,payload_hash=digest(encode(args['arguments'])),
+                        requested_resource={k:redact_known_secrets(v) for k,v in args['arguments'].items() if k in ('recipient','path','source_id','artifact_id')},
+                        origin='MODEL_PROPOSAL')
+                    try:
+                        result=self.tools(self,binding,snapshot,args['tool'],args['arguments'],tool_request_id)
+                        self.tool_receipts.append(dict(tool=args['tool'],tool_request_id=tool_request_id,decision='ALLOW',
+                            result_artifact_id=result.get('artifact_id')))
+                    except Denied as error:
+                        self.tool_receipts.append(dict(tool=args['tool'],tool_request_id=tool_request_id,decision='DENY',reason_code=error.code))
+                        self._record(binding,'tool.authorization','DENY',stage='ACTION_AUTHORIZATION',tool=args['tool'],
+                            tool_request_id=tool_request_id,snapshot_id=snapshot.id,reason=error.code,observed_execution=False)
+                        raise
                 elif op == "tools.collect":
                     fields(args, ("snapshot_id",))
                     snapshot = self._snapshot(binding, args["snapshot_id"])
                     if self.collect is None:
                         raise Denied("TOOL_NOT_AUTHORIZED")
+                    if binding in self.collected: raise Denied('TOOL_COLLECTION_ALREADY_REQUESTED')
+                    self.collected.add(binding)
                     self.collect(self, binding)
                     result = dict(snapshot_id=self.issue_snapshot(binding, snapshot.intent))
                 elif op == "read_evidence":
@@ -415,19 +455,27 @@ class Firewall:
                     fields(args, ("snapshot_id", "body"))
                     snapshot = self._snapshot(binding, args["snapshot_id"])
                     body = text(args["body"])
+                    if not body.strip(): raise Denied("EMPTY_OUTPUT_DENIED")
                     self._dlp(binding, body.encode(), snapshot)
                     self.final_outputs.append(body)
                     result = dict(status="OUTPUT_RELEASED", body=body)
+                elif op == "runtime.stop":
+                    fields(args,("snapshot_id","status"))
+                    self._snapshot(binding,args['snapshot_id'])
+                    if args['status'] not in ('CANNOT_COMPLETE','REQUIRES_REVIEW','INVALID_TURN_PROTOCOL'):
+                        raise Denied('INVALID_REQUEST')
+                    raise Denied(args['status'])
                 elif op == "memory.write":
                     raise Denied("PERSISTENT_MEMORY_DISABLED")
                 else:
                     raise Denied("UNREGISTERED_OPERATION")
-                self._record(binding, op, "ALLOW")
+                self._record(binding, op, "ALLOW",snapshot_id=args.get('snapshot_id') if isinstance(args,dict) else None,
+                             observed_execution=op=='email.dispatch')
                 return dict(ok=True, result=result)
             except (Denied, TypeError, ValueError, KeyError) as exc:
                 code = exc.code if isinstance(exc, Denied) else "INVALID_REQUEST"
-                audit_op = op if op in ("model.generate", "tools.collect", "read_evidence", "email.prepare", "email.dispatch",
-                                        "finalize", "memory.write") else "request"
+                audit_op = op if op in ("model.generate", "tools.collect", "tools.invoke", "read_evidence", "email.prepare", "email.dispatch",
+                                        "finalize", "runtime.stop", "memory.write") else "request"
                 self._record(binding, audit_op, "DENY", reason=code)
                 return dict(ok=False, error=code)
 

@@ -4,7 +4,7 @@ All agents use `Firewall`, server-issued context snapshots, the same shared insp
 
 | Agent | Working capability | Limits |
 |---|---|---|
-| Procurement Analyst | Extracts supplied supplier facts, compares price then available delivery/warranty, cites evidence and recommends | No live purchasing/email; missing terms must remain missing |
+| Procurement Analyst | Reads released facts; deterministic score tool compares price then available delivery/warranty, cites evidence and recommends | No live purchasing/email; missing terms must remain missing |
 | Web Research Agent | Reads up to two user-selected public HTTPS pages through the pinned-address broker; inspects returned static HTML/text; creates a cited brief | No autonomous search engine; no scripts, private hosts, redirects or arbitrary network tools |
 | Developer Assistant | Reads a fixed synthetic repository through the broker; explains code/bugs and proposes inert patch text | No shell, test execution, live repo writes or unrestricted filesystem |
 
@@ -13,3 +13,5 @@ Profiles are defined server-side in `agents.py`. Agents cannot edit profiles, gr
 Attack Lab can apply a common synthetic procurement outcome task to any registered profile; this is a matched security fixture, not proof that each profile completed its distinctive business workflow. Hosted smoke tests must demonstrate those separate workflows.
 
 Tests: Linux Docker acceptance plus versioned API/parser tests; frontend `npm run build`. The native Mac agent path remains unavailable; use the verified Linux runtime for actual execution.
+
+Hosted workflows have at most three model turns and two model-selected tool requests. Server-approved page/repository collection happens once before generation; subsequent reads use that released cache. `propose_patch` returns inert text and never runs tests or writes a repository. All receipts pass through shared inspection and a new server snapshot. Python SDK applications are clients of this hosted runtime; inspection-only clients do not gain runtime enforcement. Run/evaluation traces distinguish actual model proposals from `FORCED_COMPROMISE_PROBE_NOT_MODEL_OUTPUT`.

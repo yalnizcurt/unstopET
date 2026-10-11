@@ -56,7 +56,7 @@ SQLite is intentionally temporary at `/tmp/atf-history.sqlite3`, with a 24-hour/
 Public synthetic evaluation exports are copied into the image and restored as explicitly labelled archived measurements. This preserves reviewable test evidence after redeploy; it does not make live user history durable. Documentation/evidence-only commits can use Render’s documented `[skip render]` commit phrase to avoid restarting the demo unnecessarily.
 
 
-## Verified submission release
+## Historical submission release (10 October 2026)
 
 [submission-readiness-report.json](submission-readiness-report.json) records the final A–G hosted checks, source-bound Render release, Vercel READY deployment, actual browser assets, model outputs, independent forced-action denials and secret-literal checks. [Release checklist](docs/RELEASE_CHECKLIST.md) records the conditional readiness decision. Backend source `1d953ac` remains live; frontend/document-only commits deliberately skip a backend restart.
 

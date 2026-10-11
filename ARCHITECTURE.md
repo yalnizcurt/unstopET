@@ -1,4 +1,99 @@
-# Implemented architecture
+# Integration-first Agent Trust Firewall
+
+One FastAPI service, one shared security engine, the existing sealed Linux runtime and the existing Groq gateway. Hosted execution is enforceable; an inspection-only external caller must obey release guidance. The Python SDK is a client, not an alternate privileged agent runtime.
+
+```mermaid
+flowchart TB
+  subgraph Connect[1. Integration and untrusted information]
+    Console[Security console on Vercel]
+    SDK[Independent application / Python SDK]
+    Sources[Task intent separately from files / pasted evidence]
+    Registry[Server-owned integration registry]
+    Console --> API[Authenticated versioned API]
+    SDK --> API
+    Sources --> API
+    Registry --> API
+  end
+  subgraph Inspect[2. Shared inspection plane]
+    Parser[Restricted parser / declared channels / provenance]
+    Rules[Normalize / rules / DLP / bounded decoding]
+    Router[Conditional Prompt Guard]
+    Policy[Content and completeness policy]
+    Release[Inspected released fragments; unsupported portions withheld]
+    Parser --> Rules --> Router --> Policy --> Release
+  end
+  subgraph Runtime[3. Trusted context and bounded agent]
+    Snapshot[Server-issued owner / task / policy / hash / expiry snapshot]
+    Gateway[Server constructs system and user roles / egress DLP]
+    Groq[Groq generation]
+    Child[Credential-free Linux child: maximum 3 model turns]
+    Snapshot --> Gateway --> Groq
+    Groq --> Child
+    Child -->|snapshot reference only| Gateway
+  end
+  subgraph Actions[4. Mandatory broker and output security]
+    Broker[Existing Firewall.handle]
+    Validate[Profile / exact schema / resource / current snapshot]
+    Tool[Released read / deterministic scoring / inert patch]
+    Effect[Exact envelope / authorization / DLP / single-use permit]
+    Mock[Contained mock sink; live email disabled]
+    Final[Final output DLP]
+    Child -->|proposal only; maximum 2 tool turns| Broker
+    Broker --> Validate --> Tool
+    Validate --> Effect --> Mock
+    Child --> Final --> User[Released response]
+  end
+  API --> Parser
+  Release --> Snapshot
+  Tool -->|Tool result must be inspected| Parser
+  Inspect -.-> Trace[Trusted run ID / events / decisions / temporary SQLite]
+  Runtime -.-> Trace
+  Actions -.-> Trace
+  Trace --> Activity[Runtime Activity / incidents / investigations]
+  Trace --> Lab[Contained A/B/C Lab; actual utility and outcome scoring]
+  Activity --> Console
+  Lab --> Console
+```
+
+The authenticated source plan collects at most two selected public pages or the fixed repository before generation. Subsequent model-selected reads use the released task cache; they cannot introduce a new URL or filesystem path. Procurement's `score_suppliers` reads released explicit fields and uses decimal price, supplied delivery and warranty, with absent/conflicting currencies disclosed. It grants no purchase or email permission. A proposed patch is inert text. Every tool receipt is parsed and inspected before a fresh snapshot and next model call.
+
+```mermaid
+sequenceDiagram
+  participant Client as Independent SDK application
+  participant API as Trusted API
+  participant Inspect as Shared inspection
+  participant Child as Isolated bounded agent
+  participant Broker as Mandatory broker / gateway
+  participant Groq as Groq
+  Client->>API: Upload four synthetic supplier files
+  API->>Inspect: Extract hidden sheet, inspect, release fragments
+  Client->>API: Separate task intent and artifact IDs
+  API->>Child: Server-issued context snapshot
+  Child->>Broker: model.generate(snapshot)
+  Broker->>Groq: Server-built roles and released evidence
+  Groq-->>Child: TOOL_REQUEST score_suppliers
+  Child->>Broker: Validated proposal; no authority grant
+  Broker->>Inspect: Deterministic score result as untrusted text
+  Inspect-->>Broker: Released result / explicit coverage
+  Broker-->>Child: New snapshot reference
+  Child->>Broker: Second model request
+  Broker->>Groq: Server-controlled context with inspected receipt
+  Groq-->>Child: FINAL_RESPONSE
+  Child->>Broker: finalize / DLP
+  API->>Broker: Labelled independent forbidden mock-email probe
+  Broker-->>API: DENY; zero dispatches
+  API-->>Client: Released output + run ID + actual trace
+```
+
+Events carry trusted run/integration IDs, sequence/timestamp, stage, snapshot/resource/evidence references, payload hashes and policy decisions. No model chain-of-thought is published. A final response indicates output release; business task success is independently evaluated. Failed/provider-limited/reviewed runs retain their prior evidence and decisions. Inspection-only and unavailable proxy/MCP modes do not advertise hosted runtime enforcement.
+
+Integration verification compares the packaged Linux acceptance source hashes with current modules and requires actual startup containment. A health response, a registration or browser configuration cannot mark protection verified. Record retention remains temporary, one shared demo identity, 24 hours / 300 total rows. Lab run views adapt existing evaluation rows rather than duplicating persistence tables.
+
+## Retained security diagrams and historical architecture
+
+The following diagrams describe the preserved inspection, authority and exact-dispatch controls; the bounded turn loop and integration control plane above extend the original one-response product.
+
+### Original platform architecture
 
 The console is React/TypeScript on Vercel. A single FastAPI service on Render hosts the versioned API, shared inspection plane, credentialed model gateway, server-owned agent profiles and execution broker. Existing Linux Landlock/seccomp isolation is retained. No additional microservices were added.
 
