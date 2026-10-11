@@ -1,0 +1,8 @@
+{
+  "configured_at": "2026-10-11T16:59:56.937964+00:00",
+  "scope": "Equivalent demo access-code rotation; existing identity/permissions unchanged",
+  "replacement_stored": "Render server-side secret only",
+  "new_secret_exported": false,
+  "old_credential_revoked": true,
+  "checked_at": "2026-10-11T17:02:04.040152+00:00"
+}

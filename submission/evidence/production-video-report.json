@@ -1,0 +1,84 @@
+{
+  "status": "RECORDED_AND_DECODE_VERIFIED",
+  "created_at": "2026-10-11T17:23:22.123955+00:00",
+  "public_url": "https://agent-trust-firewall.vercel.app",
+  "backend_commit": "aca81e6a06fcb36104d101298eb7162f0a4534ca",
+  "frontend_commit_verified_by_release_lead": "cbedb770eb65d2cf2732e6cf4ae4975f8c0a83ce",
+  "run_id": "ea056be9628a677dfaddc91af4d7cbb9",
+  "integration_id": "python-sdk-procurement",
+  "model": "openai/gpt-oss-120b",
+  "workbook_id": "629bbfac58fcad2ab41c587997a7bcd0",
+  "hostile_fragment_id": "627f38b6e62f1586",
+  "forced_probe_event_id": "1e08710d6d49ad33a0113102702eb450",
+  "incident_id": "1e08710d6d49ad33a0113102702eb450",
+  "viewport": [
+    1440,
+    1000
+  ],
+  "paid_model_calls_in_recording": 0,
+  "intercepted_api_responses": false,
+  "footage": "Actual production browser; existing retained synthetic task results; no generated mock UI",
+  "narration_audio": false,
+  "forced_probe_is_model_output": false,
+  "duration_seconds": 180.0,
+  "exported_size": [
+    1440,
+    1000
+  ],
+  "fps": 25.0,
+  "full_file_decode_passed": true,
+  "shots": [
+    {
+      "view": "Public introduction",
+      "seconds": 0.0
+    },
+    {
+      "view": "Public illustrative attack explanation",
+      "seconds": 15.033
+    },
+    {
+      "view": "Actual protected-agent registry",
+      "seconds": 35.425
+    },
+    {
+      "view": "Actual SDK integration instructions",
+      "seconds": 55.608
+    },
+    {
+      "view": "Current retained SDK run",
+      "seconds": 75.441
+    },
+    {
+      "view": "Actual authorized tool receipt",
+      "seconds": 90.252
+    },
+    {
+      "view": "Actual hidden-workbook inspection",
+      "seconds": 100.096
+    },
+    {
+      "view": "Actual denied forced containment probe",
+      "seconds": 125.496
+    },
+    {
+      "view": "Actual correlated incident",
+      "seconds": 146.203
+    },
+    {
+      "view": "Actual released supplier comparison",
+      "seconds": 155.449
+    },
+    {
+      "view": "Archived metrics and first-use reliability limits",
+      "seconds": 170.046
+    }
+  ],
+  "protected_api_requests": 15,
+  "non_get_api_requests": 0,
+  "page_javascript_errors": [],
+  "captions": "Burned explanatory captions; matching standalone SRT and narration script",
+  "login_setup_trimmed": true,
+  "file_sha256": "338bf62d5e6e18d0d51ebaa40ea400f8eb56a24e22f7c56ca2bc2e6e8affb132",
+  "visual_frame_qa": "PENDING_MANUAL_INSPECTION",
+  "universal_protection": false
+}

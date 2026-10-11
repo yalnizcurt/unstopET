@@ -1,4 +1,6 @@
-# Integration-first platform release
+# Historical integration-first platform release — 11 October 2026
+
+This page retains the 8a412ab release and its earlier screenshots. The final release, new challenge failures and current verification are indexed in [submission](../submission/README.md). The five captures below were taken from backend 748a60d; the separately preserved 8a412ab report has newer workflow evidence.
 
 The target architecture extends the verified firewall rather than replacing it. Production proof, deployed source and outcomes are recorded in `integration-platform-production-report.json` after hosted acceptance. Historical submission measurements remain separately versioned.
 

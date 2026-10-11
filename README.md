@@ -3,6 +3,7 @@
 Runtime security for AI agents: a React/TypeScript security console, shared inspection engine, hosted protected runtime and reusable Python client. Server policy controls authority, evidence release and external effects even when the model follows an adversarial instruction.
 
 - Console: https://agent-trust-firewall.vercel.app
+- Public read-only walkthrough: https://agent-trust-firewall.vercel.app/#Walkthrough
 - API documentation: https://agent-trust-firewall-api.onrender.com/api/docs
 - API health: https://agent-trust-firewall-api.onrender.com/api/v1/health
 - Repository: https://github.com/yalnizcurt/unstopET
@@ -13,7 +14,9 @@ Agents: procurement comparison; public HTTPS research through a controlled reade
 
 Supported declared adapters: UTF-8 text, static HTML, PDF text/metadata/annotation strings, DOCX XML channels, XLSX cells/hidden sheets/comments, bounded ZIPs. English raster OCR and metadata remain partial; QR decoding and guaranteed recognition are not enabled. Unsupported regions remain withheld. Persistent memory and unrestricted shell/connectors are disabled.
 
-The integration-first prototype adds a real independent SDK application, bounded brokered tool steps and source-linked runtime investigations. Current deployment evidence and the release decision are in [Platform release](docs/PLATFORM_RELEASE.md); prior measurements retain their original version in [the historical checklist](docs/RELEASE_CHECKLIST.md). General reliability, durable multi-user storage and universal protection are not established.
+The integration-first prototype adds a real independent SDK application, bounded brokered tool steps and source-linked runtime investigations. The final package is in [submission](submission/README.md); prior measurements retain their original versions in [Platform release](docs/PLATFORM_RELEASE.md) and [the historical checklist](docs/RELEASE_CHECKLIST.md).
+
+**Detection reliability is an open gap.** A frozen first-use challenge detected 4/48 attacks and falsely flagged 6/16 benign cases in both deterministic and routed-AI configurations. Public tool-output attacks were 0/32 detected. These results are separate from passing containment checks and successful business workflows. Read [the complete challenge](evaluation/heldout/README.md); no universal protection, enterprise readiness or official F3/D2 achievement is claimed.
 
 ## Local development
 
@@ -33,7 +36,7 @@ The production start command is `python3 api.py`. Versioned APIs live under `/ap
 
 ## Verification and limits
 
-The current Linux acceptance report records 110 passing checks and two Mac-only skips; the historical baseline had 82 passing checks. Classifier calibration and reserved-variant reports use actual Groq Prompt Guard scores. The authored 42-attack / six-benign detection matrix exercises seven categories across six document surfaces; it is not an unseen-attack reliability estimate. Historical A–G API and browser acceptance is recorded in [submission-readiness-report.json](submission-readiness-report.json); current integration acceptance is recorded in [integration-platform-production-report.json](integration-platform-production-report.json). authored small sets are not universal protection or official F3/D2 achievement.
+The current Linux acceptance report records 120 passing checks, zero failures/errors and two Mac-only skips. The earlier 168-instance authored benchmark detects 66/84 attack instances with 0/84 benign flags; its 28 strings are repeated over six formats. Real Prompt Guard calibration and the 8a412ab hosted comparison show a small familiar-example detection gain, which did not generalize to the first-use challenge. Historical A–G evidence remains in [submission-readiness-report.json](submission-readiness-report.json); the 8a412ab workflows and 30 A/B/C responses remain in [integration-platform-production-report.json](integration-platform-production-report.json). Final exact-source evidence is indexed in [the submission checklist](submission/FINAL_CHECKLIST.md).
 
 Free Render history is temporary SQLite, bounded to 24 hours / 300 total records. Raw binaries are discarded after extraction. Synthetic/public demo inputs only; this is not enterprise tenant authentication or durable production audit storage. Free services can sleep and restart.
 

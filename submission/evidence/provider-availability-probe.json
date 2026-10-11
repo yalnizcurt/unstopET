@@ -1,0 +1,13 @@
+{
+  "checked_at": "2026-10-11T17:16:20.600587+00:00",
+  "model": "openai/gpt-oss-120b",
+  "scope": "Minimal parent-provider availability probe; no child or business workflow execution",
+  "status": "UNAVAILABLE",
+  "code": 403,
+  "rate_limit_kind": "UNSPECIFIED",
+  "retry_after_seconds": null,
+  "limitations": [
+    "Minimal direct probe differed from the normal gateway request, including user-agent and token budget; its HTTP 403 does not identify the hosted HTTP 429 cause or reset window.",
+    "The real SDK was subsequently relaunched through its normal authenticated gateway and completed; see production acceptance."
+  ]
+}

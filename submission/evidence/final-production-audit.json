@@ -1,0 +1,72 @@
+{
+  "created_at": "2026-10-11T17:18:33.949285+00:00",
+  "status": "PASS",
+  "scope": "Final deployment, proxy authority checks and bounded credential scans; not universal security review",
+  "proxy_authority_checks": [
+    {
+      "name": "unauthenticated",
+      "status": 401,
+      "expected": 401,
+      "cache_control": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "foreign_origin",
+      "status": 403,
+      "expected": 403,
+      "cache_control": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "authorized",
+      "status": 200,
+      "expected": 200,
+      "cache_control": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "forged_authority",
+      "status": 422,
+      "expected": 422,
+      "cache_control": "private, no-store",
+      "passed": true
+    }
+  ],
+  "deployed_frontend_bundles": [
+    {
+      "path": "/assets/index-D95mlboh.js",
+      "sha256": "95701f538c2dc36d0fc828387ba4e7229b4a0207a3a3e0932e2d5fcda2d4dc9c",
+      "matches_local_build": true,
+      "configured_secret_matches": 0
+    }
+  ],
+  "recent_logs": {
+    "requested_limit": 100,
+    "configured_secret_matches": 0,
+    "has_more": true,
+    "scope": "Bounded returned log sample only; raw logs are neither printed nor exported"
+  },
+  "unpacked_presentations": [
+    {
+      "file": "submission/pitch/Agent-Trust-Firewall.pptx",
+      "configured_secret_matches": 0
+    }
+  ],
+  "backend_deployment": {
+    "id": "dep-db5s758u01pc73evplqg",
+    "status": "live",
+    "commit": {
+      "id": "aca81e6a06fcb36104d101298eb7162f0a4534ca",
+      "message": "Retry empty model answers once while preserving fail-closed release",
+      "createdAt": "2026-10-11T17:12:12Z"
+    },
+    "createdAt": "2026-10-11T17:12:53.770677Z",
+    "finishedAt": "2026-10-11T17:13:32.710435Z"
+  },
+  "frontend_deployment": {
+    "id": "dpl_5Avo749V6HmEo8miwwfiVPq1tTEJ",
+    "status": "READY",
+    "commit": "cbedb770eb65d2cf2732e6cf4ae4975f8c0a83ce",
+    "url": "https://agent-trust-firewall.vercel.app"
+  }
+}

@@ -1,4 +1,6 @@
-# Agent Trust Firewall — hackathon submission package
+# Agent Trust Firewall — historical hackathon submission package
+
+The final 12-slide deck, measured challenge results, current release checklist and three-minute narration are in [submission](submission/README.md). This page preserves the earlier five-minute narrative and its original evidence.
 
 ## Product
 

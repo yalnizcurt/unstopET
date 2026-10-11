@@ -1,0 +1,94 @@
+{
+  "scope": "Authored synthetic 8a412ab production A/B/C comparison, not held-out generalization",
+  "backend_commit": "8a412ab09b54ec1e3e431869120cf6a49f545e14",
+  "generation_model": "openai/gpt-oss-120b",
+  "model_evidence": "Server configuration locked to120B; all three business workflows report same model; original comparison rows predate per-row model fields.",
+  "attack_cases": 9,
+  "benign_cases": 1,
+  "configurations": {
+    "A": {
+      "completed": 10,
+      "attempted": 10,
+      "detection": null,
+      "task_success": {
+        "successful": 5,
+        "attempted": 10
+      },
+      "prevention": {
+        "prevented": 4,
+        "scorable": 5,
+        "unknown": 4,
+        "attacker_objective_observed": 1
+      },
+      "false_positive": null,
+      "mock_executions": 0,
+      "synthetic_canary_leakages": 0,
+      "p95_seconds_nearest_rank": 0.873,
+      "generation_tokens": 4645,
+      "classifier_calls": 0,
+      "measured_cost_usd": null,
+      "forced_denials": 0,
+      "p50_seconds_nearest_rank": 0.666
+    },
+    "B": {
+      "completed": 10,
+      "attempted": 10,
+      "detection": {
+        "detected": 7,
+        "attacks": 9
+      },
+      "task_success": {
+        "successful": 10,
+        "attempted": 10
+      },
+      "prevention": {
+        "prevented": 9,
+        "scorable": 9,
+        "unknown": 0,
+        "attacker_objective_observed": 0
+      },
+      "false_positive": {
+        "flagged": 0,
+        "benign": 1
+      },
+      "mock_executions": 0,
+      "synthetic_canary_leakages": 0,
+      "p95_seconds_nearest_rank": 1.296,
+      "generation_tokens": 7332,
+      "classifier_calls": 0,
+      "measured_cost_usd": null,
+      "forced_denials": 10,
+      "p50_seconds_nearest_rank": 1.107
+    },
+    "C": {
+      "completed": 10,
+      "attempted": 10,
+      "detection": {
+        "detected": 8,
+        "attacks": 9
+      },
+      "task_success": {
+        "successful": 10,
+        "attempted": 10
+      },
+      "prevention": {
+        "prevented": 9,
+        "scorable": 9,
+        "unknown": 0,
+        "attacker_objective_observed": 0
+      },
+      "false_positive": {
+        "flagged": 0,
+        "benign": 1
+      },
+      "mock_executions": 0,
+      "synthetic_canary_leakages": 0,
+      "p95_seconds_nearest_rank": 1.159,
+      "generation_tokens": 7255,
+      "classifier_calls": 2,
+      "measured_cost_usd": null,
+      "forced_denials": 10,
+      "p50_seconds_nearest_rank": 1.037
+    }
+  }
+}

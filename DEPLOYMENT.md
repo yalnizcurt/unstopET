@@ -71,3 +71,9 @@ This addresses a reproduced browser `ERR_BLOCKED_BY_CLIENT` for direct Render re
 ## Verified model configuration
 
 The 20B daily generation quota was exhausted during integration acceptance; failures are preserved in `integration-platform-20b-quota-report.json`, with safe quota classification in `integration-provider-quota-report.json`. The compatible `openai/gpt-oss-120b` configuration is validated through the same gateway and Linux controls before deployment. Prior 20B measurements are not attributed to the new model. Each final A/B/C comparison uses the same configured model. No Groq built-in tools or remote MCP are enabled. Compatibility reference: [Groq 120B documentation](https://console.groq.com/docs/model/openai/gpt-oss-120b).
+
+## Final scoped release
+
+The final backend is `aca81e6a06fcb36104d101298eb7162f0a4534ca`; the frontend remains `cbedb770eb65d2cf2732e6cf4ae4975f8c0a83ce`. Exact deployment receipts and the served bundle comparison are in [final production audit](submission/evidence/final-production-audit.json). The final feature and promoted main CI runs passed. Fresh three-profile and independent SDK evidence, including an initial rate-limit failure before recovery, is in [production acceptance](submission/evidence/production-acceptance.json).
+
+The final evidence/documentation commit uses Render’s documented [skip-deploy phrase](https://render.com/docs/deploys), so publishing the recording and pitch does not restart the tested backend or discard temporary run history. The deployment receipts identify served code independently of the repository’s later documentation head.

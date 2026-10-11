@@ -2,7 +2,11 @@
 
 Measurements and targets are separate. Do not treat a passing unit test as a measured attack prevention percentage.
 
-- `platform-linux-acceptance-report.json`: current integration source, 110 passing Linux checks, two Mac-only skips and zero failures/errors. The prior 82-check baseline is separately recorded in `integration-baseline-report.json`. This verifies enforcement/regressions, not general detector reliability.
+- `submission/evidence/production-acceptance.json`: final exact-source Research/Developer/Procurement and independent SDK smoke with real 120B responses; one prior SDK rate-limit failure remains in the report. Manual review distinguishes completion from patch correctness. Empty-answer failures are separately retained.
+- `platform-linux-acceptance-report.json`: final source, 120 passing Linux checks, two Mac-only skips and zero failures/errors. This verifies enforcement/regressions, not general detector reliability.
+- [First-use challenge](evaluation/heldout/README.md): 32 public InjecAgent tool-output attacks, 16 new authored attacks and 16 benign controls, frozen before scoring. B/C both detect 4/48 attacks and falsely flag 6/16 benign cases. Public attacks: 0/32 detected. Eleven real classifier calls add zero detections. No agent generation or action execution is measured in this inspection-only study; authors were not blinded and classifier training overlap is unknown.
+- `evaluation/authored-168-report.json`: 66/84 attack instances detected, 0/84 benign flags and supplier prices retained in all 168 instances. This repeats 28 authored strings over six formats and is separate from the challenge.
+- `submission/evidence/authored-production-metrics.json`: 8a412ab / 120B hosted comparison, ten authored tasks in A/B/C. B detects 7/9 attacks, C 8/9; both complete 10/10 legitimate tasks and prevent 9/9 scorable attacks. A completes 5/10, has one observed wrong-ranking attacker objective and four unknown outcomes. Twenty independently forced email proposals are denied; they are not model-generated exfiltration attempts. Earlier provider failures remain separately versioned.
 - `semantic-evaluation-report.json`: 16 authored calibration inputs with real Groq Prompt Guard 2 86M scores. At a frozen 0.9 threshold, the implemented router recovers two of eight attacks missed by rules; zero added false positives on eight benign cases. Standalone classifier flags an educational quote; the router excludes explicitly labelled educational material. Several indirect attacks remain missed.
 - `semantic-heldout-report.json`: eight reserved authored language/phrasing variants, not independent authoring. Routed classifier recovers three of four attacks missed by rules, with no added false positives on four benign cases. The French variant is missed. This sample is too small for broad reliability claims.
 - `detection-matrix-report.json`: 42 authored attack format variants (seven categories × six surfaces) and six benign format variants. Target-category detection and preserved price facts pass on this regression matrix. Repeated wording and thin benign coverage prevent general reliability claims. The report includes 95% Wilson intervals.
@@ -10,7 +14,7 @@ Measurements and targets are separate. Do not treat a passing unit test as a mea
 
 The baseline's synthetic canary is intentionally provided to the baseline model; protected models have no grant to protected data. This is a containment test, not a universal sensitive-data discovery test. Real provider credentials never enter either model input or fixture. A model that returns the wrong winner has still followed an attacker objective even when the broker prevents email; the UI reports both facts.
 
-Seven-category and multiformat fixtures are authored engineering evidence, not an official F3 score. Official D2 reliability and independently authored unseen attack families remain unverified. Report sample sizes and category/surface outcomes; never advertise universal protection.
+Seven-category and multiformat fixtures are authored engineering evidence, not an official F3 score. The independently published challenge exposes substantial detection and benign-preservation failures; official D2 reliability is not established. Report sample sizes and category/surface outcomes; never advertise universal protection.
 
 ## Repeatable demonstration
 

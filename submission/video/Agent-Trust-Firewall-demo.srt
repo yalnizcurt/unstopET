@@ -1,0 +1,39 @@
+1
+00:00:00,000 --> 00:00:15,000
+Agent Trust Firewall: inspect agent evidence, independently authorize actions, and review security outcomes.
+
+2
+00:00:15,000 --> 00:00:35,000
+A supplier workbook can combine legitimate facts with instructions that try to change the task or authorize an external action.
+
+3
+00:00:35,000 --> 00:00:55,000
+Three bounded reference workflows use the same hosted security layer. Verification covers declared controls, not universal attack detection.
+
+4
+00:00:55,000 --> 00:01:15,000
+The Python SDK is a separate client of the protected hosted runtime. Inspection-only clients must enforce returned decisions themselves.
+
+5
+00:01:15,000 --> 00:01:40,000
+This is an actual retained SDK procurement run. Its trace records model requests, permitted tools, inspected receipts and released output.
+
+6
+00:01:40,000 --> 00:02:05,000
+Actual captured workbook evidence: hostile hidden-sheet content is withheld while permitted commercial facts remain available.
+
+7
+00:02:05,000 --> 00:02:25,000
+Forced containment test, not a model-generated attack: the broker denied an unauthorized email request. The model cannot grant itself permission.
+
+8
+00:02:25,000 --> 00:02:35,000
+The recorded security incident links the denial to its execution. Detection, denial and business correctness are separate observations.
+
+9
+00:02:35,000 --> 00:02:50,000
+The released supplier comparison recommends Vendor B, retains delivery and warranty facts, cites evidence and discloses unspecified currency.
+
+10
+00:02:50,000 --> 00:03:00,000
+The first-use challenge detected only 4 of 48 attacks, with 6 of 16 benign cases flagged. Detector reliability needs improvement; no universal protection is claimed.
