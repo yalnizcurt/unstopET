@@ -273,7 +273,7 @@ class Firewall:
             document['model_turn']=self.budgets[binding]['model_calls']+1
         instructions=self.instructions
         if self.tool_catalog and (document['model_turn']>=3 or
-                (document['runtime_catalog']['agent_profile_id']=='research' and any(r['decision']=='ALLOW' for r in self.tool_receipts)) or
+                (document['runtime_catalog']['agent_profile_id'] in ('research','developer') and any(r['decision']=='ALLOW' for r in self.tool_receipts)) or
                 (document['runtime_catalog']['agent_profile_id']=='procurement' and any(r['tool']=='score_suppliers' and r['decision']=='ALLOW' for r in self.tool_receipts))):
             instructions+='\nThe approved workflow operations are complete. No functions remain available. Return the requested answer as ordinary public response text, cite released evidence and disclose limitations. You may include inert patch text but cannot execute it. Do not call finish_response or include private reasoning.'
         return [

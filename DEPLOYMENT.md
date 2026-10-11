@@ -32,7 +32,7 @@ The Docker image runs as a non-root user and binds Render's `PORT`. The applicat
 3. Add its exact production origin to Render's `ALLOWED_ORIGINS` and redeploy the API.
 4. Open the site and enter the Render application access code. The configured Render HTTPS API is shown in Settings. Run the supplier example.
 
-No Groq secret belongs in Vercel. `VITE_API_BASE` selects the API at build time and defaults to the verified Render service. The UI never saves the access code. Preview origins must be added individually if needed.
+No Groq secret belongs in Vercel. Production calls use the fixed same-origin `/api` rewrite; `VITE_API_BASE` is only for local Vite development. The UI never saves the access code. Preview origins must be added individually if needed.
 
 ## Verify the deployed slice
 
@@ -49,7 +49,7 @@ The original Gate 1 report is historical evidence. The expanded release below ad
 
 The backend now starts `python3 api.py` (FastAPI). `/api/v1` exposes profiles, tasks, artifact inspection/coverage, events, policies, evaluations and contained Attack Lab runs. The old `/api/analyze` route is preserved for the original demo client.
 
-The React/Vite frontend is built with `npm ci && npm run build` in `frontend/`; Vercel serves `dist` with SPA refresh routing. `VITE_API_BASE` defaults to the existing Render origin. `SEMANTIC_ENABLED=1` enables the classifier after measured calibration/reserved checks. Credentials remain only in Render environment settings.
+The React/Vite frontend is built with `npm ci && npm run build` in `frontend/`; Vercel serves `dist` with SPA refresh routing. Production `/api` calls are pinned to the fixed Render rewrite; local `VITE_API_BASE` defaults to Render. `SEMANTIC_ENABLED=1` enables the classifier after measured calibration/reserved checks. Credentials remain only in Render environment settings.
 
 SQLite is intentionally temporary at `/tmp/atf-history.sqlite3`, with a 24-hour/300-record cap. No paid database or disk was provisioned, and the unrelated existing database was not reused. Binary upload bytes are discarded. This configuration is a synthetic demo, not durable enterprise deployment.
 
@@ -58,7 +58,7 @@ Public synthetic evaluation exports are copied into the image and restored as ex
 
 ## Historical submission release (10 October 2026)
 
-[submission-readiness-report.json](submission-readiness-report.json) records the final A–G hosted checks, source-bound Render release, Vercel READY deployment, actual browser assets, model outputs, independent forced-action denials and secret-literal checks. [Release checklist](docs/RELEASE_CHECKLIST.md) records the conditional readiness decision. Backend source `1d953ac` remains live; frontend/document-only commits deliberately skip a backend restart.
+[submission-readiness-report.json](submission-readiness-report.json) records the final A–G hosted checks, source-bound Render release, Vercel READY deployment, actual browser assets, model outputs, independent forced-action denials and secret-literal checks. [Release checklist](docs/RELEASE_CHECKLIST.md) records the conditional readiness decision. Backend source `1d953ac` was live for that historical report; later versions are separately recorded. Frontend/document-only commits can deliberately skip a backend restart.
 
 For the five-minute demonstration, warm the free service, authenticate, use the committed public supplier fixtures and malicious research URL, and open the existing measured semantic comparison. Keep tests synthetic. Provider 429s are bounded, explicit and retained; reduce request pace and retry after cooldown. No paid plan or unrestricted execution was enabled to hide availability limits.
 
@@ -67,3 +67,7 @@ For the five-minute demonstration, warm the free service, authenticate, use the 
 The production console uses its own Vercel origin for `/api/*`. A fixed external rewrite forwards that path to the existing Render HTTPS API; no user-selected destination, function, secret setting or new microservice is added. Authenticated responses use `private, no-store`. Render still checks bearer authentication, exact browser origins, request schemas, processing budgets and every broker boundary. The Python SDK continues calling Render directly.
 
 This addresses a reproduced browser `ERR_BLOCKED_BY_CLIENT` for direct Render requests without disabling browser protections or widening API permissions. Production checks must verify unauthenticated 401, foreign-origin 403, forged authority 422 and a successful authorized read through the Vercel route. Local Vite development keeps the configured direct API URL. API documentation is also available through the console origin at `/api/docs`. Vercel documents fixed external rewrites as its [reverse-proxy routing feature](https://vercel.com/docs/routing/rewrites).
+
+## Verified model configuration
+
+The 20B daily generation quota was exhausted during integration acceptance; failures are preserved in `integration-platform-20b-quota-report.json`, with safe quota classification in `integration-provider-quota-report.json`. The compatible `openai/gpt-oss-120b` configuration is validated through the same gateway and Linux controls before deployment. Prior 20B measurements are not attributed to the new model. Each final A/B/C comparison uses the same configured model. No Groq built-in tools or remote MCP are enabled. Compatibility reference: [Groq 120B documentation](https://console.groq.com/docs/model/openai/gpt-oss-120b).

@@ -79,7 +79,7 @@ class GroqProvider:
             if isinstance(document,dict):
                 receipts=document.get('completed_tool_requests',[])
                 if (document.get('model_turn',1)>=3 or
-                        (self.runtime_profile=='research' and any(r.get('decision')=='ALLOW' for r in receipts)) or
+                        (self.runtime_profile in ('research','developer') and any(r.get('decision')=='ALLOW' for r in receipts)) or
                         (self.runtime_profile=='procurement' and any(r.get('tool')=='score_suppliers' and r.get('decision')=='ALLOW' for r in receipts))):
                     # A completed workflow needs public text, not another function argument envelope.
                     del payload['tools'];del payload['parallel_tool_calls']

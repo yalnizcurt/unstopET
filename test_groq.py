@@ -104,6 +104,10 @@ class GroqTests(unittest.TestCase):
         self.assertNotIn('tools',captured[-1])
         provider.runtime_profile='developer'
         with self.assertRaisesRegex(Denied,'PROVIDER_COMPLETION_INCOMPLETE'):
+            provider([dict(role='system',content='server'),dict(role='user',content=json.dumps(dict(model_turn=2,completed_tool_requests=[dict(tool='propose_patch',decision='ALLOW')])) )])
+        self.assertEqual(captured[-1]['tool_choice'],'none')
+        self.assertNotIn('tools',captured[-1])
+        with self.assertRaisesRegex(Denied,'PROVIDER_COMPLETION_INCOMPLETE'):
             provider([dict(role='system',content='server'),dict(role='user',content=json.dumps(dict(model_turn=3,completed_tool_requests=[])))])
         self.assertEqual(captured[-1]['tool_choice'],'none')
         self.assertNotIn('tools',captured[-1])

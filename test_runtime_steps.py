@@ -50,6 +50,10 @@ class RuntimeToolTests(unittest.TestCase):
             self.assertEqual([m['role'] for m in messages],['system','user'])
             self.assertIn('No functions remain available',messages[0]['content'])
             self.assertIn('cannot execute it',messages[0]['content'])
+            if profile=='developer':
+                f.budgets[b]['model_calls']=1
+                f.tool_receipts=[dict(tool='propose_patch',decision='ALLOW')]
+                self.assertIn('No functions remain available',f.build_messages(b,snapshot)[0]['content'])
     def test_source_collection_cannot_be_replayed_and_stale_snapshots_cannot_invoke(self):
         calls=[]
         f=Firewall(collect=lambda *a:calls.append('collected'),tools=lambda *a: {},tool_catalog=lambda *a:dict(agent_profile_id='procurement'))
