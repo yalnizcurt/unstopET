@@ -13,6 +13,12 @@ Public-demo retention: synthetic inputs only, bounded history, raw upload bytes 
 
 Acceptance gates: preserve legitimate evidence, reject forged authority and unauthorized effects, never claim complete inspection for unsupported content, complete distinct tasks with all three agents, and show real events/evaluation data in the hosted UI.
 
-## Verified progress
+## Historical progress before the integration-first transformation
 
 Milestones 1–3: functional console/FastAPI, three shared protected profiles and actual isolated-runtime integration checks pass. Milestone 4: declared document adapters and contained Attack Lab implemented; classifier contribution measured; English OCR now runs in the same default-deny parser with no exec/fork/network permission. Hosted procurement and research completed with real Groq; developer response-limit failure was recorded and corrected, subsequently completed in the hosted UI. Advanced memory/correlation/red-team generation stay disabled. The Linux acceptance gate passes 82 checks (two Mac-only checks skipped); final deployment/browser/evaluation verification is in progress.
+
+## Integration-first implementation
+
+The same service, broker, inspection, sealed Linux process, Groq gateway and store now serve five server-owned registrations. The Python SDK and separate procurement application invoke hosted protected execution; the child has at most three model calls and two model-selected narrow tool requests. Tool output is inspected before a new snapshot. Runtime/incident views are tied to actual run/evidence IDs; failures are retained. The console has eight primary destinations and preserves the original workspaces/scanner/evaluation views under Security Lab.
+
+Final source acceptance: 110 passing Linux checks, zero failures/errors and two Mac-only skips. Terminal model turns use ordinary public text rather than function arguments; undeclared calls still fail closed and final output still passes DLP. Real provider failures and their source versions are retained. See [module map and release evidence](docs/PLATFORM_RELEASE.md), [milestone history](docs/PLATFORM_TRANSFORMATION.md), [SDK](sdk/python/README.md) and [five-minute demo](docs/PLATFORM_DEMO.md).

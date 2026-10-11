@@ -13,7 +13,7 @@ Agents: procurement comparison; public HTTPS research through a controlled reade
 
 Supported declared adapters: UTF-8 text, static HTML, PDF text/metadata/annotation strings, DOCX XML channels, XLSX cells/hidden sheets/comments, bounded ZIPs. English raster OCR and metadata remain partial; QR decoding and guaranteed recognition are not enabled. Unsupported regions remain withheld. Persistent memory and unrestricted shell/connectors are disabled.
 
-Release decision: **READY WITH DISCLOSED LIMITATIONS** for the tested synthetic/public hackathon workflow. All three agents and the hosted walkthrough work. The broader nine-attack set has 8/9 routed detection; general reliability targets, durable multi-user storage and universal protection are not established. See the [release checklist](docs/RELEASE_CHECKLIST.md).
+The integration-first prototype adds a real independent SDK application, bounded brokered tool steps and source-linked runtime investigations. Current deployment evidence and the release decision are in [Platform release](docs/PLATFORM_RELEASE.md); prior measurements retain their original version in [the historical checklist](docs/RELEASE_CHECKLIST.md). General reliability, durable multi-user storage and universal protection are not established.
 
 ## Local development
 
@@ -29,11 +29,11 @@ npm run dev
 npm run build
 ```
 
-The production start command is `python3 api.py`. Versioned APIs live under `/api/v1`; request schemas reject browser-supplied security authority. `VITE_API_BASE` can configure the frontend API URL and is not a credential.
+The production start command is `python3 api.py`. Versioned APIs live under `/api/v1`; request schemas reject browser-supplied security authority. Local development can use `VITE_API_BASE`. The production console pins API calls to its own origin; Vercel forwards `/api` only to the existing Render service with private/no-store response headers. No browser parameter can choose another API destination.
 
 ## Verification and limits
 
-The current Linux acceptance report records 109 passing checks and two Mac-only skips; the historical baseline had 82 passing checks. Classifier calibration and reserved-variant reports use actual Groq Prompt Guard scores. The authored 42-attack / six-benign detection matrix exercises seven categories across six document surfaces; it is not an unseen-attack reliability estimate. Final hosted A–G API and browser acceptance is recorded in [submission-readiness-report.json](submission-readiness-report.json); authored small sets are not universal protection or official F3/D2 achievement.
+The current Linux acceptance report records 110 passing checks and two Mac-only skips; the historical baseline had 82 passing checks. Classifier calibration and reserved-variant reports use actual Groq Prompt Guard scores. The authored 42-attack / six-benign detection matrix exercises seven categories across six document surfaces; it is not an unseen-attack reliability estimate. Historical A–G API and browser acceptance is recorded in [submission-readiness-report.json](submission-readiness-report.json); current integration acceptance is recorded in [integration-platform-production-report.json](integration-platform-production-report.json). authored small sets are not universal protection or official F3/D2 achievement.
 
 Free Render history is temporary SQLite, bounded to 24 hours / 300 total records. Raw binaries are discarded after extraction. Synthetic/public demo inputs only; this is not enterprise tenant authentication or durable production audit storage. Free services can sleep and restart.
 

@@ -109,3 +109,17 @@ Findings 1–17 are corrected and verified for the disclosed synthetic/public de
 | Deployment and submission preparation | COMPLETE | Verified Vercel/Render, actual reports, six diagrams, timed walkthrough and screenshots; portal submission/recording not performed |
 
 Final decision: **READY WITH DISCLOSED LIMITATIONS** for the tested hackathon demonstration. The extended detection target and general reliability targets are not established. See `docs/RELEASE_CHECKLIST.md` and `EVALUATION.md` for denominators and unresolved capability limits.
+
+## Integration-first audit — 11 October 2026
+
+The preserved 82-check security baseline and new registration/SDK/bounded-turn/event contracts pass together: 110 passing Linux checks, two Mac-only skips, zero failures/errors. The source-hash manifest is packaged with the service and checked before registry verification; startup repeats isolation before listening. New capabilities still pass through `Firewall.handle` and cannot alter policy, destinations, profiles or memory.
+
+- A moved catalog filename label reintroduced quarantined input. The unchanged regression caught it; the label now comes from released evidence.
+- Blank model completions could be mistaken for useful output. They are rejected before release. Model success and independently scored task success stay distinct.
+- Native Groq function names sometimes carry a `functions.` prefix. Only that prefix is normalized before exact declared-name/argument checks; unknown, parallel and forged proposals remain denied.
+- Groq repeatedly failed to encode final research/developer answers as function arguments. Those formal hosted failures remain in `integration-platform-prior-deployment-report.json` and `integration-platform-748-deployment-report.json`. Terminal turns now disable functions and use public text through the same final-output controls; no provider-error body or private reasoning is published.
+- The in-app browser blocked direct Render fetches. The production frontend now uses Vercel's fixed same-origin HTTPS rewrite. Authentication, explicit-origin rejection and schema authority checks still execute in Render; private/no-store headers prevent shared caching. No new proxy service, model endpoint or runtime route was added.
+
+Current hosted proof, exact source and console observations are recorded in `integration-platform-production-report.json`. The console has eight primary sections; earlier nine-screen/mobile assertions above belong to the historical release. Current desktop verification is separate. The enabled browser ignored the requested 390px viewport override (observed 1093px/1280px); no new mobile visual pass or mobile screenshot is claimed. Existing responsive CSS remains, and its current mobile appearance needs manual verification.
+
+No paid resources, unrestricted tools, persistent memory, contextual escalation or external runtime-enforcement claims were added. No independent unseen-family study, enterprise isolation, portal submission or security certification was performed.
