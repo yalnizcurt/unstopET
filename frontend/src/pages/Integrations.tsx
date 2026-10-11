@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Badge, type Row } from "../components/Common";
 import { API } from "../app/api";
-const snippet = `import os\nfrom pathlib import Path\nfrom agent_trust_firewall import ATFClient\n\nclient = ATFClient(\n    base_url=os.environ['ATF_API_URL'],\n    api_key=os.environ['ATF_ACCESS_TOKEN'],\n)\nartifact = client.inspect_file('proposal.xlsx', Path('proposal.xlsx').read_bytes())\nrun = client.run_protected_agent(\n    agent_id='procurement',\n    task='Compare supplier proposals and cite evidence.',\n    artifact_ids=[artifact['id']],\n)\nprint(run['output'])\nprint(client.get_timeline(run['id']))`;
+const snippet = `from pathlib import Path\nfrom agent_trust_firewall import ATFClient\n\n# The SDK establishes its own anonymous server session.\nclient = ATFClient(base_url='https://agent-trust-firewall.vercel.app')\nartifact = client.inspect_file('proposal.xlsx', Path('proposal.xlsx').read_bytes())\nrun = client.run_protected_agent(\n    agent_id='procurement',\n    task='Compare supplier proposals and cite evidence.',\n    artifact_ids=[artifact['id']],\n)\nprint(run['output'])\nprint(client.get_timeline(run['id']))`;
 export function Integrations({
   integrations,
   go,
@@ -45,7 +45,7 @@ export function Integrations({
         <ol className="onboarding">
           <li>Choose hosted execution for mandatory server-side boundaries.</li>
           <li>
-            Configure the approved demo access code in your client environment.
+            Open the public workspace or let the SDK establish its anonymous server session.
           </li>
           <li>
             Submit task intent separately from evidence using the Python SDK.
@@ -105,8 +105,8 @@ export function Integrations({
       <div className="notice">
         Inspection-only mode provides signals and released-fragment guidance; it
         does not enforce your external model or tools. Inference proxy and MCP
-        gateway are unavailable. Shared demo authentication is not enterprise
-        tenant identity.
+        gateway are unavailable. Anonymous temporary sessions do not establish
+        enterprise tenant identity.
       </div>
     </>
   );

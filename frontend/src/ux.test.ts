@@ -5,7 +5,12 @@ import { exhibitEvidence } from "./exhibitEvidence.ts";
 
 assert.match(requestErrorMessage("BUSY_TRY_AGAIN"), /same file/);
 assert.match(requestErrorMessage("RUN_ACCESS_DENIED"), /expired.*another session/);
-assert.match(requestErrorMessage("AUTHENTICATION_REQUIRED"), /access code/);
+assert.match(requestErrorMessage("DEMO_SESSION_REQUIRED"), /temporary workspace expired/);
+assert.match(requestErrorMessage("DEMO_SESSION_RECREATED"), /evidence again/);
+assert.match(requestErrorMessage("DEMO_DAILY_BUDGET_EXHAUSTED"), /shared processing budget/);
+assert.match(requestErrorMessage("DEMO_INFERENCE_DISABLED"), /temporarily disabled/);
+assert.match(requestErrorMessage("DEMO_RATE_LIMITED"), /request limit/);
+assert.match(requestErrorMessage("SESSION_CAPACITY_EXHAUSTED"), /capacity/);
 assert.match(requestErrorMessage("REQUEST_BUDGET_EXHAUSTED"), /request limit/);
 assert.match(requestErrorMessage("GROQ_RATE_LIMIT"), /No successful result/);
 assert(!requestErrorMessage("raw provider error: secret").includes("secret"));

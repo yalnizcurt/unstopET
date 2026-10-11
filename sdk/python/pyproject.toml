@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "agent-trust-firewall"
-version = "1.0.0"
+version = "1.1.0"
 description = "HTTPS client for hosted Agent Trust Firewall execution and inspection"
 requires-python = ">=3.10"
 dependencies = []

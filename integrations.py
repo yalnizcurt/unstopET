@@ -34,7 +34,7 @@ def verification(identity, runtime_verified, report_path=None):
         hashes = report['source_sha256']
         required = ['firewall.py','api.py','agent_runtime.py','gate1.py','linux_guard.py',
                     'inspection.py','extractors.py','parsing.py','parser_worker.py','ocr.py','groq_ai.py',
-                    'network.py','agents.py','semantic.py','storage.py','evaluation.py','integrations.py','runtime_tools.py','runtime_events.py']
+                    'network.py','agents.py','semantic.py','storage.py','evaluation.py','integrations.py','runtime_tools.py','runtime_events.py','demo_access.py']
         matched = all(name in hashes and hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()==hashes[name]
                       for name in required)
         passed = report['status']=='PASS' and not report['failures'] and not report['errors'] and matched
@@ -60,5 +60,5 @@ def describe(identity, sessions, runtime_verified):
         available_tools=profile.get('tools',[]), verified_security_boundaries=proof['verified_security_boundaries'],
         last_execution_at=runs[0]['created_at'] if runs else None, last_verified_at=proof['last_verified_at'],
         deployment_mode='HOSTED_LINUX' if entry['agent_profile_id'] else 'INSPECTION_ONLY',
-        limitations=['Shared demo identity','24-hour temporary records','No live email, purchasing, shell, MCP or memory']+
+        limitations=['Anonymous visitor sessions; not enterprise accounts','24-hour temporary records','No live email, purchasing, shell, MCP or memory']+
         (['Caller must obey release guidance; external runtime is not enforced'] if not entry['agent_profile_id'] else []))

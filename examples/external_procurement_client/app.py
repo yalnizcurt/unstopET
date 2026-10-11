@@ -11,9 +11,7 @@ def main():
     parser.add_argument('--documents',type=Path,default=Path(__file__).resolve().parents[2]/'docs'/'demo-fixtures')
     parser.add_argument('--output',type=Path)
     args=parser.parse_args()
-    access=os.environ.get('ATF_ACCESS_TOKEN')
-    if not access: raise SystemExit('Set ATF_ACCESS_TOKEN from the approved server demo configuration.')
-    client=ATFClient(os.environ.get('ATF_API_URL','https://agent-trust-firewall-api.onrender.com'),access)
+    client=ATFClient(os.environ.get('ATF_API_URL','https://agent-trust-firewall-api.onrender.com'))
     try:
         artifacts=[client.inspect_file(name,(args.documents/name).read_bytes()) for name in
                    ('vendor-a.txt','vendor-b.docx','vendor-c.pdf','malicious-proposal.xlsx')]

@@ -1,21 +1,16 @@
 import type { Row } from "../components/Common";
-import { requestErrorMessage } from "../errors";
-export const API =
-  (import.meta as any).env.PROD
-    ? location.origin
-    : (import.meta as any).env.VITE_API_BASE ||
-      "https://agent-trust-firewall-api.onrender.com";
-export async function request(path: string, token: string, body?: Row) {
-  const response = await fetch(API + "/api/v1/" + path, {
-    method: body ? "POST" : "GET",
-    headers: {
-      Authorization: "Bearer " + token,
-      ...(body ? { "Content-Type": "application/json" } : {}),
-    },
-    body: body ? JSON.stringify(body) : undefined,
-    signal: AbortSignal.timeout(150000),
-  });
-  const data = await response.json();
-  if (!response.ok) throw Error(requestErrorMessage(data.error));
+import { APIError, requestOptions } from "../anonymousSession";
+export const API = location.origin;
+export async function request(path: string, body?: Row) {
+  let response: Response;
+  try {
+    response = await fetch(API + "/api/v1/" + path, {
+      ...requestOptions(body), signal: AbortSignal.timeout(150000),
+    });
+  } catch { throw new APIError("REQUEST_UNAVAILABLE"); }
+  let data;
+  try { data = await response.json(); }
+  catch { throw new APIError("INVALID_SERVICE_RESPONSE"); }
+  if (!response.ok) throw new APIError(data?.error);
   return data;
 }

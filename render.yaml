@@ -10,11 +10,13 @@ services:
     envVars:
       - key: GROQ_API_KEY
         sync: false
-      - key: APP_ACCESS_TOKEN
-        generateValue: true
       - key: ALLOWED_ORIGINS
         sync: false
       - key: GROQ_MODEL
         value: openai/gpt-oss-120b
       - key: SEMANTIC_ENABLED
+        value: "1"
+      - key: DEMO_DAILY_OPERATIONS
+        value: "100"
+      - key: DEMO_INFERENCE_ENABLED
         value: "1"

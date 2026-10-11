@@ -1,3 +1,4 @@
+from test_public_demo import bootstrap
 import base64
 import io
 import json
@@ -29,13 +30,14 @@ class PlatformTests(unittest.TestCase):
             if not response['ok']: return dict(completed=False)
             final=fw.handle(binding,dict(op='finalize',args=dict(snapshot_id=snapshot,body=response['result']['text'])))
             return dict(completed=final['ok'])
-        self.app=create_app('test-access-token-123456',lambda:provider,{'https://allowed.example'},
+        self.app=create_app(lambda:provider,{'https://allowed.example'},
             Store(),parser=extract,runner=runner,verify=False)
-        self.client=TestClient(self.app)
-        self.auth={'Authorization':'Bearer test-access-token-123456'}
+        self.client=TestClient(self.app,base_url='https://testserver')
+        bootstrap(self.client)
+        self.auth={'X-ATF-Demo':'1'}
     def post(self,path,body): return self.client.post('/api/v1/'+path,json=body,headers=self.auth)
     def test_auth_origin_and_forged_authority(self):
-        self.assertEqual(self.client.get('/api/v1/agents').status_code,401)
+        self.assertEqual(TestClient(self.app,base_url='https://testserver').get('/api/v1/agents').status_code,401)
         self.assertEqual(self.client.get('/api/v1/agents',headers=dict(self.auth,Origin='https://evil.example')).status_code,403)
         for field in ['role','system_prompt','trust_level','tenant_id','context_snapshot_id','user_authorized']:
             self.assertEqual(self.post('tasks',dict(agent_id='procurement',intent='Compare',evidence=['x'],**{field:'trusted'})).status_code,422)
@@ -136,9 +138,10 @@ class PlatformTests(unittest.TestCase):
         def unavailable(messages): raise Denied('PROVIDER_HTTP_503')
         def runner(firewall,binding,mode,snapshot):
             return dict(completed=firewall.handle(binding,dict(op='model.generate',args=dict(snapshot_id=snapshot)))['ok'])
-        app=create_app('offline-outage-test-code',lambda:unavailable,set(),Store(),parser=extract,runner=runner,verify=False)
-        with TestClient(app) as client:
-            r=client.post('/api/v1/attacks/run',json=dict(agent_id='procurement',scenario='override',surface='text'),headers={'Authorization':'Bearer offline-outage-test-code'})
+        app=create_app(lambda:unavailable,set(),Store(),parser=extract,runner=runner,verify=False)
+        with TestClient(app,base_url='https://testserver') as client:
+            bootstrap(client)
+            r=client.post('/api/v1/attacks/run',json=dict(agent_id='procurement',scenario='override',surface='text'),headers={'X-ATF-Demo':'1'})
         row=r.json()['results'][1]
         self.assertEqual(row['status'],'FAILED')
         self.assertIsNone(row['attack_prevented'])
@@ -216,13 +219,37 @@ class PlatformTests(unittest.TestCase):
         with open('cloud-evaluation-report.json') as source: measured=json.load(source)
         archive_store=Store()
         with patch('api.Store',return_value=archive_store):
-            create_app('archive-test-long-code',lambda:(_ for _ in ()).throw(AssertionError('No model replay')),set(),verify=False)
-        rows=archive_store.list('evaluation')
+            create_app(lambda:(_ for _ in ()).throw(AssertionError('No model replay')),set(),verify=False)
+        rows=archive_store.list('evaluation',principal='public-archive')
         originals={r['id']:r['created_at'] for r in measured['results'] if r.get('id')}
         self.assertEqual(len(rows),len(originals))
         for record in rows:
             self.assertEqual(record['origin'],'ARCHIVED_MEASURED_RUN')
-            self.assertEqual(record['created_at'],originals[record['id']])
+            self.assertEqual(record['created_at'],originals[record['source_evaluation_id']])
+    def test_packaged_archive_import_handles_legacy_record_id_without_owner_overwrite(self):
+        with open('cloud-evaluation-report.json') as source: measured=json.load(source)
+        packaged=next(r for r in measured['results'] if r.get('id') and r.get('results'))
+        archive_store=Store()
+        legacy=archive_store.put('evaluation',dict(packaged,scope='LEGACY_PRIVATE_SCOPE',
+            results=[{'output':'LEGACY_PRIVATE_OUTPUT'}]),principal='demo-owner',record_id=packaged['id'])
+        unrelated=archive_store.put('evaluation',dict(scope='UNRELATED_PRIVATE_SCOPE',
+            results=[{'output':'UNRELATED_PRIVATE_OUTPUT'}]),principal='demo-owner')
+        with patch('api.Store',return_value=archive_store):
+            app=create_app(lambda:(_ for _ in ()).throw(AssertionError('No model replay')),set(),verify=False)
+        self.assertEqual(archive_store.get(legacy['id'],'evaluation',principal='demo-owner'),legacy)
+        self.assertEqual(archive_store.get(unrelated['id'],'evaluation',principal='demo-owner'),unrelated)
+        public_rows=archive_store.list('evaluation',principal='public-archive')
+        imported=next(r for r in public_rows if r['results']==packaged['results'])
+        self.assertEqual(imported['origin'],'ARCHIVED_MEASURED_RUN')
+        self.assertEqual(imported['source_evaluation_id'],packaged['id'])
+        self.assertNotEqual(imported['id'],packaged['id'])
+        self.assertEqual(imported['created_at'],packaged['created_at'])
+        visitor=TestClient(app,base_url='https://testserver');bootstrap(visitor)
+        self.assertEqual(visitor.get('/api/v1/overview').json()['evaluation_runs'],0)
+        response=visitor.get('/api/v1/evaluations')
+        self.assertEqual(response.json(),public_rows)
+        for private in ('LEGACY_PRIVATE_SCOPE','LEGACY_PRIVATE_OUTPUT','UNRELATED_PRIVATE_SCOPE','UNRELATED_PRIVATE_OUTPUT'):
+            self.assertNotIn(private,response.text)
     def test_attack_lab_forces_and_labels_independent_action_containment(self):
         r=self.post('attacks/run',dict(agent_id='procurement',scenario='override',surface='text'))
         self.assertEqual(r.status_code,200,r.text)
@@ -235,12 +262,17 @@ class PlatformTests(unittest.TestCase):
         self.assertIsNone(rows[1]['attacker_objective_observed'])
         events=self.client.get('/api/v1/events',headers=self.auth).json()
         self.assertTrue(any(e.get('origin')==probe['origin'] and e['result']=='DENY' for e in events))
-    def test_public_api_documentation_requires_bearer_for_protected_operations(self):
+    def test_public_api_documentation_uses_bootstrap_without_bearer(self):
         self.assertEqual(self.client.get('/api/docs').status_code,200)
         schema=self.client.get('/api/openapi.json').json()
-        self.assertEqual(schema['paths']['/api/v1/tasks']['post']['security'],[{'DemoAccessCode':[]}])
+        schemes=schema.get('components',{}).get('securitySchemes',{})
+        self.assertNotIn('DemoAccessCode',schemes)
+        self.assertFalse(any(s.get('scheme')=='bearer' for s in schemes.values()))
+        self.assertIn('/api/v1/demo/session',schema['paths'])
+        marker=next(p for p in schema['paths']['/api/v1/tasks']['post']['parameters'] if p['name']=='X-ATF-Demo')
+        self.assertTrue(marker['required']);self.assertEqual(marker['schema']['enum'],['1'])
         self.assertNotIn('security',schema['paths']['/api/health']['get'])
-        self.assertEqual(self.client.get('/api/v1/events').status_code,401)
+        self.assertEqual(TestClient(self.app,base_url='https://testserver').get('/api/v1/events').status_code,401)
     def test_history_real_metrics_no_placeholder_evaluation(self):
         before=self.client.get('/api/v1/overview',headers=self.auth).json()
         self.assertEqual(before['inputs'],0);self.assertIsNone(before['avg_seconds'])

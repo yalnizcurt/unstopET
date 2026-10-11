@@ -1,3 +1,4 @@
+from test_public_demo import bootstrap
 import hashlib
 import json
 import tempfile
@@ -21,7 +22,7 @@ class IntegrationTests(unittest.TestCase):
             self.assertFalse(proof['verified_security_boundaries'])
             self.assertEqual(verification('procurement',False)['status'],'UNKNOWN')
             report=json.loads(Path('platform-linux-acceptance-report.json').read_text())
-            report['source_sha256']={name:hashlib.sha256(Path(name).read_bytes()).hexdigest() for name in report['source_sha256']}
+            report['source_sha256']={name:hashlib.sha256(Path(name).read_bytes()).hexdigest() for name in set(report['source_sha256'])|{'demo_access.py'}}
             evidence=Path(tmp)/'matching.json';evidence.write_text(json.dumps(report))
             self.assertEqual(verification('procurement',True,evidence)['status'],'PROTECTION_VERIFIED')
             report['source_sha256']['api.py']='0'*64;evidence.write_text(json.dumps(report))
@@ -33,8 +34,8 @@ class IntegrationTests(unittest.TestCase):
         from extractors import extract
         from storage import Store
         from fastapi.testclient import TestClient
-        app=create_app('synthetic-integration-test-code',lambda:None,set(),Store(),parser=extract,verify=False)
-        client=TestClient(app); auth={'Authorization':'Bearer synthetic-integration-test-code'}
+        app=create_app(lambda:None,set(),Store(),parser=extract,verify=False)
+        client=TestClient(app,base_url='https://testserver'); bootstrap(client); auth={'X-ATF-Demo':'1'}
         self.assertEqual(len(client.get('/api/v1/agents',headers=auth).json()),3)
         entries=client.get('/api/v1/integrations',headers=auth).json()
         self.assertEqual(len(entries),5)
@@ -43,4 +44,4 @@ class IntegrationTests(unittest.TestCase):
             r=client.post('/api/v1/tasks',headers=auth,json=dict(agent_id='procurement',intent='Compare',
                 evidence=['public'],integration_id=identity))
             self.assertEqual(r.status_code,422)
-        self.assertEqual(client.post('/api/v1/integrations',headers=auth,json={'tools':['shell']}).status_code,405)
+        self.assertEqual(client.post('/api/v1/integrations',headers=auth,json={'tools':['shell']}).status_code,403)

@@ -8,7 +8,7 @@ Runtime security for AI agents: a React/TypeScript security console, shared insp
 - API health: https://agent-trust-firewall-api.onrender.com/api/v1/health
 - Repository: https://github.com/yalnizcurt/unstopET
 
-The console centers on Protected Agents, Runtime Activity, Security Incidents, read-only Security Policies, Security Lab, Integrations and Settings. Existing file scanning, workspaces, fragment investigation and A/B/C evaluations remain accessible. Access requires the server-configured demo access code; no Groq key enters the frontend.
+The console centers on Protected Agents, Runtime Activity, Security Incidents, read-only Security Policies, Security Lab, Integrations and Settings. Existing file scanning, workspaces, fragment investigation and A/B/C evaluations remain accessible. Access is public with no login or access code. The console opens directly to Security Overview and transparently establishes an isolated anonymous server session. No Groq key enters the frontend.
 
 Agents: procurement comparison; public HTTPS research through a controlled reader; synthetic repository review with inert patch suggestions. All generation uses the existing verified Linux runtime, trusted Model Gateway and mandatory broker. Mock email requests cannot independently authorize side effects; live email is disabled.
 
@@ -20,7 +20,7 @@ The integration-first prototype adds a real independent SDK application, bounded
 
 ## Local development
 
-The backend requires Linux Landlock ABI 3+ and libseccomp; it deliberately fails closed on unsupported hosts. Use the Docker image on a supported Linux kernel. Set `APP_ACCESS_TOKEN`, `GROQ_API_KEY`, `GROQ_MODEL`, `ALLOWED_ORIGINS` and optionally `SEMANTIC_ENABLED=1` in the trusted server environment. Never place secrets in frontend variables or Git.
+The backend requires Linux Landlock ABI 3+ and libseccomp; it deliberately fails closed on unsupported hosts. Use the Docker image on a supported Linux kernel. Set `GROQ_API_KEY`, `GROQ_MODEL`, `ALLOWED_ORIGINS` and optionally `SEMANTIC_ENABLED=1` in the trusted server environment. Application access no longer depends on `APP_ACCESS_TOKEN`. Configure the public-demo request/operation caps and inference-disable switch as described in [Deployment](DEPLOYMENT.md). Never place secrets in frontend variables or Git.
 
 ```sh
 docker build -t agent-trust-firewall .
@@ -36,9 +36,9 @@ The production start command is `python3 api.py`. Versioned APIs live under `/ap
 
 ## Verification and limits
 
-The current Linux acceptance report records 120 passing checks, zero failures/errors and two Mac-only skips. The earlier 168-instance authored benchmark detects 66/84 attack instances with 0/84 benign flags; its 28 strings are repeated over six formats. Real Prompt Guard calibration and the 8a412ab hosted comparison show a small familiar-example detection gain, which did not generalize to the first-use challenge. Historical A–G evidence remains in [submission-readiness-report.json](submission-readiness-report.json); the 8a412ab workflows and 30 A/B/C responses remain in [integration-platform-production-report.json](integration-platform-production-report.json). Final exact-source evidence is indexed in [the submission checklist](submission/FINAL_CHECKLIST.md).
+The pre-public-access Linux acceptance report records 120 passing checks, zero failures/errors and two Mac-only skips; anonymous-session release checks are reported separately. The earlier 168-instance authored benchmark detects 66/84 attack instances with 0/84 benign flags; its 28 strings are repeated over six formats. Real Prompt Guard calibration and the 8a412ab hosted comparison show a small familiar-example detection gain, which did not generalize to the first-use challenge. Historical A–G evidence remains in [submission-readiness-report.json](submission-readiness-report.json); the 8a412ab workflows and 30 A/B/C responses remain in [integration-platform-production-report.json](integration-platform-production-report.json). Final exact-source evidence is indexed in [the submission checklist](submission/FINAL_CHECKLIST.md).
 
-Free Render history is temporary SQLite, bounded to 24 hours / 300 total records. Raw binaries are discarded after extraction. Synthetic/public demo inputs only; this is not enterprise tenant authentication or durable production audit storage. Free services can sleep and restart.
+Each visitor receives a server-issued, 24-hour `Secure`/`HttpOnly`/`SameSite=Strict` cookie. Artifacts, runs and incidents are scoped to that anonymous session; browser-supplied identities cannot claim another visitor’s data. Free Render history is temporary SQLite, bounded to 24 hours / 300 total records. Raw binaries are discarded after extraction. Synthetic/public demo inputs only; this is not enterprise tenant authentication or durable production audit storage. Free services can sleep and restart, expiring sessions, history and application abuse counters. Provider-account limits remain authoritative.
 
 See [Implementation sequence](IMPLEMENTATION.md), [Architecture](ARCHITECTURE.md), [Security](SECURITY.md), [Agent capabilities](AGENTS.md), [Coverage](COVERAGE.md), [Evaluation](EVALUATION.md), [Deployment](DEPLOYMENT.md), [Submission package](SUBMISSION.md), [Release checklist](docs/RELEASE_CHECKLIST.md) and [Implementation audit](docs/IMPLEMENTATION_AUDIT.md).
 
@@ -46,4 +46,10 @@ See [Implementation sequence](IMPLEMENTATION.md), [Architecture](ARCHITECTURE.md
 
 The dedicated implementation branch extends the same broker into maximum three model turns / two model-selected tool requests. Tools include released reads, deterministic supplier scoring and inert patch receipts; no direct child network/model/filesystem/shell/MCP path is enabled. Server-issued snapshots and inspection precede every continuation. Failed runs retain chronological evidence.
 
-Use the [Python client](sdk/python/README.md) and [independent reference application](examples/external_procurement_client/README.md) for hosted protected execution. Inspection alone does not enforce your external agent. Source-bound registry verification is distinct from connectivity. See [transformation tracking](docs/PLATFORM_TRANSFORMATION.md), [category crosswalk](docs/OFFICIAL_CATEGORY_CROSSWALK.md) and [platform walkthrough](docs/PLATFORM_DEMO.md). Production verification for the new transformation is reported separately from historical submission evidence.
+Use the [Python client](sdk/python/README.md) and [independent reference application](examples/external_procurement_client/README.md) for hosted protected execution. Inspection alone does not enforce your external agent. Source-bound registry verification is distinct from connectivity. See [transformation tracking](docs/PLATFORM_TRANSFORMATION.md), [category crosswalk](docs/OFFICIAL_CATEGORY_CROSSWALK.md) and [platform walkthrough](docs/PLATFORM_DEMO.md). Production verification for each new release is reported separately from historical submission evidence. Earlier access-token reports and videos retain their historical source and are not proof of current anonymous access.
+
+## Public demo access and budgets
+
+Visitors can inspect synthetic/public files and run all three existing protected profiles without login, subject to server-side session/IP request limits, upload/file-count limits, a global admitted-operation cap, concurrency control and the existing runtime/model budgets. An application operation cap is not a measured USD or token budget. When inference is disabled or the cap is exhausted, non-inference exploration remains available; no fabricated AI success replaces an error. Anonymous visitor isolation is temporary demonstration storage, not durable personal accounts or enterprise tenancy.
+
+The Python SDK establishes its own session lazily and retains the server cookie within one client instance. Use `ATFClient(base_url)`; the legacy `api_key` argument is accepted for source compatibility but ignored and never transmitted. A different browser or SDK instance cannot see that client’s records. See [SDK migration and errors](sdk/python/README.md) and [the API session contract](docs/API_INTEGRATION.md).

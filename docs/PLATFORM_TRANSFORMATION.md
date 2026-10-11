@@ -1,5 +1,6 @@
-# Integration-first platform implementation
+# Historical implementation notes — before anonymous public access
 
+This source-bound document retains the prior shared-access-code release and its original measurements. Current access and SDK migration are documented in [API integration](API_INTEGRATION.md); shared-token statements below are historical, not setup instructions.
 Baseline: source `79e2d4f`, deployed API `1d953ac`, branch `codex/integration-platform`.
 G0 passed on 11 October 2026: exact-source Linux Docker suite 82 pass / two Mac-only skips / zero failures or errors; frontend tests and production build pass; hosted Linux health and a real synthetic Groq call pass. Evidence: `integration-baseline-report.json`. Existing fixtures and prior reports are retained.
 

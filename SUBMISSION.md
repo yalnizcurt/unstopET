@@ -15,7 +15,7 @@ The differentiator is measurable defense in depth: the same enforcement boundari
 - API reference: https://agent-trust-firewall-api.onrender.com/api/docs
 - Repository: https://github.com/yalnizcurt/unstopET
 
-Use the server-configured demo access code, never the Groq key. No submission portal upload or official assessment is claimed.
+Current access is public without login or an access code. The server creates an isolated anonymous visitor session; never provide a Groq key to a browser/client. Historical shared-code tests below retain their original source and are not anonymous-access verification. No submission portal upload or official assessment is claimed.
 
 ## Working agents and security
 
@@ -49,7 +49,7 @@ Use [Release checklist](docs/RELEASE_CHECKLIST.md) for the final decision and A�
 
 ## Reproducible five-minute walkthrough
 
-Prepare the free Render service before presenting; open the console and authenticate. Use the public synthetic files in [demo-fixtures](docs/demo-fixtures). All side effects are mock operations. Pre-run longer comparisons if cold starts would disrupt the five-minute presentation; clearly show their original measurement timestamps.
+Prepare the free Render service before presenting; open the console directly and let it establish an anonymous visitor session. Use the public synthetic files in [demo-fixtures](docs/demo-fixtures). All side effects are mock operations. Pre-run longer comparisons if cold starts would disrupt the five-minute presentation; clearly show their original measurement timestamps.
 
 | Time | Actual demonstration |
 |---|---|
@@ -61,4 +61,4 @@ Prepare the free Render service before presenting; open the console and authenti
 | 3:45–4:30 | Attack Lab `semantic`: compare A/B/C detection, task completion, tokens and decisions. C detects the known paraphrase that B misses. Show the retained `semantic_evasion` miss/unknowns as a limit |
 | 4:30–5:00 | Show measured evaluations, six architecture views and release limitations. Explain that authorization is independent of detector or model success |
 
-Screenshots and final executed scenario evidence are linked from the release checklist and `submission-readiness-report.json`. Recording is unavailable in the enabled browser tools; no recording or portal submission is falsely claimed.
+Screenshots and final executed scenario evidence are linked from the release checklist and `submission-readiness-report.json`. A source-bound captioned recording of the earlier release is retained in `submission/video/`. It is historical, not a fresh anonymous-access recording. No portal submission is claimed.

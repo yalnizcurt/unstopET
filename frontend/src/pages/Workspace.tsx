@@ -68,6 +68,7 @@ export function Workspace(props: ViewProps) {
             onSubmit={(e) => {
               e.preventDefault();
               action(async () => {
+                setResult(null);
                 const r = await api("tasks", {
                   agent_id: agent,
                   intent,
@@ -168,7 +169,7 @@ export function Workspace(props: ViewProps) {
                 Synthetic / public data only. No real external email.
               </small>
               <button className="primary" disabled={busy}>
-                {busy ? "Inspecting and working…" : "Run protected task"}
+                {props.connecting ? "Connecting workspace…" : busy ? "Inspecting and working…" : "Run protected task"}
                 <Play size={15} />
               </button>
             </div>

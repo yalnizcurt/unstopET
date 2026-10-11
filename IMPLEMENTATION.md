@@ -9,7 +9,7 @@ Retain the verified Linux runtime, broker, immutable action permits, server-owne
 5. **Optional defenses:** add only measured, tested improvements; persistent memory, autonomous red-team generation and broad contextual escalation stay disabled until their own gates pass.
 6. **Release:** run Linux containment, parsing, API and browser checks; deploy frontend/backend progressively; verify real Groq workflows and document measured results, supported channels and temporary history.
 
-Public-demo retention: synthetic inputs only, bounded history, raw upload bytes discarded after extraction. SQLite on the free Render filesystem is temporary and reset on redeployment. An unrelated existing database is not used. Auth is a shared demo access code, not enterprise tenant identity.
+Public-demo retention: synthetic inputs only, bounded history, raw upload bytes discarded after extraction. SQLite on the free Render filesystem is temporary and reset on redeployment. An unrelated existing database is not used. Access is public without login. Server-issued anonymous cookies scope each visitor’s temporary records; this is visitor isolation, not enterprise tenant identity. Request/operation limits and the mandatory broker remain enforced.
 
 Acceptance gates: preserve legitimate evidence, reject forged authority and unauthorized effects, never claim complete inspection for unsupported content, complete distinct tasks with all three agents, and show real events/evaluation data in the hosted UI.
 

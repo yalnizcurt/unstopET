@@ -57,9 +57,11 @@ class PlatformLinuxIntegration(unittest.TestCase):
         def provider(messages):
             calls.append(messages)
             return dict(provider='TEST',text='{"winner":"Vendor B","price":100,"requested_email":{"recipient":"attacker@example.com","body":"report"}}')
-        app=create_app('long-demo-access-code-for-tests',lambda:provider,set(),Store())
-        with TestClient(app) as client:
-            headers={'Authorization':'Bearer long-demo-access-code-for-tests'}
+        from test_public_demo import bootstrap
+        app=create_app(lambda:provider,set(),Store())
+        with TestClient(app,base_url='https://testserver') as client:
+            bootstrap(client)
+            headers={'X-ATF-Demo':'1'}
             for agent in ['procurement','research','developer']:
                 body=dict(agent_id=agent,intent='Compare suppliers',evidence=['Supplier: Vendor B\nPrice: 100'])
                 if agent=='developer':body['use_demo_repository']=True

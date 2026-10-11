@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ShieldCheck,
   LayoutDashboard,
@@ -26,13 +26,13 @@ import {
   X,
   Sun,
   Moon,
-  LogOut,
   ShieldAlert,
   Clock3,
   FileText,
 } from "lucide-react";
 import { routeFromHash } from "../routing";
 import { PublicExhibit } from "../pages/PublicExhibit";
+import { APIError, AnonymousSession } from "../anonymousSession";
 
 import { API, request } from "./api";
 import { nav, parentRoute } from "./navigation";
@@ -73,9 +73,9 @@ export default function App() {
   const [showPublicExhibit, setShowPublicExhibit] = useState(
     routeFromHash(location.hash) === "Walkthrough",
   );
-  const [token, setToken] = useState(""),
-    [draft, setDraft] = useState(""),
-    [ready, setReady] = useState(false),
+  const [sessionState, setSessionState] = useState("connecting"),
+    [sessionError, setSessionError] = useState(""),
+    [sessionNote, setSessionNote] = useState(""),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
   const [page, setPage] = useState(routeFromHash(location.hash)),
@@ -113,10 +113,24 @@ export default function App() {
     [scenario, setScenario] = useState("override"),
     [surface, setSurface] = useState("text"),
     [comparison, setComparison] = useState<Row | null>(null);
-  async function api(path: string, body?: Row, credential = token) {
-    return request(path, credential, body);
+  const sessionClient = useRef<AnonymousSession | null>(null);
+  const initialization = useRef<Promise<void> | null>(null);
+  if (!sessionClient.current) {
+    sessionClient.current = new AnonymousSession(request, () => {
+      setOverview({}); setArtifacts([]); setEvents([]); setSessions([]);
+      setEvaluations([]); setRuns([]); setIncidents([]); setAttachments([]);
+      setResult(null); setInvestigate(null); setSelectedRun(null);
+      setSelectedIncident(null); setSelectedIntegration(null); setComparison(null);
+      setSessionNote("Your previous temporary workspace expired. This new isolated workspace starts with no visitor records; upload evidence again before running a task.");
+      void initialize();
+    });
   }
-  async function refresh(credential = token) {
+  async function api(path: string, body?: Row) {
+    return sessionClient.current!.request(path, body);
+  }
+  async function refresh(retryReplacement = true): Promise<void> {
+    await sessionClient.current!.establish();
+    const revision = sessionClient.current!.revision;
     const values = await Promise.all(
       [
         "agents",
@@ -133,8 +147,12 @@ export default function App() {
         "integrations",
         "incidents",
         "runs",
-      ].map((p) => api(p, undefined, credential)),
+      ].map((p) => api(p)),
     );
+    if (revision !== sessionClient.current!.revision) {
+      if (!retryReplacement) throw new APIError("DEMO_SESSION_REQUIRED");
+      return refresh(false);
+    }
     [
       setAgents,
       setOverview,
@@ -151,6 +169,22 @@ export default function App() {
       setIncidents,
       setRuns,
     ].forEach((fn, i) => fn(values[i]));
+  }
+  function initialize(): Promise<void> {
+    if (initialization.current) return initialization.current;
+    setSessionState("connecting");
+    setSessionError("");
+    initialization.current = (async () => {
+      try {
+        await sessionClient.current!.establish();
+        await refresh();
+        setSessionState("ready");
+      } catch (failure) {
+        setSessionState("unavailable");
+        setSessionError(failure instanceof Error ? failure.message : "The demo service is unavailable. Retry connecting.");
+      } finally { initialization.current = null; }
+    })();
+    return initialization.current;
   }
   async function action(fn: () => Promise<void>) {
     setBusy(true);
@@ -188,6 +222,9 @@ export default function App() {
     addEventListener("hashchange", fn);
     return () => removeEventListener("hashchange", fn);
   }, []);
+  useEffect(() => {
+    if (!showPublicExhibit) void initialize();
+  }, [showPublicExhibit]);
   async function upload(input: HTMLInputElement) {
     const selected = Array.from(input.files || []);
     input.value = "";
@@ -246,7 +283,9 @@ export default function App() {
     result,
     action,
     api,
-    busy,
+    busy: busy || sessionState !== "ready",
+    connecting: sessionState !== "ready",
+    processing: busy,
     upload,
     refresh,
     setEvidence,
@@ -275,90 +314,6 @@ export default function App() {
           setShowPublicExhibit(false);
           go("Overview");
         }} />
-      ) : !ready ? (
-        <main className="login">
-          <div className="login-art">
-            <div className="brand-mark">
-              <ShieldCheck size={38} />
-            </div>
-            <span className="eyebrow">AGENT TRUST FIREWALL</span>
-            <h1>
-              Runtime security for AI agents.
-              <br />
-              <span>
-                Keep authority
-                <br />
-                where it belongs.
-              </span>
-            </h1>
-            <p>
-              Connect agents. Enforce boundaries. Investigate what happened.
-            </p>
-            <div className="login-grid">
-              <span>
-                <LockKeyhole size={16} /> Server-owned permissions
-              </span>
-              <span>
-                <FileSearch size={16} /> Fragment-level inspection
-              </span>
-              <span>
-                <ShieldCheck size={16} /> Isolated agent execution
-              </span>
-            </div>
-          </div>
-          <form
-            className="login-form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              action(async () => {
-                await refresh(draft);
-                setToken(draft);
-                setDraft("");
-                setReady(true);
-              });
-            }}
-          >
-            <span className="eyebrow">SECURITY CONSOLE</span>
-            <h2>Open your workspace</h2>
-            <p className="subtle">
-              Use the demo access code configured on the server.
-            </p>
-            <label>
-              Access code
-              <input
-                aria-label="Access code"
-                type="password"
-                autoComplete="off"
-                required
-                value={draft}
-                onChange={(e) => setDraft(e.target.value)}
-              />
-            </label>
-            {error && (
-              <div role="alert" className="notice">
-                {error}
-              </div>
-            )}
-            <button className="primary" disabled={busy}>
-              {busy ? "Connecting…" : "Open console"}
-              <ArrowUpRight size={17} />
-            </button>
-            <p className="login-note">
-              <LockKeyhole size={14} /> Code stays in this browser session. Groq
-              credentials stay on the server.
-            </p>
-            <button type="button" className="exhibit-open-link" onClick={() => {
-              setShowPublicExhibit(true);
-              location.hash = "Walkthrough";
-            }}>
-              Explore public product walkthrough <ArrowUpRight size={16} />
-            </button>
-            <p className="subtle">
-              Synthetic public demo · temporary history · defense-in-depth
-              prototype
-            </p>
-          </form>
-        </main>
       ) : (
         <>
           <aside className={"sidebar " + (mobile ? "open" : "")}>
@@ -418,14 +373,21 @@ export default function App() {
                 <strong>{page === "Workspace" ? active?.name : page}</strong>
               </div>
               <div className="header-right">
-                <Badge value={health.status} />
+                <Badge value={sessionState === "ready" ? health.status : sessionState.toUpperCase()} />
                 <button
                   className="icon"
                   aria-label="Refresh records"
-                  disabled={busy}
-                  onClick={() => action(() => refresh())}
+                  disabled={busy || sessionState === "connecting"}
+                  onClick={() => sessionState === "unavailable" ? void initialize() : void action(() => refresh())}
                 >
                   <RefreshCw size={17} />
+                </button>
+                <button
+                  className="icon"
+                  aria-label="View walkthrough"
+                  onClick={() => go("Walkthrough")}
+                >
+                  <FileSearch size={17} />
                 </button>
                 <button
                   className="icon"
@@ -434,20 +396,22 @@ export default function App() {
                 >
                   {light ? <Moon size={17} /> : <Sun size={17} />}
                 </button>
-                <button
-                  className="icon"
-                  aria-label="Sign out"
-                  onClick={() => {
-                    setToken("");
-                    setReady(false);
-                  }}
-                >
-                  <LogOut size={17} />
-                </button>
-                <div className="avatar">D</div>
+                <div className="avatar" title="Anonymous demo workspace">A</div>
               </div>
             </header>
             <main className="content">
+              {sessionState === "connecting" && (
+                <div className="notice subtle-notice" role="status">
+                  <RefreshCw size={16} /> Connecting your isolated temporary workspace. Navigation is available while records load.
+                </div>
+              )}
+              {sessionState === "unavailable" && (
+                <div className="notice error" role="alert">
+                  <AlertTriangle size={18} /> {sessionError}
+                  <button className="text-button" onClick={() => void initialize()}>Retry connection</button>
+                </div>
+              )}
+              {sessionNote && <div className="notice" role="status">{sessionNote}</div>}
               {error && (
                 <div className="notice error" role="alert">
                   <AlertTriangle size={18} />
@@ -603,7 +567,7 @@ export default function App() {
                 <ShieldCheck size={14} /> Agent Trust Firewall · prototype
               </span>
               <span>
-                Synthetic public demo · temporary history · memory disabled
+                Anonymous isolated demo · temporary history · memory disabled
               </span>
             </footer>
           </div>

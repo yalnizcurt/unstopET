@@ -1,5 +1,6 @@
-# Implementation audit
+# Historical audit — shared-code releases of 10–11 October 2026
 
+This source-bound document retains the prior shared-access-code release and its original measurements. The anonymous public-access amendment of 12 October 2026 is outside this audit’s measured scope. Current access and SDK migration are documented in [API integration](API_INTEGRATION.md); shared-token statements below are historical, not setup instructions.
 What this repo does: Agent Trust Firewall runs three Groq-powered agents behind one server-controlled inspection and execution boundary. A React console exposes file inspections, task results and contained A/B/C evaluations. This audit assumes one synthetic/public hackathon demonstration at a time; shared demo identity and temporary history are not enterprise multi-tenant infrastructure.
 
 Audit baseline: deployed backend `e606ecb`, Vercel production console, source and its pending explicitly labelled containment experiment. Evidence: `platform-linux-acceptance-report.json` (70 passing, two Mac-only skips at audit), `cloud-platform-smoke-report.json` (three real agents, seven adapter uploads, rejected authority/private-network requests), authored detector/semantic reports and recorded browser navigation checks. Final revised-source deployment and walkthrough remain pending at this audit snapshot.

@@ -18,7 +18,7 @@ Seven-category and multiformat fixtures are authored engineering evidence, not a
 
 ## Repeatable demonstration
 
-1. Open the hosted console with the configured demo access code.
+1. Open the hosted console directly; it creates an isolated anonymous visitor session without login or an access code. Use only public/synthetic inputs.
 2. Open Procurement Analyst and run the labelled synthetic supplier example. Inspect legitimate facts and the quarantined hostile line.
 3. Use File Scanner for a supported artifact, then inspect original inert text, released fragments, locations and gaps.
 4. Run an Attack Lab comparison; inspect actual A/B/C responses and execution decisions, then open Evaluations and Security Events.

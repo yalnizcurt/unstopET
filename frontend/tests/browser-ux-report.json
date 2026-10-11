@@ -3,7 +3,11 @@
   "checks": [
     {
       "viewport": "1440x1000",
-      "public_api_calls": 0,
+      "static_walkthrough_api_calls": 0,
+      "main_opens_without_login": true,
+      "bootstrap_failure_keeps_shell_visible": true,
+      "no_bearer_credentials": true,
+      "all_mutations_have_demo_marker": true,
       "navigation_routes": 8,
       "scanner_same_file_retry": true,
       "workspace_same_file_retry": true,
@@ -11,12 +15,19 @@
       "forced_probe_label_visible": true,
       "source_plan_distinguished_from_model_proposal": true,
       "eviction_label_visible": true,
+      "concurrent_expiry_replacement_count": 1,
+      "old_visitor_selections_cleared": true,
+      "quota_errors_visible": 3,
       "page_errors": [],
-      "scope": "Actual local Chromium with intercepted UI fixtures; not live backend acceptance"
+      "scope": "Actual local Chromium with intercepted UI fixtures; not live backend or cookie-isolation acceptance"
     },
     {
       "viewport": "390x844",
-      "public_api_calls": 0,
+      "static_walkthrough_api_calls": 0,
+      "main_opens_without_login": true,
+      "bootstrap_failure_keeps_shell_visible": true,
+      "no_bearer_credentials": true,
+      "all_mutations_have_demo_marker": true,
       "navigation_routes": 8,
       "scanner_same_file_retry": true,
       "workspace_same_file_retry": true,
@@ -24,10 +35,13 @@
       "forced_probe_label_visible": true,
       "source_plan_distinguished_from_model_proposal": true,
       "eviction_label_visible": true,
+      "concurrent_expiry_replacement_count": 1,
+      "old_visitor_selections_cleared": true,
+      "quota_errors_visible": 3,
       "page_errors": [],
-      "scope": "Actual local Chromium with intercepted UI fixtures; not live backend acceptance"
+      "scope": "Actual local Chromium with intercepted UI fixtures; not live backend or cookie-isolation acceptance"
     }
   ],
-  "screenshot_directory": "/tmp/atf-frontend-ux",
+  "screenshot_directory": "/tmp/atf-public-session-ux",
   "production_smoke": false
 }

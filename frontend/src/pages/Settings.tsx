@@ -19,9 +19,12 @@ export function Settings(props: ViewProps) {
           <span className="eyebrow">DEPLOYMENT & CAPABILITIES</span>
           <h1>Workspace settings</h1>
           <p className="subtle">
-            Actual server configuration. Secrets are never sent to this console.
+            Public demo configuration. Provider secrets stay on the server; this page is read-only.
           </p>
         </div>
+      </div>
+      <div className="notice subtle-notice">
+        No login required. The server creates an isolated temporary browser workspace using an HttpOnly cookie. Use synthetic or public data only. Shared request and AI-operation limits apply; existing records remain readable when new AI work is disabled.
       </div>
       <section className="panel">
         <h3>Connected service</h3>
@@ -32,13 +35,25 @@ export function Settings(props: ViewProps) {
             <ArrowUpRight size={14} />
           </a>
         </div>
-        {Object.entries(settings).map(([k, v]) => (
+        {Object.entries(settings).filter(([key]) => key !== "demo_limits").map(([k, v]) => (
           <div className="boundary-row" key={k}>
             <span>{k.replaceAll("_", " ")}</span>
             <span className="subtle">{String(v)}</span>
           </div>
         ))}
       </section>
+      {settings.demo_limits && (
+        <section className="panel">
+          <h3>Server-enforced demo limits</h3>
+          {Object.entries(settings.demo_limits).map(([key, value]) => (
+            <div className="boundary-row" key={key}>
+              <span>{key.replaceAll("_", " ")}</span>
+              <span className="subtle">{value !== null && typeof value === "object" ? JSON.stringify(value) : String(value)}</span>
+            </div>
+          ))}
+          <p className="subtle">Limits apply to this session and shared service capacity. Reaching the processing cap stops new operations; existing records remain available until they expire.</p>
+        </section>
+      )}
       <section className="panel">
         <h3>Supported format coverage</h3>
         <div className="coverage-list">

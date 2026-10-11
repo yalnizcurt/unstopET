@@ -2,16 +2,16 @@ import React from "react";
 import { ArrowLeft, ArrowRight, ShieldCheck, LockKeyhole, FileSearch, Activity, ExternalLink } from "lucide-react";
 import { exhibitEvidence as measured } from "../exhibitEvidence";
 
-// Public evidence is packaged with the site. This view never calls an authenticated API or model.
+// Packaged evidence can be viewed without establishing a visitor session.
 export function PublicExhibit({ onBack }: { onBack: () => void }) {
   return (
     <main className="exhibit">
       <header className="exhibit-header">
         <div className="exhibit-logo"><ShieldCheck size={23}/> Agent Trust <strong>Firewall</strong></div>
-        <button onClick={onBack} className="exhibit-secondary"><ArrowLeft size={15}/> Protected console</button>
+        <button onClick={onBack} className="exhibit-secondary"><ArrowLeft size={15}/> Open workspace</button>
       </header>
       <section className="exhibit-hero">
-        <span className="exhibit-kicker">PUBLIC WALKTHROUGH · NO ACCESS CODE REQUIRED</span>
+        <span className="exhibit-kicker">PUBLIC WALKTHROUGH · NO LOGIN REQUIRED</span>
         <h1>Let agents use evidence.<br/><em>Keep permissions under control.</em></h1>
         <p>Inspect what AI agents consume. Independently authorize their tools. Review the evidence of security enforcement and useful task completion.</p>
         <div className="exhibit-hero-actions">
@@ -21,7 +21,7 @@ export function PublicExhibit({ onBack }: { onBack: () => void }) {
         <div className="exhibit-journey" aria-label="Product journey">
           {["Connect", "Protect", "Execute", "Investigate", "Validate"].map((step, index) => <div key={step}><span>{String(index + 1).padStart(2, "0")}</span><strong>{step}</strong></div>)}
         </div>
-        <p className="exhibit-reading-note">A two-minute tour of synthetic business tasks, captured product screens and archived results. Live tasks require authentication; this page makes no paid requests.</p>
+        <p className="exhibit-reading-note">A two-minute tour of synthetic business tasks, captured product screens and archived results. Open the workspace directly to use a temporary isolated demo session. This page makes no paid requests.</p>
       </section>
       <section className="exhibit-section" id="exhibit-attack">
         <div className="exhibit-title"><span>01 / THE ATTACK</span><h2>A supplier workbook tries to turn evidence into authority.</h2></div>
@@ -65,7 +65,7 @@ export function PublicExhibit({ onBack }: { onBack: () => void }) {
           ].map(([name, title, description]) => (
             <figure className="exhibit-card" key={name}>
               <a href={`/evidence/historical-${name}-748a60d.png`} target="_blank" rel="noreferrer" aria-label={`Open full-size ${title.toLowerCase()} capture`}>
-                <img src={`/evidence/historical-${name}-748a60d.png`} alt={`${title}: historical authenticated console capture using synthetic data`} loading="lazy"/>
+                <img src={`/evidence/historical-${name}-748a60d.png`} alt={`${title}: historical console capture using synthetic data`} loading="lazy"/>
               </a>
               <figcaption><h3>{title}</h3><p>{description}</p><small>Historical live capture · backend 748a60d · open image for full detail</small></figcaption>
             </figure>
@@ -105,7 +105,7 @@ export function PublicExhibit({ onBack }: { onBack: () => void }) {
       </section>
       <footer className="exhibit-footer">
         <a href="https://github.com/yalnizcurt/unstopET" target="_blank" rel="noreferrer">Public source & reproducible reports <ExternalLink size={15}/></a>
-        <button onClick={onBack} className="exhibit-primary">Open protected console <ArrowRight size={17}/></button>
+        <button onClick={onBack} className="exhibit-primary">Open workspace <ArrowRight size={17}/></button>
       </footer>
     </main>
   );

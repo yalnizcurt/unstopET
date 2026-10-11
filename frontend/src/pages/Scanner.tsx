@@ -15,6 +15,7 @@ export function Scanner(props: ViewProps) {
     page,
     evidence,
     busy,
+    processing,
     upload,
     artifacts,
     setInvestigate,
@@ -46,7 +47,7 @@ export function Scanner(props: ViewProps) {
           />
         </label>
       </div>
-      {busy && (
+      {processing && (
         <div className="notice">
           Inspection in progress. Verdicts will appear only after processing.
         </div>

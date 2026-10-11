@@ -41,3 +41,7 @@ Threat-model and competitive context: [primary-source research](../docs/THREAT_M
 ## Team and recording prerequisites
 
 Team name, member names and individual contributions need human confirmation. Visible placeholders in the editable deck are intentional until supplied. The video script is complete. An actual browser recording is in progress after final deployment; exported playback verification is pending. An MP4 counts as complete only when it appears in `submission/video/` and passes duration and playback checks.
+
+## Anonymous access migration
+
+Current product access no longer requires a demo code. The server creates isolated anonymous visitor sessions; an external SDK client and a separate browser cannot share history by run ID. The 11 October captures/video and source-bound tests above retain their prior shared-code release. They are historical product evidence, not anonymous-access verification. No historical report, metric denominator or video frame has been rewritten.

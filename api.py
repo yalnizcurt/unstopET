@@ -1,7 +1,7 @@
 """Versioned security platform API. All agent execution uses the existing sealed Linux path."""
 import base64
 from contextlib import asynccontextmanager
-import hmac
+import hashlib
 import json
 import os
 import secrets
@@ -9,7 +9,7 @@ import threading
 import time
 from pathlib import Path
 from typing import Literal
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 from agents import PROFILES, REPOSITORY
@@ -20,7 +20,8 @@ from inspection import MANIFEST, inspect
 from network import fetch_public
 from parsing import parse_file
 from semantic import PromptGuard
-from storage import Store
+from storage import Store, record_principal
+from demo_access import COOKIE, SESSION_SECONDS, DemoAccess, DemoDenied, PUBLIC_GET, permitted_route
 from integrations import catalog, registration, describe, verification
 from runtime_events import RunEvents, security_summary
 from runtime_tools import PROFILE_TOOLS, TOOLS, TURN_INSTRUCTIONS, score_suppliers
@@ -46,58 +47,90 @@ class Attack(Strict):
     agent_id: Literal['procurement','research','developer']='procurement'
     scenario: str = Field(max_length=60)
     surface: Literal['text','html','pdf','docx','xlsx','zip']='text'
+class SessionStart(Strict): pass
 
 
-def create_app(access_token, provider_factory, origins, store=None, parser=parse_file, runner=run_runtime,
-               verify=True, semantic_enabled=False):
+def create_app(provider_factory, origins, store=None, parser=parse_file, runner=run_runtime,
+               verify=True, semantic_enabled=False, demo_limits=None, now=time.time):
     if store is None:
         store=Store(os.environ.get('ATF_DB_PATH','/tmp/atf-history.sqlite3'))
         archive=Path(__file__).with_name('cloud-evaluation-report.json')
         if archive.is_file():
             measured=json.loads(archive.read_text())
             for record in measured.get('results',[]):
-                if record.get('results') and record.get('id') and not store.get(record['id'],'evaluation'):
-                    store.put('evaluation',dict(record,origin='ARCHIVED_MEASURED_RUN',
-                        scope=record['scope']+' Archived measurement from '+str(measured.get('backend_commit'))+'.'),record_id=record['id'])
-    work=threading.Lock(); attempts=[]
+                if record.get('results') and record.get('id'):
+                    # Separate packaged archive IDs from legacy private history; never republish stored rows.
+                    identity=hashlib.sha256(('public-archive:'+record['id']).encode()).hexdigest()[:32]
+                    if not store.get(identity,'evaluation',principal='public-archive'):
+                        store.put('evaluation',dict(record,origin='ARCHIVED_MEASURED_RUN',source_evaluation_id=record['id'],
+                            scope=record['scope']+' Archived measurement from '+str(measured.get('backend_commit'))+'.'),principal='public-archive',record_id=identity)
+    work=threading.Lock(); demo_access=DemoAccess(store,demo_limits,now)
     @asynccontextmanager
     async def lifespan(app):
         if verify: verify_linux_boundary()
         yield
     app=FastAPI(title='Agent Trust Firewall',version='1.0.0',lifespan=lifespan,docs_url='/api/docs',redoc_url=None,openapi_url='/api/openapi.json')
     app.state.store=store
+    app.state.demo_access=demo_access
     @app.middleware('http')
     async def boundary(request: Request, call_next):
         origin=request.headers.get('origin')
-        headers={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}
+        headers={'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'}
         if origin in origins:
-            headers.update({'Access-Control-Allow-Origin':origin,'Vary':'Origin'})
-        if origin and origin not in origins: return JSONResponse({'error':'ORIGIN_DENIED'},403)
+            headers.update({'Access-Control-Allow-Origin':origin,'Access-Control-Allow-Credentials':'true','Vary':'Origin'})
+        if origin and origin not in origins: return JSONResponse({'error':'ORIGIN_DENIED'},403,headers=headers)
+        method=request.headers.get('access-control-request-method','GET') if request.method=='OPTIONS' else request.method
+        if not permitted_route(request.url.path,method):
+            return JSONResponse({'error':'PUBLIC_DEMO_ROUTE_DENIED'},403,headers=headers)
         if request.method=='OPTIONS':
-            headers.update({'Access-Control-Allow-Methods':'GET, POST, OPTIONS','Access-Control-Allow-Headers':'Authorization, Content-Type'})
+            headers.update({'Access-Control-Allow-Methods':'GET, POST, OPTIONS','Access-Control-Allow-Headers':'Content-Type, X-ATF-Demo'})
             return JSONResponse({},200,headers=headers)
-        if request.url.path not in ('/api/health','/api/v1/health','/api/docs','/api/openapi.json'):
-            if not hmac.compare_digest(request.headers.get('authorization','').encode(),('Bearer '+access_token).encode()):
-                return JSONResponse({'error':'AUTHENTICATION_REQUIRED'},401,headers=headers)
+        scope=None
+        try:
+            owner=None
+            if request.url.path not in PUBLIC_GET and request.url.path!='/api/v1/demo/session':
+                owner=demo_access.owner(request.cookies.get(COOKIE))
+            if request.url.path not in ('/api/health','/api/v1/health'):
+                demo_access.request_limit(demo_access.peer(request),owner,request.method=='POST')
+            if request.url.path not in PUBLIC_GET and request.url.path!='/api/v1/demo/session' and not owner:
+                raise DemoDenied('DEMO_SESSION_REQUIRED',401)
             if request.method=='POST':
+                if request.headers.get('x-atf-demo')!='1':raise DemoDenied('DEMO_CSRF_REQUIRED',403)
                 try: length=int(request.headers.get('content-length','0'))
                 except ValueError: length=0
-                if not 1<=length<=1_500_000 or request.headers.get('content-type','').split(';')[0]!='application/json':
+                if ('transfer-encoding' in request.headers or not 1<=length<=1_500_000 or
+                    request.headers.get('content-type','').split(';')[0]!='application/json'):
                     return JSONResponse({'error':'INVALID_REQUEST_BODY'},413,headers=headers)
-        try: result=await call_next(request)
+                parts=[];received=0
+                async for chunk in request.stream():
+                    received+=len(chunk)
+                    if received>1_500_000:
+                        return JSONResponse({'error':'INVALID_REQUEST_BODY'},413,headers=headers)
+                    parts.append(chunk)
+                if received!=length:return JSONResponse({'error':'INVALID_REQUEST_BODY'},413,headers=headers)
+                # Starlette's cached request replays this bounded body to FastAPI without rereading the network.
+                request._body=b''.join(parts)
+            if owner:scope=record_principal.set(owner)
+            result=await call_next(request)
+        except DemoDenied as error:
+            result=JSONResponse({'error':error.code},error.status,headers={'Retry-After':str(error.retry_after)} if error.status==429 else {})
         except Exception: result=JSONResponse({'error':'REQUEST_UNAVAILABLE'},503)
+        finally:
+            if scope is not None:record_principal.reset(scope)
         result.headers.update(headers); return result
     @app.exception_handler(Denied)
-    async def deny(request, error): return JSONResponse({'error':error.code},422)
+    async def deny(request, error):
+        return JSONResponse({'error':error.code},getattr(error,'status',422),
+            headers={'Retry-After':str(error.retry_after)} if getattr(error,'status',422)==429 else {})
     from fastapi.exceptions import RequestValidationError
     @app.exception_handler(RequestValidationError)
     async def invalid(request,error): return JSONResponse({'error':'INVALID_FIELDS_OR_LIMITS'},422)
 
     def enter():
-        if not work.acquire(blocking=False): raise Denied('BUSY_TRY_AGAIN')
-        now=time.monotonic(); attempts[:]=[t for t in attempts if now-t<60]
-        if len(attempts)>=15: work.release(); raise Denied('REQUEST_BUDGET_EXHAUSTED')
-        attempts.append(now)
+        if not work.acquire(blocking=False): raise DemoDenied('BUSY_TRY_AGAIN',retry_after=1)
+        try:demo_access.admit_operation()
+        except Exception:
+            work.release();raise
     def guard(provider): return PromptGuard(provider) if semantic_enabled and provider else None
     def inspection(name,raw,classifier,source_kind="USER_SUPPLIED_UNTRUSTED_CONTENT",trace=None,tool_request_id=None):
         result=inspect(parser(name,raw),classifier)
@@ -224,7 +257,7 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
                           collect=collect if body.urls or body.use_demo_repository else None,
                           tools=invoke,tool_catalog=tool_catalog,event_sink=trace.broker)
         firewall.policy_version=2
-        binding=Binding('demo-owner',body.session_id or trace.run_id,trace.run_id)
+        binding=Binding(record_principal.get(),body.session_id or trace.run_id,trace.run_id)
         state['firewall']=firewall
         snapshot=firewall.start_task(binding,body.intent)
         state['authorized_intent']=firewall.snapshots[snapshot].intent
@@ -258,6 +291,11 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
     @app.get('/api/health')
     @app.get('/api/v1/health')
     def health(): return dict(status='READY',isolation='VERIFIED_LINUX' if verify else 'TEST_FIXTURE',storage='TEMPORARY_SQLITE',semantic_detector='PROMPT_GUARD_2_ROUTED' if semantic_enabled else 'DISABLED_PENDING_EVALUATION')
+    @app.post('/api/v1/demo/session')
+    def start_session(body: SessionStart,request: Request,response: Response):
+        cookie,created=demo_access.bootstrap(request.cookies.get(COOKIE),demo_access.peer(request))
+        if created:response.set_cookie(COOKIE,cookie,max_age=SESSION_SECONDS,secure=True,httponly=True,samesite='strict',path='/')
+        return dict(access='ANONYMOUS_PUBLIC_DEMO',expires_in=SESSION_SECONDS,session_created=created)
     @app.get('/api/v1/agents')
     def agents(): return [dict(profile,model=os.environ.get('GROQ_MODEL','openai/gpt-oss-20b'),
         profile_version=1,security_policy_version=2,outbound_policy='BROKER_AND_DLP',
@@ -293,7 +331,7 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
     def settings(): return dict(provider='Groq',model=os.environ.get('GROQ_MODEL','openai/gpt-oss-20b'),
         semantic_enabled=semantic_enabled,storage='Temporary SQLite; cleared by redeploy / 24-hour retention',
         provider_retry='One retry with 250ms backoff for HTTP 429/503 or empty output; other failures stay explicit',
-        authentication='Shared demo access code, single principal',cost='Not calculated; provider billing is authoritative',
+        access='Public anonymous visitor; no login',demo_limits=demo_access.policy(),cost='Not calculated; provider billing is authoritative',
         raw_upload_retention='Discarded after extraction',isolated_runtime='Linux Landlock + seccomp')
     @app.get('/api/v1/overview')
     def overview():
@@ -318,6 +356,7 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
         try:
             try: raw=base64.b64decode(body.data,validate=True)
             except ValueError: raise Denied('INVALID_BASE64_FILE') from None
+            if not 1<=len(raw)<=1_048_576:raise Denied('FILE_SIZE_LIMIT_EXCEEDED')
             if body.filename!=redact_known_secrets(body.filename): raise Denied('SENSITIVE_FILENAME_DENIED')
             provider=provider_factory(); return inspection(body.filename,raw,guard(provider))
         finally: work.release()
@@ -337,7 +376,7 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
         enter()
         started=time.monotonic();provider=None; identity=secrets.token_hex(16)
         trace=RunEvents(identity,body.integration_id or body.agent_id,body.agent_id)
-        trace.record('USER_TASK_ACCEPTED','task.accept','ALLOW',reason_code='AUTHENTICATED_DEMO_REQUEST')
+        trace.record('USER_TASK_ACCEPTED','task.accept','ALLOW',reason_code='SERVER_ISSUED_ANONYMOUS_SESSION')
         state=dict(artifacts=[],tool_activity=[]); error_code=None
         try:
             provider=provider_factory(); record=execute(body,provider,guard(provider),trace,state)
@@ -387,7 +426,7 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
             containment_probe=row.get('containment_probe'),evaluation_id=e['id'],created_at=row['created_at'],
             configuration=row['configuration'],origin='CONTAINED_ATTACK_LAB',task_success=row.get('task_success'),
             runtime='CONTAINED_BASELINE' if row['configuration']=='A' else 'VERIFIED_LINUX' if verify else 'TEST_FIXTURE')
-            for e in store.list('evaluation') for row in e['results'] if row.get('run_id')]
+            for e in evaluations() for row in e['results'] if row.get('run_id')]
     @app.get('/api/v1/runs')
     def runs(): return sorted(store.list('session')+lab_runs(),key=lambda r:r['created_at'],reverse=True)
     @app.get('/api/v1/sessions/{identity}')
@@ -424,7 +463,7 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
     @app.get('/api/v1/events')
     def events(): return store.list('event')
     @app.get('/api/v1/evaluations')
-    def evaluations(): return store.list('evaluation')
+    def evaluations(): return store.list('evaluation')+store.list('evaluation',principal='public-archive')
     @app.get('/api/v1/attacks')
     def attacks():
         from evaluation import SCENARIOS
@@ -453,20 +492,19 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
     original_openapi=app.openapi
     def documented_schema():
         schema=original_openapi()
-        schema.setdefault('components',{}).setdefault('securitySchemes',{})['DemoAccessCode']={
-            'type':'http','scheme':'bearer','description':'Render APP_ACCESS_TOKEN; never the Groq credential'}
         for path,operations in schema['paths'].items():
-            if path not in ('/api/health','/api/v1/health'):
-                for operation in operations.values(): operation['security']=[{'DemoAccessCode':[]}]
+            if 'post' in operations:
+                operations['post'].setdefault('parameters',[]).append({'name':'X-ATF-Demo','in':'header','required':True,
+                    'schema':{'type':'string','enum':['1'],'default':'1'},'description':'CSRF request marker; not an identity or permission.'})
         return schema
     app.openapi=documented_schema
     return app
 
 if __name__=='__main__':
     import uvicorn
-    access=os.environ.get('APP_ACCESS_TOKEN',''); key=os.environ.get('GROQ_API_KEY','')
-    if len(access)<20 or not key: raise SystemExit('Server access and provider secrets are required')
-    app=create_app(access,lambda:GroqProvider(key,os.environ.get('GROQ_MODEL','openai/gpt-oss-20b')),
+    key=os.environ.get('GROQ_API_KEY','')
+    if not key: raise SystemExit('Server provider secret is required')
+    app=create_app(lambda:GroqProvider(key,os.environ.get('GROQ_MODEL','openai/gpt-oss-20b')),
         set(os.environ.get('ALLOWED_ORIGINS','https://agent-trust-firewall.vercel.app').split(',')),
         semantic_enabled=os.environ.get('SEMANTIC_ENABLED')=='1')
     uvicorn.run(app,host='0.0.0.0',port=int(os.environ.get('PORT','10000')),log_level='warning',access_log=False)

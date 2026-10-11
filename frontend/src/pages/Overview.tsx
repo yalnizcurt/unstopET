@@ -27,7 +27,7 @@ export function Overview(props: ViewProps) {
           <span className="eyebrow">YOUR AGENT SECURITY POSTURE</span>
           <h1>Security overview</h1>
           <p className="subtle">
-            Live temporary records from secured workflows. Archived lab
+            Your isolated temporary workspace. No login required. Archived lab
             measurements keep their original timestamps.
           </p>
         </div>
@@ -38,21 +38,21 @@ export function Overview(props: ViewProps) {
       </div>
       <div className="integration-summary">
         <span>
-          <strong>{overview.protected_agents ?? 0}</strong> protected profiles
+          <strong>{overview.protected_agents ?? "—"}</strong> protected profiles
         </span>
         <span>
-          <strong>{overview.verified_integrations ?? 0}</strong> verified
+          <strong>{overview.verified_integrations ?? "—"}</strong> verified
           integrations
         </span>
         <span>
-          <strong>{overview.unverified_integrations ?? 0}</strong> unverified
+          <strong>{overview.unverified_integrations ?? "—"}</strong> unverified
           integrations
         </span>
         <span>
-          <strong>{overview.sanitized ?? 0}</strong> sanitized fragments
+          <strong>{overview.sanitized ?? "—"}</strong> sanitized fragments
         </span>
         <span>
-          <strong>{overview.partial ?? 0}</strong> incomplete inspections
+          <strong>{overview.partial ?? "—"}</strong> incomplete inspections
         </span>
       </div>
       <div className="stats">
@@ -142,7 +142,7 @@ export function Overview(props: ViewProps) {
               <small>Mean task seconds</small>
             </div>
             <div>
-              <strong>{overview.partial ?? 0}</strong>
+              <strong>{overview.partial ?? "—"}</strong>
               <small>Partial scans</small>
             </div>
           </div>
@@ -159,7 +159,7 @@ export function Overview(props: ViewProps) {
             <ArrowUpRight size={15} />
           </button>
         </div>
-        <EventTable rows={overview.events} />
+        <EventTable rows={overview.events || []} />
       </section>
       <div className="notice subtle-notice">
         <Clock3 size={16} />

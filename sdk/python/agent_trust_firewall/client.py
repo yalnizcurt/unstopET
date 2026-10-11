@@ -3,9 +3,10 @@ import base64
 import json
 import re
 import ssl
+from http.cookiejar import CookieJar
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit, quote
-from urllib.request import Request, build_opener, ProxyHandler, HTTPSHandler, HTTPRedirectHandler
+from urllib.request import Request, build_opener, ProxyHandler, HTTPSHandler, HTTPRedirectHandler, HTTPCookieProcessor
 
 class ATFError(Exception):
     def __init__(self, code, status=None, run_id=None):
@@ -16,25 +17,40 @@ class NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, *args): raise ATFError('REDIRECT_DENIED')
 
 class ATFClient:
-    def __init__(self, base_url, api_key):
+    def __init__(self, base_url, api_key=None):
+        """Create one anonymous visitor. Legacy api_key is ignored and never retained or sent."""
         try: parsed=urlsplit(base_url); port=parsed.port
         except ValueError: raise ATFError('INVALID_SERVICE_URL') from None
         if parsed.scheme!='https' or not parsed.hostname or parsed.username or parsed.password or parsed.query or parsed.fragment or parsed.path not in ('','/') or port not in (None,443):
             raise ATFError('INVALID_SERVICE_URL')
-        if not isinstance(api_key,str) or not api_key or '\n' in api_key or '\r' in api_key:
-            raise ATFError('INVALID_ACCESS_CODE')
-        self.base_url=base_url.rstrip('/'); self._api_key=api_key
+        self.base_url=base_url.rstrip('/')
+        self._cookies=CookieJar()
+        self._session_ready=False
         context=ssl.create_default_context()
         try:
             import certifi
         except ImportError: pass
         else: context.load_verify_locations(certifi.where())
-        self._opener=build_opener(ProxyHandler({}),NoRedirect(),HTTPSHandler(context=context))
+        self._opener=build_opener(ProxyHandler({}),NoRedirect(),HTTPSHandler(context=context),HTTPCookieProcessor(self._cookies))
 
     def _request(self, path, body=None):
+        if not self._session_ready:
+            self._send('demo/session',{})
+            valid=any(cookie.name=='__Host-atf-demo' and cookie.secure and cookie.path=='/'
+                and not cookie.domain_specified and not cookie.is_expired()
+                and (cookie.has_nonstandard_attr('HttpOnly') or cookie.has_nonstandard_attr('httponly'))
+                and (cookie.get_nonstandard_attr('SameSite',cookie.get_nonstandard_attr('samesite')) or '').lower()=='strict'
+                for cookie in self._cookies)
+            if not valid: raise ATFError('DEMO_SESSION_REQUIRED',401)
+            self._session_ready=True
+        return self._send(path,body)
+
+    def _send(self, path, body=None):
+        headers={'Content-Type':'application/json','User-Agent':'ATF-Python-Client/1.1'}
+        if body is not None: headers['X-ATF-Demo']='1'
         request=Request(self.base_url+'/api/v1/'+path,
             data=None if body is None else json.dumps(body).encode(),
-            headers={'Authorization':'Bearer '+self._api_key,'Content-Type':'application/json','User-Agent':'ATF-Python-Client/1.0'})
+            headers=headers)
         try:
             with self._opener.open(request,timeout=90) as response:
                 raw=response.read(2_000_001)

@@ -6,4 +6,4 @@ assert.equal(route.source,'/api/:path*');
 assert.equal(route.destination,'https://agent-trust-firewall-api.onrender.com/api/:path*');
 assert(!route.destination.includes('$') && !route.destination.includes('?'));
 assert(config.headers.some((h:any)=>h.source==='/api/(.*)' && h.headers.some((v:any)=>v.key==='Cache-Control' && v.value.includes('no-store'))));
-console.log('Pinned API route and authenticated-response cache checks passed');
+console.log('Pinned API route and visitor-response cache checks passed');

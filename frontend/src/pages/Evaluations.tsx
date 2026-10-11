@@ -30,7 +30,7 @@ export function Evaluations(props: ViewProps) {
           <span className="eyebrow">MEASURED EVIDENCE</span>
           <h1>Evaluations</h1>
           <p className="subtle">
-            Stored attack comparisons. Unknowns and failures remain visible.
+            Your comparisons and explicitly labelled archived reports. Archived results retain their original timestamps; unknowns and failures remain visible.
           </p>
         </div>
         <button className="primary" onClick={() => go("Attack Lab")}>

@@ -113,7 +113,7 @@ export function AttackLab(props: ViewProps) {
           </select>
         </label>
         <button className="primary" disabled={busy}>
-          {busy ? "Running actual comparison…" : "Run contained test"}
+          {props.connecting ? "Connecting workspace…" : busy ? "Running actual comparison…" : "Run contained test"}
           <Play size={15} />
         </button>
       </form>

@@ -1,4 +1,9 @@
-"""Record existing production records only. No model calls, API fixtures, or credentials exported."""
+"""HISTORICAL ONLY: recorder for shared-code frontend cbedb770 / backend aca81e6.
+
+Not usable against the anonymous public API. Preserve the original recording/provenance.
+The new release requires fresh browser-owned data; an SDK client cannot share its history.
+"""
+raise SystemExit('HISTORICAL_RECORDER_DISABLED: use a new anonymous-session recording workflow.')
 import argparse
 from datetime import datetime, timezone
 import hashlib

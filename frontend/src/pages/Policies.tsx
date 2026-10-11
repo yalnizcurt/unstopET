@@ -23,7 +23,7 @@ export function Policies(props: ViewProps) {
             modify them.
           </p>
         </div>
-        <Badge value={"VERSION " + policies.version} />
+        <Badge value={policies.version === undefined ? "LOADING POLICY" : "VERSION " + policies.version} />
       </div>
       <div className="overview-grid">
         <section className="panel">
@@ -36,7 +36,7 @@ export function Policies(props: ViewProps) {
                 <small>
                   {i === 2
                     ? "Facts only; cannot authorize effects"
-                    : "Server-authenticated channel"}
+                    : i === 0 ? "Controlled by the server" : "Visitor task intent; cannot change server permissions"}
                 </small>
               </div>
             ))}

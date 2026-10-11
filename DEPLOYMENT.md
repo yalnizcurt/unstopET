@@ -2,78 +2,66 @@
 
 Repository: https://github.com/yalnizcurt/unstopET
 
-## Current deployment
+## Existing production projects
 
 - Interface: https://agent-trust-firewall.vercel.app
 - API: https://agent-trust-firewall-api.onrender.com
 - Interactive API documentation: https://agent-trust-firewall-api.onrender.com/api/docs
 - Render service: https://dashboard.render.com/web/srv-db3v5p3l550s73c220d0
-- Region/plan: Singapore/free; deploy after repository checks pass.
-- Historical Gate 1 verification: [cloud-deployment-report.json](cloud-deployment-report.json); platform verification is recorded separately in [cloud-platform-smoke-report.json](cloud-platform-smoke-report.json).
+- Region/plan: Singapore/free.
 
-The existing Render connection and Vercel login were used. The hosted browser completed an actual Groq task after the Render startup isolation test passed. The Groq key was stored in Render with explicit user approval; it is absent from source and frontend. For access, copy `APP_ACCESS_TOKEN` from the Render service's Environment page into the interface's access-code field. The interface never saves it.
+Use these existing projects and URLs. The application opens directly to Security Overview without login, an access code or a registration screen. It transparently establishes an isolated anonymous server session. The Groq key remains in Render server secrets; no provider/deployment credential belongs in the browser, SDK client, Vercel variables or source.
 
-## Render API
+## Render configuration
 
-1. Sign in to an existing Render account and create a Blueprint from this repository's `main` branch. `render.yaml` selects a free Docker web service.
-2. Set `GROQ_API_KEY` as a server environment secret. Do not add it to Git, a frontend field, a Docker build argument or browser storage.
-3. Keep the generated `APP_ACCESS_TOKEN`. This shared demo access code authorizes paid model calls; disclose it only to demo users.
-4. Set `ALLOWED_ORIGINS` to the exact Vercel production origin, such as `https://your-project.vercel.app`. Multiple exact origins can be comma-separated. Do not use `*`.
-5. Deploy and inspect startup logs. Success is `Linux isolation verified; authenticated API ready.` Confirm `/api/health` reports `READY` and `VERIFIED_LINUX`.
+The existing `render.yaml` selects the Docker service and `python3 api.py`. Keep `GROQ_API_KEY`, `GROQ_MODEL`, `ALLOWED_ORIGINS` and the existing optional semantic/provider settings in the trusted server environment. `APP_ACCESS_TOKEN` no longer authorizes application requests and is not required by the API. Remove obsolete application-token configuration without changing the server-side Groq key or deployment credentials.
 
-Startup launches a synthetic-only compromised child and tests filesystem, parent credentials, networking, shell execution and alternate connectors. It also completes a legitimate brokered task. The container requires Landlock ABI 3+ and usable seccomp; the current Render deployment passed these checks. Each later startup must repeat them. If its security policy/kernel disallows these controls, the service stays unavailable. Do not remove restrictions or substitute an unrestricted child to get a successful deploy.
+`ALLOWED_ORIGINS` contains exact approved browser origins, including `https://agent-trust-firewall.vercel.app`; never use `*`. The session cookie is host-only `__Host-atf-demo`, Secure, HttpOnly, SameSite=Strict, Path=/ and Max-Age=86400. The server stores a hashed lookup of a random 256-bit identity and returns no identity in JSON. Production requires HTTPS; do not disable Secure or TLS verification to make development requests pass.
 
-The Docker image runs as a non-root user and binds Render's `PORT`. The application verifies boundaries before reading the provider key or opening the HTTP listener. No storage disk, queue, second microservice or paid service is required for this slice.
+Configure the public-demo session/IP request limits, global operation concurrency, daily admitted-operation cap and inference-disable switch using the deployment variables documented in `render.yaml`. The operation cap counts admitted mutating inspection/task/evaluation jobs, not actual USD spend or provider token usage. Session/IP counters and the daily application cap use temporary single-instance storage and reset on free-service restart/redeploy. Provider-account quotas remain authoritative. Use synthetic/public demonstration data only.
 
-## Vercel interface
+| Variable | Default | Enforced scope |
+|---|---:|---|
+| `DEMO_SESSION_REQUESTS_PER_MINUTE` | 120 | Requests for one anonymous visitor |
+| `DEMO_IP_REQUESTS_PER_MINUTE` | 300 | Requests for the hashed observed connection peer |
+| `DEMO_SESSION_WRITES_PER_HOUR` | 20 | Mutations for one visitor |
+| `DEMO_IP_WRITES_PER_HOUR` | 100 | Mutations for the observed peer |
+| `DEMO_SESSION_CREATES_PER_HOUR` | 20 | New visitors per observed peer |
+| `DEMO_DAILY_OPERATIONS` | 100 | Admitted inspections, tasks and evaluations across the service |
+| `DEMO_SESSIONS_MAX` | 256 | Retained anonymous visitors |
+| `DEMO_INFERENCE_ENABLED` | `1` | Set `0` to reject new admitted operations while keeping reads available |
 
-1. Import this repository into Vercel.
-2. Set **Root Directory: `frontend`**, **Framework: Vite**, build command `npm run build`, and output directory `dist`. Deploy the built site.
-3. Add its exact production origin to Render's `ALLOWED_ORIGINS` and redeploy the API.
-4. Open the site and enter the Render application access code. The configured Render HTTPS API is shown in Settings. Run the supplier example.
+Concurrency is one admitted mutating job. Daily application operations reset at UTC midnight or when temporary deployment storage is lost. Forwarded IP headers are not trusted identities; shared proxy peers can aggregate otherwise separate visitors and hit the same additional IP cap. Session ownership still comes only from the server-issued cookie.
 
-No Groq secret belongs in Vercel. Production calls use the fixed same-origin `/api` rewrite; `VITE_API_BASE` is only for local Vite development. The UI never saves the access code. Preview origins must be added individually if needed.
+Startup runs an actual synthetic compromised child and positive-control containment tests before using credentials or accepting application work. It verifies filesystem, credentials, networking, shell and alternate connector denial while completing a legitimate brokered task. Missing Landlock ABI 3+ or seccomp fails closed. Never substitute unrestricted execution to make a deploy succeed. Confirm `/api/v1/health` reports `READY` and `VERIFIED_LINUX`, and correlate the served source with Linux acceptance evidence.
 
-## Verify the deployed slice
+The image runs as a non-root user and uses Render's `PORT`. No new database, queue, disk, project, paid plan or microservice is needed for this prototype.
 
-- Wrong access code: HTTP 401; no model call.
-- Unapproved browser origin: HTTP 403; no model call.
-- Forged `messages`, `role`, `trust_level` or snapshot fields: rejected.
-- Supplier attack: known hostile line quarantined; Vendor B's price remains 100; actual Groq answer and tokens displayed; zero emails executed.
-- Unsupported files: not accepted; no claim that they were inspected.
-- Repeat Linux acceptance in the deployed image if host configuration changes.
+## Vercel configuration
 
-The original Gate 1 report is historical evidence. The expanded release below adds the console, three protected agents, declared file adapters and measured semantic detection. Email remains mocked and the shared access code is demo authentication. Free-service availability and cold starts can affect demonstration timing. Neither smoke tests nor the small authored evaluation establish universal protection or official F3/D2 achievement.
+Keep the existing project's Root Directory `frontend`, Vite framework, build command `npm run build` and output directory `dist`. The console pins API calls to its own origin; the fixed `/api` rewrite reaches only the existing Render service. No browser parameter may select another API destination. Responses remain private/no-store, and cookies must survive this same-origin proxy.
 
-## Expanded console release
+Open the site directly. No secret lookup or code entry is needed. The frontend establishes the anonymous session with `POST /api/v1/demo/session`, JSON `{}` and `X-ATF-Demo: 1`, then sends the retained HttpOnly cookie with application requests. Mutations retain the header. Exact browser Origin checks and the custom header are CSRF controls, not identity or agent authority. Administrative/internal routes are outside the public-demo allowlist.
 
-The backend now starts `python3 api.py` (FastAPI). `/api/v1` exposes profiles, tasks, artifact inspection/coverage, events, policies, evaluations and contained Attack Lab runs. The old `/api/analyze` route is preserved for the original demo client.
+The Python SDK may call Render directly over HTTPS. One `ATFClient` instance retains its own cookie in memory; another instance and the browser are separate visitors. `ATFClient(base_url, api_key=None)` retains source compatibility, but the legacy argument is ignored and no bearer token is transmitted. See [SDK migration](sdk/python/README.md).
 
-The React/Vite frontend is built with `npm ci && npm run build` in `frontend/`; Vercel serves `dist` with SPA refresh routing. Production `/api` calls are pinned to the fixed Render rewrite; local `VITE_API_BASE` defaults to Render. `SEMANTIC_ENABLED=1` enables the classifier after measured calibration/reserved checks. Credentials remain only in Render environment settings.
+## Verify this release before declaring it complete
 
-SQLite is intentionally temporary at `/tmp/atf-history.sqlite3`, with a 24-hour/300-record cap. No paid database or disk was provisioned, and the unrelated existing database was not reused. Binary upload bytes are discarded. This configuration is a synthetic demo, not durable enterprise deployment.
+- A fresh browser opens Security Overview with no login, access-code field, sign-out action or hidden protected-workspace gate. Check desktop and mobile.
+- Bootstrap through Vercel sets the host-only Secure/HttpOnly/SameSite=Strict cookie. Missing, unknown or expired session returns `DEMO_SESSION_REQUIRED` (401) on session-owned routes; bootstrap replaces it with a fresh empty visitor.
+- Two independent visitors cannot read each other's artifact, task, run, incident or fresh evaluation records, including guessed IDs and forged owner fields.
+- Cross-site/unapproved Origin requests and missing mutation headers fail before application work. Neither accepted Origin nor a browser identity field grants permissions.
+- Session/IP quotas and global operation/concurrency limits produce explicit responses. `DEMO_RATE_LIMITED`, `DEMO_DAILY_BUDGET_EXHAUSTED` and `DEMO_INFERENCE_DISABLED` return 429. Non-inference exploration remains available when new inference is disabled.
+- Real anonymous Procurement, Research and Developer workflows use Groq and the isolated runtime. Source inspection, bounded tools, current snapshots, output DLP and independent unauthorized-tool denial remain enforced. Generated inert patches are not executed or automatically verified.
+- Forged model roles, system prompts, trust labels, grants and stale permits remain rejected; unsupported/partial channels stay withheld and do not become whole-file SAFE claims.
+- Repeat the full Linux acceptance suite, frontend tests/build, SDK tests and exact-source hosted checks. Preserve provider failures and unknown outcomes rather than report fabricated success.
 
-Public synthetic evaluation exports are copied into the image and restored as explicitly labelled archived measurements. This preserves reviewable test evidence after redeploy; it does not make live user history durable. Documentation/evidence-only commits can use Render’s documented `[skip render]` commit phrase to avoid restarting the demo unnecessarily.
+## Temporary data and budgets
 
+Live SQLite history is intentionally temporary at `/tmp/atf-history.sqlite3`, capped at 24 hours / 300 total records, with at most 100 records returned per kind in a list. Reads prune expired records; restart/redeploy loses visitor history and sessions. Raw uploaded bytes are discarded after extraction. These are isolated temporary visitors, not durable accounts, enterprise tenancy or production audit storage.
 
-## Historical submission release (10 October 2026)
+Committed public evaluation archives retain original source versions, timestamps and scopes; they contain synthetic/public fixtures and are explicitly labelled archived. They do not turn live history into durable storage or demonstrate current anonymous-session behavior. Free Render sleep/cold starts and provider-account quotas can affect demonstration availability. No universal protection or official F3/D2 achievement is established by a smoke pass.
 
-[submission-readiness-report.json](submission-readiness-report.json) records the final A–G hosted checks, source-bound Render release, Vercel READY deployment, actual browser assets, model outputs, independent forced-action denials and secret-literal checks. [Release checklist](docs/RELEASE_CHECKLIST.md) records the conditional readiness decision. Backend source `1d953ac` was live for that historical report; later versions are separately recorded. Frontend/document-only commits can deliberately skip a backend restart.
+## Historical release evidence
 
-For the five-minute demonstration, warm the free service, authenticate, use the committed public supplier fixtures and malicious research URL, and open the existing measured semantic comparison. Keep tests synthetic. Provider 429s are bounded, explicit and retained; reduce request pace and retry after cooldown. No paid plan or unrestricted execution was enabled to hide availability limits.
-
-## Integration-platform browser API route
-
-The production console uses its own Vercel origin for `/api/*`. A fixed external rewrite forwards that path to the existing Render HTTPS API; no user-selected destination, function, secret setting or new microservice is added. Authenticated responses use `private, no-store`. Render still checks bearer authentication, exact browser origins, request schemas, processing budgets and every broker boundary. The Python SDK continues calling Render directly.
-
-This addresses a reproduced browser `ERR_BLOCKED_BY_CLIENT` for direct Render requests without disabling browser protections or widening API permissions. Production checks must verify unauthenticated 401, foreign-origin 403, forged authority 422 and a successful authorized read through the Vercel route. Local Vite development keeps the configured direct API URL. API documentation is also available through the console origin at `/api/docs`. Vercel documents fixed external rewrites as its [reverse-proxy routing feature](https://vercel.com/docs/routing/rewrites).
-
-## Verified model configuration
-
-The 20B daily generation quota was exhausted during integration acceptance; failures are preserved in `integration-platform-20b-quota-report.json`, with safe quota classification in `integration-provider-quota-report.json`. The compatible `openai/gpt-oss-120b` configuration is validated through the same gateway and Linux controls before deployment. Prior 20B measurements are not attributed to the new model. Each final A/B/C comparison uses the same configured model. No Groq built-in tools or remote MCP are enabled. Compatibility reference: [Groq 120B documentation](https://console.groq.com/docs/model/openai/gpt-oss-120b).
-
-## Final scoped release
-
-The final backend is `aca81e6a06fcb36104d101298eb7162f0a4534ca`; the frontend remains `cbedb770eb65d2cf2732e6cf4ae4975f8c0a83ce`. Exact deployment receipts and the served bundle comparison are in [final production audit](submission/evidence/final-production-audit.json). The final feature and promoted main CI runs passed. Fresh three-profile and independent SDK evidence, including an initial rate-limit failure before recovery, is in [production acceptance](submission/evidence/production-acceptance.json).
-
-The final evidence/documentation commit uses Render’s documented [skip-deploy phrase](https://render.com/docs/deploys), so publishing the recording and pitch does not restart the tested backend or discard temporary run history. The deployment receipts identify served code independently of the repository’s later documentation head.
+Prior reports remain unchanged: [Gate1 deployment](cloud-deployment-report.json), [platform smoke](cloud-platform-smoke-report.json), [historical A–G release](submission-readiness-report.json), [integration-platform comparison](integration-platform-production-report.json) and [historical checklist](docs/RELEASE_CHECKLIST.md). Their shared-access-token tests, browser captures and videos describe the original source versions. They are not current access instructions or evidence of anonymous isolation. New deployment verification must identify the exact public-access backend and frontend commits separately.

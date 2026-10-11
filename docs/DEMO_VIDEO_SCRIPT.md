@@ -1,10 +1,10 @@
 # Agent Trust Firewall: three-minute product demonstration
 
-Recording status: **PENDING REAL RECORDING AND PLAYBACK VERIFICATION**. A browser recording route is available for the final production walkthrough. The recording agent will capture the actual application after deployment. This script and shot list are complete preparation, not a substitute video or a claim that an MP4 has already succeeded.
+Recording status: **HISTORICAL SOURCE-BOUND EXPORT**. The captioned 180-second MP4 records frontend `cbedb770` and backend `aca81e6`, with existing SDK run `ea056be9628a677dfaddc91af4d7cbb9`. Its prior shared-code setup is historical; it does not demonstrate the new anonymous access/session isolation. The report records full-file decode verification; final visual QA belongs to that recording report. This reusable shot list must use a fresh browser-owned run when recording the anonymous release.
 
 ## Recording setup
 
-Use the existing product at [agent-trust-firewall.vercel.app](https://agent-trust-firewall.vercel.app). Record a readable desktop viewport, ideally 1920 × 1080, with the application enlarged enough to read the instruction and denial. Authenticate before recording begins. Keep access codes, API keys, settings with secrets, environment files and provider diagnostics out of the recording.
+Use the existing product at [agent-trust-firewall.vercel.app](https://agent-trust-firewall.vercel.app). Record a readable desktop viewport, ideally 1920 × 1080, with the application enlarged enough to read the instruction and denial. Open the console directly without login; it establishes an anonymous session transparently. Keep API keys, session cookies, settings with secrets, environment files and provider diagnostics out of the recording. A separate SDK client owns another session, so it cannot provide a run to this browser by sharing an ID.
 
 Warm the free backend before starting. Complete a fresh verified Procurement run using the public supplier fixtures. Keep its runtime trace selected. Prepare Artifact Inspector with the malicious workbook selected and the hidden-cell instruction visible. Open the denial details and output in nearby tabs or views. Use measured archived runs only when clearly labelled, and disclose their source version. Do not narrate a fresh model request if the screen shows an archive.
 
@@ -30,7 +30,7 @@ The forbidden email example is an **independent forced-compromise probe**, not a
 - Verify duration, playback, audio and the correct product URL. Check the first and last frames.
 - Every model result must come from a real run or a visibly labelled measured archive.
 - Keep the forced-probe distinction visible. Do not imply that detection recall is a containment rate.
-- Remove all secret exposure before sharing. Never display an access code while signing in.
+- Remove all secret exposure before sharing. Never display provider keys or a visitor session cookie.
 - Add the finished MP4 to `submission/video/` and change the recording status only after playback verification.
 
 Suggested file: `submission/video/Agent-Trust-Firewall-demo.mp4`.
