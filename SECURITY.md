@@ -20,7 +20,7 @@ Shared demo authentication is not multi-tenant identity. Anyone with the demo ac
 
 QR decoding, imperfect English pixel OCR, PDF raster/complex-object content, Office embedded objects and dynamic HTML are not comprehensively inspected. Unsupported portions are withheld. Memory and unrestricted connectors remain disabled. No production live email, shell or repository modification capability exists.
 
-The gateway retries HTTP 429/503 once with bounded 250ms backoff. Other outages fail explicitly; no side-effect dispatch is automatically retried. Model requests and classifier calls have fixed budgets. No cost amount is invented; Groq billing remains authoritative.
+The gateway retries HTTP 429/503 or an empty model answer once with bounded 250ms backoff. Repeated empty answers and other outages fail explicitly; no side-effect dispatch is automatically retried. Model requests and classifier calls have fixed budgets. No cost amount is invented; Groq billing remains authoritative.
 
 ## Evidence
 

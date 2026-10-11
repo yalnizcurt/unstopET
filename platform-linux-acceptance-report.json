@@ -1,9 +1,9 @@
 {
   "scope": "Linux agent and parser containment, shared inspection and versioned API integration",
-  "created_at": "2026-10-11T16:53:22.605251+00:00",
+  "created_at": "2026-10-11T17:10:43.567296+00:00",
   "status": "PASS",
-  "tests_run": 120,
-  "passed": 118,
+  "tests_run": 122,
+  "passed": 120,
   "failures": 0,
   "errors": 0,
   "skipped": [
@@ -23,9 +23,9 @@
     "gate1.py": "9ae114ef4c759a9d035f7d588c80fde358f3fad51ee100c7f75e332802d14e98",
     "agent_runtime.py": "bb8c2ceef5cda304d4b09046751ac3fada783acf76ba3f7a4526af8456f6eba7",
     "linux_guard.py": "5a4e93a6f6a601a2be0ecdaf91329722df97c91f1271d3840199dd5fb1fb40a5",
-    "groq_ai.py": "ba3a26bcfaee18266e9899a12c6f71aaccd05c501865a2f40a207377da90f357",
+    "groq_ai.py": "0593faff07646a758ed0e6ea9333937dc5db55cdc74a7ae5fdc72614e613d185",
     "server.py": "5983e46e5eaf03df58dbe8760f82fd9d2886db9668f56a3e7fcd927bf56a94cd",
-    "api.py": "072526fb6c8b2fa46e19d1d3673516fef7bf02cf042ca0d9463d3544f6d96c48",
+    "api.py": "730c290642ad0087280c103feb62d7e3c3c9f675d4036925a90246769f8b46ef",
     "inspection.py": "afdc9a9f74e1b92a272a4dcc232c79b978e80515072706d7069216f0c3ad27c6",
     "extractors.py": "14b25106f81cdf3bc7a5ba01c35108f28de9eedd2a61fccc7b3f015cbaeb9193",
     "parser_worker.py": "1747e471aea7b6592af2e905191b3c148057c4523933b3cff19e383ec896e177",
@@ -135,6 +135,8 @@
     "test_runtime_function_proposals_remain_data_and_use_server_schemas (test_groq.GroqTests.test_runtime_function_proposals_remain_data_and_use_server_schemas) ... ok",
     "test_transport_is_pinned_bounded_and_does_not_send_key_as_content (test_groq.GroqTests.test_transport_is_pinned_bounded_and_does_not_send_key_as_content) ... ok",
     "test_undeclared_parallel_and_forged_provider_proposals_are_rejected (test_groq.GroqTests.test_undeclared_parallel_and_forged_provider_proposals_are_rejected) ... ok",
+    "test_empty_answer_retries_once_and_counts_both_attempts (test_groq.RetryTests.test_empty_answer_retries_once_and_counts_both_attempts) ... ok",
+    "test_repeated_empty_answers_fail_without_releasing_output (test_groq.RetryTests.test_repeated_empty_answers_fail_without_releasing_output) ... ok",
     "test_retry_is_bounded_and_does_not_expose_error_body (test_groq.RetryTests.test_retry_is_bounded_and_does_not_expose_error_body) ... ok",
     "test_isolation_and_credential_free_task (test_linux.LinuxTests.test_isolation_and_credential_free_task) ... ok",
     "test_agent_authority_fields_and_invalid_content_rejected (test_server.APITests.test_agent_authority_fields_and_invalid_content_rejected) ... ok",
@@ -212,7 +214,7 @@
     "test_unknown_not_counted_as_true_negative (test_heldout_evaluation.HeldOutEvaluationTests.test_unknown_not_counted_as_true_negative) ... ok",
     "",
     "----------------------------------------------------------------------",
-    "Ran 120 tests in 5.951s",
+    "Ran 122 tests in 6.296s",
     "",
     "OK (skipped=2)"
   ]

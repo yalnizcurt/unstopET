@@ -9,6 +9,7 @@ from storage import Store
 class RuntimeEventTests(unittest.TestCase):
     def test_failure_keeps_inspection_and_broker_denial(self):
         def provider(messages): raise Denied('PROVIDER_HTTP_429')
+        provider.attempts=2;provider.retries=1;provider.failure_codes=['PROVIDER_HTTP_429','PROVIDER_HTTP_429']
         def runner(firewall,binding,mode,snapshot,*args):
             return dict(completed=firewall.handle(binding,dict(op='model.generate',args=dict(snapshot_id=snapshot)))['ok'])
         store=Store(); app=create_app('timeline-synthetic-access-code',lambda:provider,set(),store,parser=extract,runner=runner,verify=False)
@@ -18,6 +19,7 @@ class RuntimeEventTests(unittest.TestCase):
         identity=response.json()['run_id']; run=client.get('/api/v1/runs/'+identity,headers=auth).json()
         timeline=client.get('/api/v1/runs/'+identity+'/timeline',headers=auth).json()['events']
         self.assertTrue(run['artifacts']); self.assertTrue(run['decisions'])
+        self.assertEqual(run['provider_metrics'],dict(attempts=2,retries=1,failure_codes=['PROVIDER_HTTP_429','PROVIDER_HTTP_429']))
         self.assertTrue(any(e.get('reason_code')=='PROVIDER_HTTP_429' for e in timeline))
         self.assertEqual([e['sequence'] for e in timeline],list(range(1,len(timeline)+1)))
         self.assertTrue(all(e['run_id']==identity for e in timeline))

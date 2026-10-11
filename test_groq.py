@@ -165,6 +165,39 @@ if __name__ == "__main__":
     unittest.main(verbosity=2)
 
 class RetryTests(unittest.TestCase):
+    def test_empty_answer_retries_once_and_counts_both_attempts(self):
+        from unittest.mock import patch
+        provider=GroqProvider('gsk_'+'A'*48)
+        class Response(io.BytesIO):
+            def geturl(self): return ENDPOINT
+        replies=iter([' ', 'Public answer'])
+        def response(request,timeout):
+            return Response(json.dumps(dict(choices=[dict(finish_reason='stop',message=dict(content=next(replies)))],
+                usage=dict(prompt_tokens=10,completion_tokens=2,total_tokens=12))).encode())
+        provider.opener=SimpleNamespace(open=response)
+        with patch('groq_ai.time.sleep'):
+            self.assertEqual(provider([dict(role='system',content='policy'),dict(role='user',content='task')])['text'],'Public answer')
+        self.assertEqual((provider.attempts,provider.retries),(2,1))
+        self.assertEqual(provider.failure_codes,['EMPTY_PROVIDER_OUTPUT'])
+        self.assertEqual(provider.usage,dict(prompt_tokens=20,completion_tokens=4,total_tokens=24))
+
+    def test_repeated_empty_answers_fail_without_releasing_output(self):
+        from unittest.mock import patch
+        provider=GroqProvider('gsk_'+'A'*48)
+        class Response(io.BytesIO):
+            def geturl(self): return ENDPOINT
+        provider.opener=SimpleNamespace(open=lambda *args,**kwargs:Response(json.dumps(dict(
+            choices=[dict(finish_reason='stop',message=dict(content=''))],
+            usage=dict(prompt_tokens=1,completion_tokens=1,total_tokens=2))).encode()))
+        firewall=Firewall(provider=provider);binding=Binding('alice','session','empty-answer')
+        snapshot=firewall.start_task(binding,'Complete public task')
+        with patch('groq_ai.time.sleep'):
+            result=firewall.handle(binding,dict(op='model.generate',args=dict(snapshot_id=snapshot)))
+        self.assertEqual(result['error'],'EMPTY_PROVIDER_OUTPUT')
+        self.assertFalse(firewall.final_outputs)
+        self.assertEqual((provider.attempts,provider.retries),(2,1))
+        self.assertEqual(provider.failure_codes,['EMPTY_PROVIDER_OUTPUT','EMPTY_PROVIDER_OUTPUT'])
+
     def test_retry_is_bounded_and_does_not_expose_error_body(self):
         from unittest.mock import patch
         provider=GroqProvider('gsk_'+'A'*48)

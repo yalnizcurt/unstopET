@@ -51,7 +51,7 @@ class GroqProvider:
             try: return self._complete(messages)
             except Denied as error:
                 self.failure_codes.append(error.code)
-                if retry == 0 and error.code in ('PROVIDER_HTTP_429', 'PROVIDER_HTTP_503') and self.attempts < 12:
+                if retry == 0 and error.code in ('PROVIDER_HTTP_429', 'PROVIDER_HTTP_503', 'EMPTY_PROVIDER_OUTPUT') and self.attempts < 12:
                     self.retries += 1
                     time.sleep(.25)
                     continue
@@ -138,6 +138,7 @@ class GroqProvider:
             else:
                 if choice['finish_reason']!='stop': raise Denied('PROVIDER_COMPLETION_INCOMPLETE')
                 body=text(choice['message']['content'])
+            if not body.strip(): raise Denied('EMPTY_PROVIDER_OUTPUT')
             if body != redact_known_secrets(body):
                 raise Denied("SECRET_DISCLOSURE_DENIED")
             return dict(provider="GROQ", model=self.model, text=body, usage=usage)

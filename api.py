@@ -292,7 +292,7 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
     @app.get('/api/v1/settings')
     def settings(): return dict(provider='Groq',model=os.environ.get('GROQ_MODEL','openai/gpt-oss-20b'),
         semantic_enabled=semantic_enabled,storage='Temporary SQLite; cleared by redeploy / 24-hour retention',
-        provider_retry='One retry with 250ms backoff for HTTP 429/503 only; other failures stay explicit',
+        provider_retry='One retry with 250ms backoff for HTTP 429/503 or empty output; other failures stay explicit',
         authentication='Shared demo access code, single principal',cost='Not calculated; provider billing is authoritative',
         raw_upload_retention='Discarded after extraction',isolated_runtime='Linux Landlock + seccomp')
     @app.get('/api/v1/overview')
@@ -362,7 +362,8 @@ def create_app(access_token, provider_factory, origins, store=None, parser=parse
                 runtime='VERIFIED_LINUX' if verify else 'TEST_FIXTURE',memory='DISABLED')
         finally: work.release()
         record.update(integration_id=trace.integration_id,timeline=trace.events,containment_probe=state.get('containment_probe'),
-            authorized_intent=state.get('authorized_intent'))
+            authorized_intent=state.get('authorized_intent'),
+            provider_metrics=dict(attempts=getattr(provider,'attempts',0),retries=getattr(provider,'retries',0),failure_codes=getattr(provider,'failure_codes',[])))
         saved=store.put('session',record,record_id=identity)
         for event in trace.events: store.put('event',event,record_id=event['event_id'])
         if error_code: return JSONResponse(dict(error=error_code,run_id=identity),422)
