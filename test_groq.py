@@ -98,9 +98,10 @@ class GroqTests(unittest.TestCase):
             provider([dict(role='system',content='server'),dict(role='user',content=json.dumps(dict(model_turn=2,completed_tool_requests=[dict(tool='score_suppliers',decision='ALLOW')])) )])
         self.assertEqual(captured[-1]['tool_choice']['function']['name'],'finish_response')
         provider.runtime_profile='research'
-        with self.assertRaisesRegex(Denied,'UNEXPECTED_PROVIDER_TOOL_PROPOSAL'):
+        with self.assertRaisesRegex(Denied,'PROVIDER_COMPLETION_INCOMPLETE'):
             provider([dict(role='system',content='server'),dict(role='user',content=json.dumps(dict(model_turn=2,completed_tool_requests=[dict(tool='read_released_evidence',decision='ALLOW')])) )])
-        self.assertEqual(captured[-1]['tool_choice']['function']['name'],'finish_response')
+        self.assertEqual(captured[-1]['tool_choice'],'none')
+        self.assertNotIn('tools',captured[-1])
 
     def test_finish_response_is_public_data_not_an_executed_tool(self):
         class Response(io.BytesIO):

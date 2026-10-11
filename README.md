@@ -33,7 +33,7 @@ The production start command is `python3 api.py`. Versioned APIs live under `/ap
 
 ## Verification and limits
 
-The current Linux acceptance report records 108 passing checks and two Mac-only skips; the historical baseline had 82 passing checks. Classifier calibration and reserved-variant reports use actual Groq Prompt Guard scores. The authored 42-attack / six-benign detection matrix exercises seven categories across six document surfaces; it is not an unseen-attack reliability estimate. Final hosted A–G API and browser acceptance is recorded in [submission-readiness-report.json](submission-readiness-report.json); authored small sets are not universal protection or official F3/D2 achievement.
+The current Linux acceptance report records 109 passing checks and two Mac-only skips; the historical baseline had 82 passing checks. Classifier calibration and reserved-variant reports use actual Groq Prompt Guard scores. The authored 42-attack / six-benign detection matrix exercises seven categories across six document surfaces; it is not an unseen-attack reliability estimate. Final hosted A–G API and browser acceptance is recorded in [submission-readiness-report.json](submission-readiness-report.json); authored small sets are not universal protection or official F3/D2 achievement.
 
 Free Render history is temporary SQLite, bounded to 24 hours / 300 total records. Raw binaries are discarded after extraction. Synthetic/public demo inputs only; this is not enterprise tenant authentication or durable production audit storage. Free services can sleep and restart.
 

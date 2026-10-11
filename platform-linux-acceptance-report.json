@@ -1,9 +1,9 @@
 {
   "scope": "Linux agent and parser containment, shared inspection and versioned API integration",
-  "created_at": "2026-10-11T13:03:04.823730+00:00",
+  "created_at": "2026-10-11T13:33:23.820637+00:00",
   "status": "PASS",
-  "tests_run": 110,
-  "passed": 108,
+  "tests_run": 111,
+  "passed": 109,
   "failures": 0,
   "errors": 0,
   "skipped": [
@@ -19,11 +19,11 @@
   "platform": "Linux-7.0.0-38-generic-aarch64-with-glibc2.36",
   "python_version": "3.14.5",
   "source_sha256": {
-    "firewall.py": "c7adffae998200c4f0ced589b6907efb79be5eecd8f565c2ae45c3919e737b18",
+    "firewall.py": "28889f38f33fbdb959a926eb96985fc7acbc98761e65898e7def50c8e3a040ad",
     "gate1.py": "9ae114ef4c759a9d035f7d588c80fde358f3fad51ee100c7f75e332802d14e98",
     "agent_runtime.py": "bb8c2ceef5cda304d4b09046751ac3fada783acf76ba3f7a4526af8456f6eba7",
     "linux_guard.py": "5a4e93a6f6a601a2be0ecdaf91329722df97c91f1271d3840199dd5fb1fb40a5",
-    "groq_ai.py": "2279644880213e62d28d5c98ee7768e141a2244f5fad530e652aca19cfa763e4",
+    "groq_ai.py": "82303d70cc3f1bedd899e860477cd9624043f329b75f98ae797534bdf345af71",
     "server.py": "5983e46e5eaf03df58dbe8760f82fd9d2886db9668f56a3e7fcd927bf56a94cd",
     "api.py": "072526fb6c8b2fa46e19d1d3673516fef7bf02cf042ca0d9463d3544f6d96c48",
     "inspection.py": "afdc9a9f74e1b92a272a4dcc232c79b978e80515072706d7069216f0c3ad27c6",
@@ -185,6 +185,7 @@
     "test_profile_specific_protected_resources_and_inert_patch (test_runtime_steps.MultiStepLinuxTests.test_profile_specific_protected_resources_and_inert_patch) ... ok",
     "test_real_tool_inspect_second_model_and_forced_containment (test_runtime_steps.MultiStepLinuxTests.test_real_tool_inspect_second_model_and_forced_containment) ... ok",
     "test_repeated_tool_proposals_stop_after_three_model_turns (test_runtime_steps.MultiStepLinuxTests.test_repeated_tool_proposals_stop_after_three_model_turns) ... ok",
+    "test_research_completion_instruction_is_server_owned_after_inspected_read (test_runtime_steps.MultiStepLinuxTests.test_research_completion_instruction_is_server_owned_after_inspected_read) ... ok",
     "test_runtime_does_not_extend_an_expired_task_deadline (test_runtime_steps.MultiStepLinuxTests.test_runtime_does_not_extend_an_expired_task_deadline) ... ok",
     "test_tool_result_injection_is_inspected_before_next_model (test_runtime_steps.MultiStepLinuxTests.test_tool_result_injection_is_inspected_before_next_model) ... ok",
     "test_model_budget_and_unknown_tool_cannot_change_policy (test_runtime_steps.RuntimeToolTests.test_model_budget_and_unknown_tool_cannot_change_policy) ... ok",
@@ -202,7 +203,7 @@
     "test_separate_intent_evidence_and_hosted_integration (test_sdk.SDKTests.test_separate_intent_evidence_and_hosted_integration) ... ok",
     "",
     "----------------------------------------------------------------------",
-    "Ran 110 tests in 5.634s",
+    "Ran 111 tests in 5.904s",
     "",
     "OK (skipped=2)"
   ]
