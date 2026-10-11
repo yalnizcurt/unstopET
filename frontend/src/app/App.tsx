@@ -32,6 +32,7 @@ import {
   FileText,
 } from "lucide-react";
 import { routeFromHash } from "../routing";
+import { PublicExhibit } from "../pages/PublicExhibit";
 
 import { API, request } from "./api";
 import { nav, parentRoute } from "./navigation";
@@ -69,6 +70,7 @@ const defaults: Record<string, { intent: string; evidence: string }> = {
   },
 };
 export default function App() {
+  const [showPublicExhibit, setShowPublicExhibit] = useState(false);
   const [token, setToken] = useState(""),
     [draft, setDraft] = useState(""),
     [ready, setReady] = useState(false),
@@ -260,7 +262,9 @@ export default function App() {
   };
   return (
     <div className={light ? "app light" : "app"}>
-      {!ready ? (
+      {showPublicExhibit ? (
+        <PublicExhibit onBack={() => setShowPublicExhibit(false)} />
+      ) : !ready ? (
         <main className="login">
           <div className="login-art">
             <div className="brand-mark">
@@ -332,6 +336,9 @@ export default function App() {
               <LockKeyhole size={14} /> Code stays in this browser session. Groq
               credentials stay on the server.
             </p>
+            <button type="button" className="exhibit-open-link" onClick={() => setShowPublicExhibit(true)}>
+              Explore public product walkthrough <ArrowUpRight size={16} />
+            </button>
             <p className="subtle">
               Synthetic public demo · temporary history · defense-in-depth
               prototype
