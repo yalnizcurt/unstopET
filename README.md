@@ -1,5 +1,7 @@
 # Agent Trust Firewall
 
+The existing console is now public with no login. See the [verified anonymous-access release](docs/PUBLIC_ACCESS_RELEASE.md) for live workflow, visitor-isolation, rate-limit and desktop/mobile evidence.
+
 Runtime security for AI agents: a React/TypeScript security console, shared inspection engine, hosted protected runtime and reusable Python client. Server policy controls authority, evidence release and external effects even when the model follows an adversarial instruction.
 
 - Console: https://agent-trust-firewall.vercel.app

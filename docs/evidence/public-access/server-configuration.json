@@ -1,0 +1,11 @@
+{
+  "created_at": "2026-10-11T22:00:47.643232+00:00",
+  "status": "PASS",
+  "obsolete_application_secret_removed": true,
+  "server_provider_secret_preserved": true,
+  "model_preserved": "openai/gpt-oss-120b",
+  "explicit_public_limits": {
+    "DEMO_DAILY_OPERATIONS": "100",
+    "DEMO_INFERENCE_ENABLED": "1"
+  }
+}

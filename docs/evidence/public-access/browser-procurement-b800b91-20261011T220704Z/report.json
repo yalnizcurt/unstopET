@@ -1,0 +1,188 @@
+{
+  "status": "FAIL",
+  "created_at": "2026-10-11T22:07:04.020551+00:00",
+  "url": "https://agent-trust-firewall.vercel.app",
+  "phase": "procurement",
+  "frontend_commit_verified_by_release_lead": "b800b9146bdb5e4e8b8ec74f202d33ad0d95a12d",
+  "backend_commit_verified_by_release_lead": "b800b9146bdb5e4e8b8ec74f202d33ad0d95a12d",
+  "actual_production": true,
+  "api_response_interception": false,
+  "credentials_read": false,
+  "cookie_imports": false,
+  "new_client_task_attempt_limit": 1,
+  "contexts": [
+    {
+      "viewport": [
+        1440,
+        1000
+      ],
+      "requests": [
+        {
+          "method": "POST",
+          "path": "/api/v1/demo/session",
+          "bearer_present": false,
+          "mutation_marker": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/agents",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/overview",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/artifacts",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/events",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/sessions",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/evaluations",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/policies",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/coverage",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/settings",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/health",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/attacks",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/integrations",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/incidents",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/runs",
+          "bearer_present": false,
+          "mutation_marker": null
+        }
+      ],
+      "responses": [
+        {
+          "path": "/api/v1/demo/session",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/events",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/integrations",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/evaluations",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/agents",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/policies",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/coverage",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/overview",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/settings",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/runs",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/incidents",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/health",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/artifacts",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/attacks",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/sessions",
+          "status": 200
+        }
+      ],
+      "page_errors": [],
+      "overflow_checks": [],
+      "cookie_flags": {
+        "secure": true,
+        "http_only": true,
+        "same_site": "Strict"
+      },
+      "task_attempts": 0,
+      "observed_frontend_assets": [
+        "/assets/index-7FAzgeIz.js"
+      ]
+    }
+  ],
+  "scope": "Actual Chromium browser; mobile uses emulation, not a physical device. Backend isolation and budget audits are separate release-lead checks.",
+  "error": "UNCLASSIFIED_FAILURE"
+}

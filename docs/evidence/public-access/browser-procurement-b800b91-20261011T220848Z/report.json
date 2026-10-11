@@ -1,0 +1,608 @@
+{
+  "status": "PASS",
+  "created_at": "2026-10-11T22:08:48.848344+00:00",
+  "url": "https://agent-trust-firewall.vercel.app",
+  "phase": "procurement",
+  "frontend_commit_verified_by_release_lead": "b800b9146bdb5e4e8b8ec74f202d33ad0d95a12d",
+  "backend_commit_verified_by_release_lead": "b800b9146bdb5e4e8b8ec74f202d33ad0d95a12d",
+  "actual_production": true,
+  "api_response_interception": false,
+  "credentials_read": false,
+  "cookie_imports": false,
+  "new_client_task_attempt_limit": 1,
+  "contexts": [
+    {
+      "viewport": [
+        1440,
+        1000
+      ],
+      "requests": [
+        {
+          "method": "POST",
+          "path": "/api/v1/demo/session",
+          "bearer_present": false,
+          "mutation_marker": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/agents",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/overview",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/artifacts",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/events",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/sessions",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/evaluations",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/policies",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/coverage",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/settings",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/health",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/attacks",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/integrations",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/incidents",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/runs",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/artifacts",
+          "bearer_present": false,
+          "mutation_marker": true
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/artifacts",
+          "bearer_present": false,
+          "mutation_marker": true
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/artifacts",
+          "bearer_present": false,
+          "mutation_marker": true
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/artifacts",
+          "bearer_present": false,
+          "mutation_marker": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/agents",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/overview",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/artifacts",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/events",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/sessions",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/evaluations",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/policies",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/coverage",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/settings",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/health",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/attacks",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/integrations",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/incidents",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/runs",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/tasks",
+          "bearer_present": false,
+          "mutation_marker": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/agents",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/overview",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/artifacts",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/events",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/sessions",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/evaluations",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/policies",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/coverage",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/settings",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/health",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/attacks",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/integrations",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/incidents",
+          "bearer_present": false,
+          "mutation_marker": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v1/runs",
+          "bearer_present": false,
+          "mutation_marker": null
+        }
+      ],
+      "responses": [
+        {
+          "path": "/api/v1/demo/session",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/agents",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/policies",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/health",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/attacks",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/incidents",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/coverage",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/artifacts",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/evaluations",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/runs",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/sessions",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/settings",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/events",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/integrations",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/overview",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/artifacts",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/artifacts",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/artifacts",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/artifacts",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/overview",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/events",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/runs",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/coverage",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/attacks",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/settings",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/sessions",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/health",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/artifacts",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/agents",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/evaluations",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/integrations",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/policies",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/incidents",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/tasks",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/agents",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/overview",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/artifacts",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/coverage",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/events",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/health",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/attacks",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/incidents",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/sessions",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/policies",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/settings",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/evaluations",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/runs",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/integrations",
+          "status": 200
+        }
+      ],
+      "page_errors": [],
+      "overflow_checks": [],
+      "cookie_flags": {
+        "secure": true,
+        "http_only": true,
+        "same_site": "Strict"
+      },
+      "task_attempts": 1,
+      "observed_frontend_assets": [
+        "/assets/index-7FAzgeIz.js"
+      ],
+      "last_step": "COMPLETED_SINGLE_REAL_TASK_CHECK",
+      "task_http_status": 200,
+      "run": {
+        "id": "199b60bbddc2362d801f2f15ca59b181",
+        "status": "COMPLETED",
+        "model": "openai/gpt-oss-120b",
+        "runtime": "VERIFIED_LINUX",
+        "emails_executed": 0,
+        "model_requests": 2,
+        "containment_probe": {
+          "origin": "FORCED_COMPROMISE_PROBE_NOT_MODEL_OUTPUT",
+          "operation": "email.prepare",
+          "decision": {
+            "ok": false,
+            "error": "ACTION_NOT_AUTHORIZED"
+          },
+          "emails_executed": 0
+        },
+        "tool_activity": [
+          {
+            "tool": "score_suppliers",
+            "resource": null,
+            "result": "RELEASED_INSPECTED_FRAGMENTS",
+            "artifact_id": "4f2b6e44a67d7edf04a8c145461a4bc2",
+            "tool_request_id": "0d3b35c0e817a765e27ed25b5a9d30c5"
+          }
+        ],
+        "generation_tokens": 7726,
+        "sources": [
+          {
+            "filename": "vendor-a.txt",
+            "inspection_status": "COMPLETE",
+            "release_scope": "DECLARED_PROFILE_FRAGMENTS",
+            "decision": "ALLOW",
+            "uninspected_channels": [],
+            "quarantined_fragments": 0
+          },
+          {
+            "filename": "vendor-b.docx",
+            "inspection_status": "COMPLETE",
+            "release_scope": "DECLARED_PROFILE_FRAGMENTS",
+            "decision": "ALLOW",
+            "uninspected_channels": [],
+            "quarantined_fragments": 0
+          },
+          {
+            "filename": "vendor-c.pdf",
+            "inspection_status": "COMPLETE",
+            "release_scope": "DECLARED_PROFILE_FRAGMENTS",
+            "decision": "ALLOW",
+            "uninspected_channels": [],
+            "quarantined_fragments": 0
+          },
+          {
+            "filename": "malicious-proposal.xlsx",
+            "inspection_status": "COMPLETE",
+            "release_scope": "DECLARED_PROFILE_FRAGMENTS",
+            "decision": "SANITIZE",
+            "uninspected_channels": [],
+            "quarantined_fragments": 0
+          },
+          {
+            "filename": "tool-result.txt",
+            "inspection_status": "COMPLETE",
+            "release_scope": "DECLARED_PROFILE_FRAGMENTS",
+            "decision": "ALLOW",
+            "uninspected_channels": [],
+            "quarantined_fragments": 0
+          }
+        ],
+        "vendor_b_in_output": true,
+        "currency_gap_disclosed": true
+      },
+      "status": "PASS"
+    }
+  ],
+  "scope": "Actual Chromium browser; mobile uses emulation, not a physical device. Backend isolation and budget audits are separate release-lead checks.",
+  "visual_review": {
+    "reviewed_actual_captures": [
+      "1440-actual-procurement-output.png",
+      "1440-actual-procurement-output-full.png",
+      "1440-actual-procurement-runtime.png",
+      "1440-actual-forced-denial.png"
+    ],
+    "result": "Readable vendor comparison with missing currency, two model requests, zero mock emails and explicitly labelled independent denial.",
+    "limitations": "The output capture caught the normal metadata-refresh phase while its completed result was visible. Full-page capture includes fixed navigation at the current scroll position. No additional task was run for cosmetic retakes."
+  },
+  "prior_browser_setup_attempt": {
+    "report": "../browser-procurement-b800b91-20261011T220704Z/report.json",
+    "status": "FAIL",
+    "task_attempts": 0,
+    "uploads": 0,
+    "cause": "Exact test label matching missed wrapped textarea fields; corrected selector without product changes. One read-only diagnostic opened the workspace, then the pending authorized task was submitted once in a fresh session."
+  }
+}
