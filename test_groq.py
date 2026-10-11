@@ -94,12 +94,17 @@ class GroqTests(unittest.TestCase):
         self.assertTrue(all(t['type']=='function' for t in captured[0]['tools']))
         self.assertFalse(captured[0]['parallel_tool_calls'])
         self.assertEqual([m['role'] for m in captured[0]['messages']],['system','user'])
-        with self.assertRaisesRegex(Denied,'UNEXPECTED_PROVIDER_TOOL_PROPOSAL'):
+        with self.assertRaisesRegex(Denied,'PROVIDER_COMPLETION_INCOMPLETE'):
             provider([dict(role='system',content='server'),dict(role='user',content=json.dumps(dict(model_turn=2,completed_tool_requests=[dict(tool='score_suppliers',decision='ALLOW')])) )])
-        self.assertEqual(captured[-1]['tool_choice']['function']['name'],'finish_response')
+        self.assertEqual(captured[-1]['tool_choice'],'none')
         provider.runtime_profile='research'
         with self.assertRaisesRegex(Denied,'PROVIDER_COMPLETION_INCOMPLETE'):
             provider([dict(role='system',content='server'),dict(role='user',content=json.dumps(dict(model_turn=2,completed_tool_requests=[dict(tool='read_released_evidence',decision='ALLOW')])) )])
+        self.assertEqual(captured[-1]['tool_choice'],'none')
+        self.assertNotIn('tools',captured[-1])
+        provider.runtime_profile='developer'
+        with self.assertRaisesRegex(Denied,'PROVIDER_COMPLETION_INCOMPLETE'):
+            provider([dict(role='system',content='server'),dict(role='user',content=json.dumps(dict(model_turn=3,completed_tool_requests=[])))])
         self.assertEqual(captured[-1]['tool_choice'],'none')
         self.assertNotIn('tools',captured[-1])
 

@@ -78,13 +78,12 @@ class GroqProvider:
             except ValueError: document={}
             if isinstance(document,dict):
                 receipts=document.get('completed_tool_requests',[])
-                if self.runtime_profile=='research' and any(r.get('decision')=='ALLOW' for r in receipts):
-                    # The completed read needs public text, not another function argument envelope.
+                if (document.get('model_turn',1)>=3 or
+                        (self.runtime_profile=='research' and any(r.get('decision')=='ALLOW' for r in receipts)) or
+                        (self.runtime_profile=='procurement' and any(r.get('tool')=='score_suppliers' and r.get('decision')=='ALLOW' for r in receipts))):
+                    # A completed workflow needs public text, not another function argument envelope.
                     del payload['tools'];del payload['parallel_tool_calls']
                     payload['tool_choice']='none'
-                elif document.get('model_turn',1)>=3 or (self.runtime_profile=='procurement' and
-                        any(r.get('tool')=='score_suppliers' and r.get('decision')=='ALLOW' for r in receipts)):
-                    payload['tool_choice']=dict(type='function',function=dict(name='finish_response'))
         if self.model.startswith("openai/gpt-oss-"):
             payload["reasoning_effort"] = "low"
         data = encode(payload)

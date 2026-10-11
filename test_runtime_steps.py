@@ -41,6 +41,15 @@ class RuntimeToolTests(unittest.TestCase):
         self.assertFalse(result['ok']); self.assertEqual(f.policy_version,1)
         for _ in range(3): self.assertTrue(f.handle(b,dict(op='model.generate',args=dict(snapshot_id=snapshot)))['ok'])
         self.assertEqual(f.handle(b,dict(op='model.generate',args=dict(snapshot_id=snapshot)))['error'],'MODEL_BUDGET_EXHAUSTED')
+    def test_final_turn_completion_instruction_is_server_owned_for_every_profile(self):
+        for profile in ('procurement','research','developer'):
+            f=Firewall(tool_catalog=lambda *a:dict(agent_profile_id=profile))
+            b=Binding('alice','session',profile);snapshot=f.start_task(b,'Explain released evidence',user_content=['public'])
+            f.budgets[b]['model_calls']=2
+            messages=f.build_messages(b,snapshot)
+            self.assertEqual([m['role'] for m in messages],['system','user'])
+            self.assertIn('No functions remain available',messages[0]['content'])
+            self.assertIn('cannot execute it',messages[0]['content'])
     def test_source_collection_cannot_be_replayed_and_stale_snapshots_cannot_invoke(self):
         calls=[]
         f=Firewall(collect=lambda *a:calls.append('collected'),tools=lambda *a: {},tool_catalog=lambda *a:dict(agent_profile_id='procurement'))
